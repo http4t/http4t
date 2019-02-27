@@ -49,11 +49,11 @@ export type Header =
     | string ;
 
 
-type Data = string | ArrayBuffer;
+export type Data = string | ArrayBuffer;
 
-type Body = Data | Promise<Data> | AsyncIterator<Data>;
+export type Body = Data | Promise<Data> | AsyncIterator<Data>;
 
-export interface Uri {
+export type Uri = string | {
     scheme?: string;
     authority?: string;
     path: string;
@@ -68,7 +68,7 @@ export interface Message {
 
 export interface Request extends Message {
     readonly method: Method
-    readonly uri: string | Uri,
+    readonly uri: Uri,
     readonly version?: string,
 }
 
