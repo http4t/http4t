@@ -54,11 +54,11 @@ type Data = string | ArrayBuffer;
 type Body = Data | Promise<Data> | AsyncIterator<Data>;
 
 export interface Uri {
-    scheme: string | undefined;
-    authority: string | undefined;
+    scheme?: string;
+    authority?: string;
     path: string;
-    query: string | undefined;
-    fragment: string | undefined;
+    query?: string;
+    fragment?: string;
 }
 
 export interface Message {
