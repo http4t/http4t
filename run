@@ -21,8 +21,8 @@ if [[ ! $(command -v yarn) ]]; then
 fi
 
 yarn install
-#yarn clean
 yarn build
+yarn docs
 #yarn test
 
 function package() {

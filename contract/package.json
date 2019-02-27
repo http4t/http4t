@@ -1,8 +1,10 @@
 {
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "typedoc --out docs src"
   },
   "devDependencies": {
+    "typedoc": "^0.14.2",
     "typescript": "^3.3.3333"
   }
 }
