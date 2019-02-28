@@ -1,4 +1,8 @@
 {
+  "name": "@http4t/contract",
+  "version": "${VERSION}",
+  "repository": "git@github.com:http4t/http4t.git",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
     "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src"

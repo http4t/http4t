@@ -3,4 +3,5 @@
 **/.idea/encodings.xml
 **/node_modules
 **/*.log
-**/docs
+**/out
+**/dist
