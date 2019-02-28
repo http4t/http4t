@@ -108,50 +108,45 @@ export interface ParsedUri {
 export type Uri = string | ParsedUri;
 
 /**
- * MessageFormat contain headers followed by an optional body
+ * HttpMessage contain headers followed by an optional body
  */
-export interface MessageFormat {
+export interface HttpMessage {
     readonly headers: Header[],
     readonly body?: Body
 }
 
 /**
- * Request is made up of a method, uri and optional version followed by the headers and optional body
+ * HttpRequest is made up of a method, uri and optional version followed by the headers and optional body
  */
-export interface Request extends MessageFormat {
+export interface HttpRequest extends HttpMessage {
     readonly method: Method
     readonly uri: Uri,
     /**
-     * Version is not available in all implementations so is optional
+     * httpVersion is not available in all implementations so is optional
      */
-    readonly version?: string,
+    readonly httpVersion?: string,
 }
 
 /**
- * Response is made up of an optional version, status (code) and optional description followed by the headers and optional body
+ * HttpResponse is made up of an optional version, status (code) and optional description followed by the headers and optional body
  */
-export interface Response extends MessageFormat {
+export interface HttpResponse extends HttpMessage {
     /**
-     * Version is not available in all implementations so is optional
+     * httpVersion is not available in all implementations so is optional
      */
-    readonly version?: string,
+    readonly httpVersion?: string,
     readonly status: number,
     /**
-     * Description is not available in all implementations so is optional
+     * statusDescription is not available in all implementations so is optional
      */
     readonly statusDescription?: string,
 }
 
 /**
- * Message can either be a Request or Response
- */
-export type Message = Request | Response;
-
-/**
- * Handler takes a request and returns a Response.
+ * HttpHandler takes a request and returns a Response.
  * Used by clients and servers
  */
-export interface Handler {
-    handle(request: Request): Promise<Response>;
+export interface HttpHandler {
+    handle(request: HttpRequest): Promise<HttpResponse>;
 }
 
