@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "docs": "typedoc --out docs src"
+    "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src"
   },
   "devDependencies": {
     "typedoc": "^0.14.2",

@@ -25,6 +25,9 @@ yarn build
 yarn docs
 #yarn test
 
+dist=dist
+out=out
+
 function package() {
     if [[ ! $(command -v envsubst) ]]; then
         sudo apt-get install gettext
