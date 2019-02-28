@@ -20,13 +20,23 @@ if [[ ! $(command -v yarn) ]]; then
     npm install -g yarn
 fi
 
-yarn install
-yarn build
-yarn docs
-#yarn test
+if [[ -f "package.json" ]]; then
+    yarn install
+    yarn build
+    yarn docs
+    #yarn test
 
-dist=dist
-out=out
+    dist=dist
+    out=out
+else
+    for module in */package.json; do
+        modulePath=`dirname ${module}`
+        cd ${modulePath}
+        ./run $@
+        cd ..
+    done
+fi
+
 
 function package() {
     if [[ ! $(command -v envsubst) ]]; then
