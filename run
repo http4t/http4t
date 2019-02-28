@@ -62,7 +62,7 @@ EOL
 
 function ci() {
     package
-    publish
+#    publish
 }
 
 if [[ -n "$1" ]]; then

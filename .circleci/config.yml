@@ -1,0 +1,22 @@
+version: 2.1
+
+jobs:
+  contract:
+    docker:
+      - image: circleci/node:10
+
+    steps:
+      - checkout
+      - run:
+          name: Build & Deploy
+          command: ./run ci
+          working_directory: contract
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - contract:
+          filters:
+            branches:
+              only: master
