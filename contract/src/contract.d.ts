@@ -72,14 +72,24 @@ export type HeaderName =
 export type HeaderValue = string | Date;
 
 /**
- * Data can either be binary or text
+ * Data can either be text or binary
  */
-export type Data = string | ArrayBuffer;
+export type Data = string | Uint8Array;
 
 /**
- * Body can either be synchronous or asynchronous and of fixed or unknown length.
+ * SyncBody can be fixed or unknown length.
  */
-export type Body = Data | Iterator<Data> | Promise<Data> | AsyncIterator<Data>;
+export type SyncBody = Data | Iterator<Data>;
+
+/**
+ * AsyncBody can be fixed or unknown length.
+ */
+export type AsyncBody = Promise<Data> | AsyncIterator<Data>;
+
+/**
+ * Body can either be synchronous or asynchronous
+ */
+export type Body = SyncBody | AsyncBody;
 
 /**
  * Parsed URI as specified by [RFC 3986](https://tools.ietf.org/html/rfc3986)
