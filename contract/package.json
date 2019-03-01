@@ -1,10 +1,11 @@
 {
   "name": "@http4t/contract",
-  "version": "${VERSION}",
+  "version": "1.0.1",
   "repository": "git@github.com:http4t/http4t.git",
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
+    "test": "./node_modules/.bin/mocha --require ts-node/register \"test/**/*.test.ts\"",
     "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src",
     "madge:circular": "./node_modules/.bin/madge --extensions ts --circular src/"
   },

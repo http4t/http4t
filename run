@@ -24,7 +24,7 @@ if [[ -f "package.json" ]]; then
     yarn install
     yarn build
     yarn docs
-    #yarn test
+    yarn test
 
     dist=dist
     out=out
