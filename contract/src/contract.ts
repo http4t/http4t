@@ -142,14 +142,11 @@ export interface HttpResponse extends HttpMessage {
   readonly statusDescription?: string,
 }
 
-// TODO: Inline me
-export type HandlerFunction = (request: HttpRequest) => Promise<HttpResponse>;
-
 /**
  * HttpHandler takes a request and returns a Response.
  * Used by clients and servers
  */
 export interface HttpHandler {
-  handle: HandlerFunction;
+  handle: (request: HttpRequest) => Promise<HttpResponse>;
 }
 
