@@ -1,11 +1,11 @@
 import {Body, Header, HttpRequest, Method, Uri} from "./";
-import {Uris} from "./uris";
 
 export function request(method: Method, uri: Uri, headers?: Header[], body?: Body): HttpRequest {
   return {
     method,
     uri: uri,
     headers: headers || [],
+    // TODO: is this needed?
     ...body ? {body} : {}
   };
 }
