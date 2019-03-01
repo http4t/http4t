@@ -33,7 +33,7 @@ export async function binary(body: Body | undefined): Promise<Uint8Array> {
 
 }
 
-export async function streamingText(body: Body | undefined): Promise<Uint8Array> {
+export async function streamingText(body: Body | undefined): Promise<string> {
 
 }
 
