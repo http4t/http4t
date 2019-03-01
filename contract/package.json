@@ -10,7 +10,15 @@
   },
   "devDependencies": {
     "typedoc": "^0.14.2",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+
+    "ts-node": "^4.1.0",
+
+    "mocha": "^5.2.0",
+    "@types/mocha": "^5.2.6",
+
+    "chai": "^4.1.7",
+    "@types/chai": "^4.1.7",
 
     "madge": "^3.2.0"
   }
