@@ -1,4 +1,4 @@
-import {Body, Header, HttpRequest, Method, Uri} from "./contract";
+import {Body, Header, HttpRequest, Method, Uri} from "./";
 
 export function request(method: Method, uri: Uri | string, headers?: Header[], body?: Body): HttpRequest {
   return {
