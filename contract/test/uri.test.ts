@@ -46,5 +46,9 @@ describe('Uri', function() {
   it('can extract a Uri from a request ', function () {
     assert.equal(Uri.of(get('/foo')).path, '/foo');
   });
+
+  it('supports toJSON ', function () {
+    assert.equal(Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related').toJSON(), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
+  });
 });
 

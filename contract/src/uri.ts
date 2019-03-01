@@ -1,11 +1,11 @@
 import {HttpRequest, ParsedUri} from "./contract";
 
 export class Uri implements ParsedUri {
-    scheme?: string;
-    authority?: string;
-    path: string;
-    query?: string;
-    fragment?: string;
+    readonly scheme?: string;
+    readonly authority?: string;
+    readonly path: string;
+    readonly query?: string;
+    readonly fragment?: string;
 
     constructor({scheme, authority, path, query, fragment}: ParsedUri) {
         this.scheme = scheme;
