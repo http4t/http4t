@@ -1,6 +1,6 @@
 import {Body, Header, HttpRequest, Method, Uri} from "./";
 
-export function request(method: Method, uri: Uri | string, headers?: Header[], body?: Body): HttpRequest {
+export function request(method: Method, uri: Uri, headers?: Header[], body?: Body): HttpRequest {
   return {
     method,
     uri: uri,

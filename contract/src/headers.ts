@@ -5,8 +5,9 @@ export function header(name: HeaderName, value: HeaderValue): Header {
   return [name, value];
 }
 
-export class Headers {
 
+// TODO: do functions and class
+export class Headers {
   static get(headers:Header[], name: HeaderName): HeaderValue | undefined {
     for (const [n,v] of headers) {
       if(n===name)
@@ -14,6 +15,8 @@ export class Headers {
     }
     return undefined;
   }
+
+  // TODO: Could these be generic
   static replace(name: HeaderName, value: HeaderValue): (m: Header[]) => Header[] {
     return this.modify(name, const_(header(name, value)))
   }
@@ -23,3 +26,6 @@ export class Headers {
       headers.map((h: Header) => (h[0] === name ? fn(h) : h))
   }
 }
+
+header('Content-Type', request)
+request = header(request, 'Content-Type', 'newValue')

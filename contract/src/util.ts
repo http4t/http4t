@@ -1,5 +1,7 @@
+import {Data} from "./contract";
+
 export function modify<T, K extends keyof T>(instance: T, key: K, handler: (value: T[K]) => T[K]): T {
-  return Object.assign({}, instance, {[key]: handler(instance[key])});
+  return {...instance, [key]: handler(instance[key])};
 }
 
 export function replace<T, K extends keyof T>(key: K, value: T[K]): (instance: T) => T {
@@ -10,21 +12,19 @@ export function const_<T>(value: T): () => T {
   return () => value;
 }
 
-const hasUint8Array = typeof Uint8Array === 'function';
-const {toString} = Object.prototype;
-
-// @ts-ignore
-const _identity = (x)=>x;
-
-export function identity<T>() : (instance:T)=>T {
-  return _identity
+export function identity<T>(instance:T): T {
+  return instance;
 }
 
 export function isUint8Array(instance: any): instance is Uint8Array {
-  return hasUint8Array && (instance instanceof Uint8Array || toString.call(instance) === '[object Uint8Array]');
+  return typeof instance == 'object' && instance instanceof Uint8Array;
 }
 
-export function isIterable<T = any>(instance: any): instance is Iterable<T> {
+export function isData(instance: any): instance is Data {
+  return typeof instance == 'string' || isUint8Array(instance);
+}
+
+export function isIterable(instance: any): instance is Iterable<any> {
   return typeof instance == 'object' && Symbol.iterator in instance;
 }
 

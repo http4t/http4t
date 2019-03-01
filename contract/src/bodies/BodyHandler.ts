@@ -1,6 +1,7 @@
-import {Body, Data} from "../contract";
+import {AsyncBody, Body, Data} from "../contract";
 import {isAsyncIterable, isIterable, isPromiseLike, isUint8Array, typeDescription} from "../util";
 
+// TODO: Remove?
 export interface BodyHandler<T> {
   data(body: Data): Promise<T>;
 
@@ -10,7 +11,7 @@ export interface BodyHandler<T> {
 
   asynciterable(body: AsyncIterable<Data>): Promise<T>;
 }
-
+// TODO: Remove?
 export function handleBody<T>(handler: BodyHandler<T>, body: Body): Promise<T> {
   if (isPromiseLike(body))
     return handler.promise(body);
@@ -23,3 +24,5 @@ export function handleBody<T>(handler: BodyHandler<T>, body: Body): Promise<T> {
 
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
+
+
