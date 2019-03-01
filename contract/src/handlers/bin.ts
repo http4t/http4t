@@ -1,9 +1,9 @@
 import {Buffered, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
-import {parsed} from "../uris";
+import {Uri} from "../uri";
 
 export class BinHandler implements HttpHandler {
   async handle(request: HttpRequest): Promise<HttpResponse> {
-    const uri = parsed(request.uri);
+    const uri = Uri.of(request);
     if (request.method === 'GET')
       if (uri.path === '/stream-bytes') {
         return this.streamBytes(Number.parseInt(uri.query || "0"));

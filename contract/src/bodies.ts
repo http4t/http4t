@@ -24,8 +24,7 @@ export async function bufferText(body: Body | undefined): Promise<string> {
         return string(body);
     }
     if (isIterable(body)) {
-        let from = Array.from(body);
-        return from.map(string).join("")
+        return Array.from(body).map(string).join("")
     }
     throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }

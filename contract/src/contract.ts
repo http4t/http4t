@@ -92,7 +92,7 @@ export type AsyncBody = Promise<Data> | AsyncIterable<Data>;
 export type Body = SyncBody | AsyncBody;
 
 /**
- * Parsed URI as specified by [RFC 3986](https://tools.ietf.org/html/rfc3986)
+ * ParsedUri as specified by [RFC 3986](https://tools.ietf.org/html/rfc3986)
  */
 export interface ParsedUri {
   readonly scheme?: string;
@@ -103,9 +103,9 @@ export interface ParsedUri {
 }
 
 /**
- * Uri is either parsed or unparsed
+ * UriLike is either a unparsed or parsed
  */
-export type Uri = string | ParsedUri;
+export type UriLike = string | ParsedUri;
 
 /**
  * HttpMessage contain headers followed by an optional body
@@ -120,7 +120,7 @@ export interface HttpMessage {
  */
 export interface HttpRequest extends HttpMessage {
   readonly method: Method
-  readonly uri: Uri,
+  readonly uri: UriLike,
   /**
    * httpVersion is not available in all implementations so is optional
    */
@@ -147,6 +147,6 @@ export interface HttpResponse extends HttpMessage {
  * Used by clients and servers
  */
 export interface HttpHandler {
-  handle: (request: HttpRequest) => Promise<HttpResponse>;
+  handle(request: HttpRequest): Promise<HttpResponse>;
 }
 

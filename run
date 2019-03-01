@@ -23,15 +23,15 @@ fi
 if [[ -f "package.json" ]]; then
     yarn install
     yarn build
-    yarn docs
     yarn test
+    yarn docs
 
     dist=dist
     out=out
 else
     for module in */package.json; do
         modulePath=`dirname ${module}`
-        cd ${modulePath}
+        pushd ${modulePath}
         ./run $@
         cd ..
     done

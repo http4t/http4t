@@ -1,10 +1,16 @@
 import {assert} from 'chai';
-import {parse, parsed, string} from "../src/uris";
+import {Uri} from "../src/uri";
+import {get} from "../src";
 
-describe('parse()', function() {
+describe('Uri', function() {
   describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function() {
+    it('when converting to JSON return the string', function() {
+      const uri = Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related');
+      assert.equal(JSON.stringify(uri), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
+    });
+
     it('can parse example from #appendix-B', function() {
-      const uri = parse('http://www.ics.uci.edu/pub/ietf/uri/#Related');
+      const uri = Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related');
       assert.equal(uri.scheme, 'http');
       assert.equal(uri.authority, 'www.ics.uci.edu');
       assert.equal(uri.path, '/pub/ietf/uri/');
@@ -13,7 +19,7 @@ describe('parse()', function() {
     });
 
     it('can parse query string', function() {
-      const uri = parse('?foo=bar');
+      const uri = Uri.parse('?foo=bar');
       assert.equal(uri.scheme, undefined);
       assert.equal(uri.authority, undefined);
       assert.equal(uri.path, '');
@@ -22,7 +28,7 @@ describe('parse()', function() {
     });
 
     function assertComponentRecomposition(original:string) {
-      assert.equal(string(parse(original)), original);
+      assert.equal(Uri.parse(original).toString(), original);
     }
 
     it('supports toString() using Component Recomposition from #section-5.3', function() {
@@ -36,20 +42,9 @@ describe('parse()', function() {
       assertComponentRecomposition('?foo'); // Just a query string
     });
   });
+
+  it('can extract a Uri from a request ', function () {
+    assert.equal(Uri.of(get('/foo')).path, '/foo');
+  });
 });
 
-describe('parsed()', function() {
-  it('parses strings',()=>{
-    const uri = parsed('/test');
-    assert.equal(uri.scheme, undefined);
-    assert.equal(uri.authority, undefined);
-    assert.equal(uri.path, '/test');
-    assert.equal(uri.query, undefined);
-    assert.equal(uri.fragment, undefined);
-  });
-  it('passes through objects',()=>{
-    const uri = parse('/test');
-    const actual = parsed(uri);
-    assert.equal(actual, uri);
-  })
-});
