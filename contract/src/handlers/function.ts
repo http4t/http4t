@@ -1,5 +1,5 @@
-import {HandlerFunction, HttpHandler} from "../contract";
+import {HttpHandler, HttpRequest, HttpResponse} from "../contract";
 
-export function handler(handle: HandlerFunction): HttpHandler {
+export function handler(handle: (request:HttpRequest)=>Promise<HttpResponse>): HttpHandler {
   return {handle}
 }
