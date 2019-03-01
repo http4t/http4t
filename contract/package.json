@@ -5,10 +5,13 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
-    "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src"
+    "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src",
+    "madge:circular": "./node_modules/.bin/madge --extensions ts --circular src/"
   },
   "devDependencies": {
     "typedoc": "^0.14.2",
     "typescript": "^3.3.3333"
+
+    "madge": "^3.2.0"
   }
 }
