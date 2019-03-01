@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {TextEncoder} from "util";
-import {Bodies, BodyHandler, handleBody} from "../src";
+import {Bodies, BodyHandler, Data, handleBody} from "../src";
 
 describe('handleBody()', () => {
   const handler: BodyHandler<string> = {
@@ -16,11 +16,13 @@ describe('handleBody()', () => {
   });
 
   it('handles Uint8Array', async () => {
-    expect(await handleBody(handler, new Uint8Array(2))).eq('data');
+    const body = new Uint8Array(2);
+    expect(await handleBody(handler, body)).eq('data');
   });
 
   it('handles iterables', async () => {
-    expect(await handleBody(handler, [])).eq('iterable');
+    const body : Iterable<Data> = [];
+    expect(await handleBody(handler, body)).eq('iterable');
   });
 
   it('handles async iterables', async () => {
@@ -41,12 +43,13 @@ describe('Bodies.text()', () => {
   });
 
   it('handles Uint8Array', async () => {
-    const data = new TextEncoder().encode('data');
-    expect(await Bodies.text(data)).eq('data');
+    const body = new TextEncoder().encode('data');
+    expect(await Bodies.text(body)).eq('data');
   });
 
   it('handles iterables', async () => {
-    expect(await Bodies.text( ["chunk1","chunk2"])).eq('chunk1chunk2');
+    const body = ["chunk1","chunk2"];
+    expect(await Bodies.text( body)).eq('chunk1chunk2');
   });
 
   it('handles async iterables', async () => {
