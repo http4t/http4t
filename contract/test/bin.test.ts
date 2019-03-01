@@ -1,5 +1,5 @@
 import {handlerContract} from "./handler.contract";
-import {BinHandler} from "../src/handlers";
+import {BinHandler} from "../src";
 
 describe("HttpBinHandler", function () {
   handlerContract(async () => {

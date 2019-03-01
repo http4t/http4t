@@ -11,7 +11,7 @@ export interface BodyHandler<T> {
   asynciterable(body: AsyncIterable<Data>): Promise<T>;
 }
 
-export function handle<T>(handler: BodyHandler<T>, body: Body): Promise<T> {
+export function handleBody<T>(handler: BodyHandler<T>, body: Body): Promise<T> {
   if (isPromiseLike(body))
     return handler.promise(body);
   if (typeof body === 'string' || isUint8Array(body))

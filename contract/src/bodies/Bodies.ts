@@ -1,5 +1,5 @@
 import {Body} from "../contract";
-import {handle} from "./BodyHandler";
+import {handleBody} from "./BodyHandler";
 import {textHandler} from "./text";
 
 export class Bodies {
@@ -10,6 +10,6 @@ export class Bodies {
   }
 
   static maybeText(body: Body): Promise<string | undefined> {
-    return handle(textHandler, body);
+    return handleBody(textHandler, body);
   }
 }

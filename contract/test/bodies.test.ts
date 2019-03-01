@@ -1,8 +1,8 @@
 import {expect} from "chai";
 import {TextEncoder} from "util";
-import {Bodies, BodyHandler, handle} from "../src/bodies";
+import {Bodies, BodyHandler, handleBody} from "../src";
 
-describe('handle()', () => {
+describe('handleBody()', () => {
   const handler: BodyHandler<string> = {
     data: async (b) => 'data',
     promise: async (b) => 'promise',
@@ -12,15 +12,15 @@ describe('handle()', () => {
 
   it('handles strings', async () => {
     const body = "a string";
-    expect(await handle(handler, body)).eq("data");
+    expect(await handleBody(handler, body)).eq("data");
   });
 
   it('handles Uint8Array', async () => {
-    expect(await handle(handler, new Uint8Array(2))).eq('data');
+    expect(await handleBody(handler, new Uint8Array(2))).eq('data');
   });
 
   it('handles iterables', async () => {
-    expect(await handle(handler, [])).eq('iterable');
+    expect(await handleBody(handler, [])).eq('iterable');
   });
 
   it('handles async iterables', async () => {
@@ -30,7 +30,7 @@ describe('handle()', () => {
         yield "chunk"
       }
     };
-    expect(await handle(handler, body)).eq('async iterable');
+    expect(await handleBody(handler, body)).eq('async iterable');
   });
 });
 
