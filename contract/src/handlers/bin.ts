@@ -1,55 +1,43 @@
-import {
-  delete_,
-  get,
-  HandlerFunction,
-  HttpHandler,
-  HttpRequest,
-  HttpResponse,
-  notFound,
-  ok,
-  patch,
-  post,
-  put
-} from "../";
-import {const_} from "../util";
-import {echoMessage} from "./echo";
-import {handler} from "./function";
-
-export function isPartial<T>(instance: T, partial: Partial<T>): boolean {
-  return Object.keys(partial).every(function (k) {
-    let key = k as keyof T;
-    let actual: any = instance[key];
-    let expected: any = partial[key];
-
-    if (actual instanceof Object && expected instanceof Object) {
-      return isPartial(actual, expected);
-    }
-    return partial[key] === actual;
-  });
-}
-
-export function routing(routes: [Partial<HttpRequest>, HttpHandler][]): HttpHandler {
-  return {
-    handle: async (request: HttpRequest): Promise<HttpResponse> => {
-      const match: [Partial<HttpRequest>, HttpHandler] | undefined
-        = routes.find((route) => isPartial(request, route[0]));
-
-      return match ? match[1].handle(request) : notFound();
-    }
-  }
-}
+import {Buffered, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
+import {parsed} from "../uris";
 
 export class BinHandler implements HttpHandler {
-  private readonly routing = routing([
-    [get('/get'), handler(const_(Promise.resolve(ok())))],
-    [post('/post'), echoMessage],
-    [put('/put'), echoMessage],
-    [patch('/patch'), echoMessage],
-    [delete_('/delete'), echoMessage],
-  ]);
-
   async handle(request: HttpRequest): Promise<HttpResponse> {
-    return this.routing.handle(request);
+    const uri = parsed(request.uri);
+    if (request.method === 'GET')
+      if (uri.path === '/stream-bytes') {
+        return this.streamBytes(Number.parseInt(uri.query || "0"));
+      }
+      else
+        return ok();
+    if (request.method === 'POST') return this.echo(request);
+    if (request.method === 'PUT') return this.echo(request);
+    if (request.method === 'PATCH') return this.echo(request);
+    if (request.method === 'DELETE') return this.echo(request);
+
+    return notFound();
+  }
+
+  async echo({uri, headers, body}: HttpRequest): Promise<HttpResponse> {
+    const data = await (body ? Buffered.text(body) : undefined);
+
+    return ok([], JSON.stringify({uri, data, headers}));
+  }
+
+  streamBytes(size: number): HttpResponse {
+    async function* iterable() {
+      yield randomBytes(size);
+    }
+
+    return ok([], iterable());
   }
 }
 
+function randomBytes(length: number) {
+  const buffer = new Array<number>(Math.round(length / 4) + 1);
+  for (let i = 0; i < buffer.length; i++) {
+    buffer[i] = Math.random();
+  }
+
+  return new Uint8Array(Float32Array.from(buffer).buffer).slice(0, length);
+}

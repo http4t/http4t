@@ -1,6 +1,5 @@
 import {assert} from 'chai';
-import {delete_, get, HostHandler, HttpHandler, patch, post, put} from "../src";
-import {Bodies} from "../src/bodies";
+import {Buffered,delete_, get, HostHandler, HttpHandler, patch, post, put} from "../src";
 import {Headers} from "../src/headers";
 
 export function handlerContract(factory: () => Promise<HttpHandler>, host = Promise.resolve("eu.httpbin.org")) {
@@ -23,7 +22,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(post('/post', [['Content-Length', String(body.length)]], body));
     assert.equal(response.status, 200);
 
-    const text = await Bodies.text(response.body);
+    const text = await Buffered.text(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -32,7 +31,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(put('/put', [['Content-Length', String(body.length)]], body));
     assert.equal(response.status, 200);
 
-    const text = await Bodies.text(response.body);
+    const text = await Buffered.text(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -41,7 +40,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(patch('/patch', [['Content-Length', String(body.length)]], body));
     assert.equal(response.status, 200);
 
-    const text = await Bodies.text(response.body);
+    const text = await Buffered.text(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -49,16 +48,17 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(delete_('/delete', [['Accept', "application/json"]]));
     assert.equal(response.status, 200);
 
-    const json = JSON.parse(await Bodies.text(response.body));
+    const json = JSON.parse(await Buffered.text(response.body));
     assert.equal(Headers.get(json.headers,'Accept'), "application/json");
   });
 
-  xit("supports chunked encoding", async function () {
-    const response = await this.handler.handle(get('/stream-bytes/10'));
+  it("supports chunked binary", async function () {
+    const response = await this.handler.handle(get('/stream-bytes?10'));
     assert.equal(response.status, 200);
 
     for await (const chunk of response.body) {
-      assert.equal(chunk.data().byteLength, 10);
+      assert.instanceOf(chunk, Uint8Array);
+      assert.equal(chunk.length, 10);
     }
   });
 }
