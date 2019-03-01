@@ -34,7 +34,7 @@ describe('handleBody()', () => {
   });
 });
 
-describe('text()', () => {
+describe('Bodies.text()', () => {
   it('handles strings', async () => {
     const body = "a string";
     expect(await Bodies.text(body)).eq("a string");
