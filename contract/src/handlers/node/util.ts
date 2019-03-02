@@ -34,7 +34,7 @@ export async function sendBodyToStream(body: Body | undefined, writable: stream.
 
   try {
     for  await (const chunk of  streamBinary(body)) {
-      writable.write(chunk);
+      writable.write(new Buffer(chunk));
     }
     writable.end();
   } catch (e) {

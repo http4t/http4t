@@ -1,7 +1,5 @@
 import * as node from 'http';
 import {
-  Body,
-  Header,
   HttpHandler,
   HttpRequest,
   HttpResponse,

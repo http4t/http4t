@@ -1,11 +1,16 @@
 import {Header, HeaderName, HeaderValue} from "./contract";
+import {typeDescription} from "./util";
 
 
 // TODO: clean up this gross namespace
 
 export function getHeaderValue(headers: Header[], name: HeaderName): HeaderValue | undefined {
+  if(!headers)
+    return undefined;
+
+  const lowerCaseName = name.toLowerCase();
   for (const [n, v] of headers) {
-    if (n === name)
+    if (n.toLowerCase() === lowerCaseName)
       return v;
   }
   return undefined;

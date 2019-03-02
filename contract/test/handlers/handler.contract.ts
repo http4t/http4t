@@ -48,11 +48,11 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     assert.equal(response.status, 200);
 
     const json = JSON.parse(await Buffered.text(response.body));
-    assert.equal(getHeaderValue(json.headers,'Accept'), "application/json");
+    assert.equal(json.headers['Accept'], "application/json");
   });
 
   it("supports chunked binary", async function () {
-    const response = await this.handler.handle(get('/stream-bytes?10'));
+    const response = await this.handler.handle(get('/stream-bytes/10'));
     assert.equal(response.status, 200);
 
     for await (const chunk of response.body) {

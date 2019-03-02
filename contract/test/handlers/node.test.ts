@@ -4,7 +4,7 @@ import {runningInNode} from "../../src/util";
 import {handlerContract} from "./handler.contract";
 import {BinHandler} from "../../src/handlers";
 
-xdescribe("ClientHandler", function () {
+describe("ClientHandler", function () {
     handlerContract(async () => {
         if (!runningInNode()) throw new Error("Unsupported");
 
@@ -13,7 +13,7 @@ xdescribe("ClientHandler", function () {
     });
 });
 
-xdescribe("ServerHandler", function () {
+describe("ServerHandler", function () {
     const server = new Promise<Server>(async (resolve, reject) => {
         try {
             const {ServerHandler} = await import('../../src/handlers/node/server');
