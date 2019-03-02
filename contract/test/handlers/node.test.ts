@@ -20,6 +20,8 @@ describe("ClientHandler", function () {
 
 describe("ServerHandler", function () {
   let server = new Promise<Server>(async (resolve, reject) => {
+    if(!runningInNode())
+      resolve(null as any);
     try {
       const {ServerHandler} = await import('../../src/handlers/node/server');
       resolve(new ServerHandler(new BinHandler()));
@@ -46,7 +48,7 @@ describe("ServerHandler", function () {
 
     const {ClientHandler} = await import('../../src/handlers/node/client');
     return new ClientHandler();
-  }, host());
+  }, runningInNode() ? host(): null as any);
 
   after(async function () {
     try {
