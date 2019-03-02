@@ -1,29 +1,16 @@
 import {assert} from 'chai';
-import {BinHandler} from "../../src/handlers";
+import {BinHandler} from "../../../src/";
 
-import {Server} from "../../src/server";
-import {handlerContract} from "./handler.contract";
-
-
-export function runningInNode() {
-  return (typeof process !== 'undefined') && (typeof process.versions.node !== 'undefined');
-}
-
-describe("ClientHandler", function () {
-  handlerContract(async () => {
-    if (!runningInNode()) throw new Error("Unsupported");
-
-    const {ClientHandler} = await import('../../src/handlers/node/client');
-    return new ClientHandler();
-  });
-});
+import {Server} from "../../../src/server";
+import {handlerContract} from "../handler.contract";
+import {runningInNode} from "./client.test";
 
 describe("ServerHandler", function () {
   let server = new Promise<Server>(async (resolve, reject) => {
     if(!runningInNode())
       resolve(null as any);
     try {
-      const {ServerHandler} = await import('../../src/handlers/node/server');
+      const {ServerHandler} = await import('../../../src');
       resolve(new ServerHandler(new BinHandler()));
     } catch (e) {
       reject(e);
@@ -46,7 +33,7 @@ describe("ServerHandler", function () {
   handlerContract(async () => {
     if (!runningInNode()) throw new Error("Unsupported");
 
-    const {ClientHandler} = await import('../../src/handlers/node/client');
+    const {ClientHandler} = await import('../../../src');
     return new ClientHandler();
   }, runningInNode() ? host(): null as any);
 

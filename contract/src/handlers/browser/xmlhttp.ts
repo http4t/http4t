@@ -1,8 +1,8 @@
-import {bufferText, typeDescription} from "../bodies";
-import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../contract";
-import {host} from "../requests";
-import {response} from "../responses";
-import {Uri} from "../uri";
+import {bufferText, typeDescription} from "../../bodies";
+import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../../contract";
+import {host} from "../../requests";
+import {response} from "../../responses";
+import {Uri} from "../../uri";
 
 
 async function sendBodyToRequest(body: Body | undefined, request: XMLHttpRequest) {
