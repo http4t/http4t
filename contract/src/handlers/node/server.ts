@@ -8,7 +8,7 @@ import {
   Uri
 } from "../../";
 import {Server} from "../../server";
-import {fromRawHeaders} from "./util";
+import {fromRawHeaders} from "./client";
 
 export const adapter = (handler: HttpHandler) => (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
   const req = request(

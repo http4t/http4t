@@ -1,7 +1,12 @@
 import * as node from 'http';
 
 import {Header, host, HttpHandler, HttpRequest, HttpResponse, messageBody, sendBodyToStream} from '../../';
-import {fromRawHeaders} from './util';
+
+export function fromRawHeaders(rawHeaders: string[]): Header[] {
+  if (rawHeaders.length == 0) return [];
+  const [name, value, ...remainder] = rawHeaders;
+  return [[name, value], ...fromRawHeaders(remainder)];
+}
 
 function toOutgoingHeaders(headers: Header[]): node.OutgoingHttpHeaders {
   return headers.reduce((acc: node.OutgoingHttpHeaders, h: Header) => {
@@ -29,6 +34,7 @@ function toNodeOpts(request: HttpRequest): node.RequestOptions {
     headers: toOutgoingHeaders(request.headers)
   };
 }
+
 
 export class ClientHandler implements HttpHandler {
   async handle(request: HttpRequest): Promise<HttpResponse> {
