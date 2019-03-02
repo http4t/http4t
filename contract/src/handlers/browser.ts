@@ -60,7 +60,7 @@ export class XmlHttpHandler implements HttpHandler {
         this.handler.addEventListener("load", () => {
           resolve(response(
             this.handler.status,
-            this.handler.response,
+            new Uint8Array(this.handler.response),
             ...this.getHeaders()));
         });
 
