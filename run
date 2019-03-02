@@ -24,7 +24,7 @@ if [[ -f "package.json" ]]; then
     yarn install
     yarn build
     yarn test
-    #yarn test-browser
+    yarn test-browser
     yarn docs
     yarn madge:circular
 
