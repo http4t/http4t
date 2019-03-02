@@ -32,6 +32,7 @@ if [[ -f "package.json" ]]; then
 else
     for module in */package.json; do
         modulePath=`dirname ${module}`
+        echo "Running for module ${modulePath}"
         pushd ${modulePath}
         ./run $@
         cd ..
@@ -59,6 +60,22 @@ EOL
     pushd ${dist}
     npm publish --tag ${TAG} --access public
     popd
+}
+
+function publishDocs() {
+    TMP=/tmp/http4t.github.io/
+    rm -rf ${TMP}
+    git clone https://${GH_TOKEN}@github.com/http4t/http4t.github.io.git ${TMP}
+    moduleName=${PWD##*/}
+    if [[ ${moduleName} == "http4t" ]]; then
+        echo "ignored"
+    elif [[ ${moduleName} == "site" ]]; then
+        cp -R dist/docs/ ${TMP}
+    else
+        mkdir -p ${TMP}/api
+        cp -R dist/docs ${TMP}/api/${moduleName}
+    fi
+    #push docs back to git here.
 }
 
 function ci() {

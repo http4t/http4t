@@ -1,3 +1,4 @@
 site_name: http4t
+site_dir: 'dist/docs'
 nav:
   - Home: index.md
