@@ -1,5 +1,9 @@
 import {ParsedUri} from "./contract";
-import {UriLike} from "./requests";
+
+/**
+ * UriLike is either a unparsed or parsed
+ */
+export type UriLike = string | ParsedUri;
 
 export class Uri implements ParsedUri {
     readonly scheme?: string;
