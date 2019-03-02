@@ -26,7 +26,6 @@ if [[ -f "package.json" ]]; then
     yarn test
     #yarn test-browser
     yarn docs
-    yarn madge:circular
 
     dist=dist
     out=out
