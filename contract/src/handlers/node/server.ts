@@ -5,10 +5,10 @@ import {
   HttpResponse,
   ParsedUri,
   request,
-  sendBodyToStream, Uri
+  Uri
 } from "../../";
 import {Server} from "../../server";
-import {fromRawHeaders, messageBody} from "./util";
+import {fromRawHeaders, messageBody, sendBodyToStream} from "./util";
 
 export const adapter = (handler: HttpHandler) => (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
   const req = request(

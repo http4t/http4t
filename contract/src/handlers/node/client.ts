@@ -21,7 +21,7 @@ function toOutgoingHeaders(headers: Header[]): node.OutgoingHttpHeaders {
 }
 
 // TODO: figure out why IDE is complaining when I make request a node.Request
-export function host(request: any): string {
+function host(request: any): string {
   if (typeof request.uri.authority != 'undefined')
     return request.uri.authority;
 
