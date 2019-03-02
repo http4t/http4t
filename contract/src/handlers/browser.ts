@@ -1,45 +1,15 @@
-import {streamBinary} from "../bodies";
+import {bufferText} from "../bodies";
 import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../contract";
 import {host} from "../requests";
 import {response} from "../responses";
 import {Uri} from "../uri";
 
-function readableStream(body: Body): ReadableStream<Uint8Array> {
-  return new ReadableStream<Uint8Array>({
-    start: async controller => {
-      try {
-        for await(const chunk of streamBinary(body)) {
-          controller.enqueue(chunk);
-        }
-      } catch (e) {
-        controller.error(e);
-      }
-      controller.close();
-    }
-  });
-}
-
-function fromReadableStream(stream:ReadableStream<Uint8Array>|undefined): AsyncIterable<Uint8Array> | string {
-  if(!stream)
-    return "";
-
-  return {
-    [Symbol.asyncIterator]: async function* () {
-      const reader = stream.getReader();
-      while(true){
-        const { done, value } = await reader.read();
-        if(done) return;
-        yield value;
-      }
-    }
-  };
-}
 
 async function sendBodyToRequest(body: Body | undefined, request: XMLHttpRequest) {
   if (!body)
     return request.send();
 
-  request.send(readableStream(body));
+  request.send(await bufferText(body));
 }
 
 export class XmlHttpHandler implements HttpHandler {
