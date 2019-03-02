@@ -1,10 +1,16 @@
 import {Header, HeaderName, HeaderValue} from "./contract";
 import {const_} from "./util";
 
-export function header(name: HeaderName, value: HeaderValue): Header {
-  return [name, value];
-}
+export type HeaderValueLike = string | number | Date;
 
+/**
+ * header creates a header from a name and value
+ * Dates will be formatted into the correct format as defined by [RFC 5322](https://tools.ietf.org/html/rfc5322)
+ */
+export function header(name: HeaderName, value: HeaderValueLike): Header {
+  // TODO Date formatting
+  return [name, String(value)];
+}
 
 // TODO: do functions and class
 export class Headers {
@@ -27,5 +33,3 @@ export class Headers {
   }
 }
 
-// header('Content-Type', request)
-// request = header(request, 'Content-Type', 'newValue')

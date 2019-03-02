@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 import {Buffer,delete_, get, HostHandler, HttpHandler, patch, post, put} from "../src";
-import {Headers} from "../src/headers";
+import {header, Headers} from "../src/headers";
 
 export function handlerContract(factory: () => Promise<HttpHandler>, host = Promise.resolve("eu.httpbin.org")) {
   before(async function () {
@@ -19,7 +19,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
 
   it("supports POST", async function () {
     const body = "Hello";
-    const response = await this.handler.handle(post('/post', body, ['Content-Length', String(body.length)]));
+    const response = await this.handler.handle(post('/post', body, header('Content-Length', body.length)));
     assert.equal(response.status, 200);
 
     const text = await Buffer.text(response.body);
@@ -28,7 +28,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
 
   it("supports PUT", async function () {
     const body = "Hello";
-    const response = await this.handler.handle(put('/put', body, ['Content-Length', String(body.length)]));
+    const response = await this.handler.handle(put('/put', body, header('Content-Length', body.length)));
     assert.equal(response.status, 200);
 
     const text = await Buffer.text(response.body);
@@ -37,7 +37,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
 
   it("supports PATCH", async function () {
     const body = "Hello";
-    const response = await this.handler.handle(patch('/patch', body, ['Content-Length', String(body.length)]));
+    const response = await this.handler.handle(patch('/patch', body, header('Content-Length', body.length)));
     assert.equal(response.status, 200);
 
     const text = await Buffer.text(response.body);
@@ -45,7 +45,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
   });
 
   it("supports DELETE", async function () {
-    const response = await this.handler.handle(delete_('/delete', ['Accept', "application/json"]));
+    const response = await this.handler.handle(delete_('/delete', header('Accept', "application/json")));
     assert.equal(response.status, 200);
 
     const json = JSON.parse(await Buffer.text(response.body));

@@ -66,10 +66,9 @@ export type HeaderName =
   | string ;
 
 /**
- * Header value is either a string or a Date.
- * Dates will be formatted into the correct format as defined by [RFC 5322](https://tools.ietf.org/html/rfc5322)
+ * Header value is a string.
  */
-export type HeaderValue = string | Date;
+export type HeaderValue = string;
 
 /**
  * Data can either be text or binary
