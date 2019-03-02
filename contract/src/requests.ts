@@ -10,6 +10,10 @@ export function request(method: Method, uri: UriLike, body?: Body, ...headers: H
   };
 }
 
+export function modifyRequest(request: HttpRequest, modifications: Partial<HttpRequest>): HttpRequest {
+  return Object.assign({}, request, modifications);
+}
+
 export function get(uri: UriLike, ...headers: Header[]): HttpRequest {
   return request("GET", uri, undefined, ...headers);
 }
@@ -31,5 +35,5 @@ export function delete_(uri: UriLike | string, ...headers: Header[]): HttpReques
 }
 
 export function setHeader(req: HttpRequest, name: HeaderName, value: HeaderValue): HttpRequest {
-  return request(req.method, req.uri, req.body, ...[...req.headers, header(name, value)]);
+  return modifyRequest(req, {headers: [...req.headers, header(name, value)]});
 }
