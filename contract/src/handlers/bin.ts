@@ -1,4 +1,4 @@
-import {Buffered, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
+import {Buffered, bufferText, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
 import {Random} from "../random";
 
 /**
@@ -27,7 +27,7 @@ export class BinHandler implements HttpHandler {
       acc[n] = v;
       return acc;
     }, {});
-    return ok(JSON.stringify({data: await Buffered.text(body), headers:jsonedHeaders}));
+    return ok(JSON.stringify({data: await bufferText(body), headers:jsonedHeaders}));
   }
 
   streamBytes(size: number): HttpResponse {

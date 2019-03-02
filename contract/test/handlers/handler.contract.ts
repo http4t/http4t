@@ -1,5 +1,17 @@
 import {assert} from 'chai';
-import {Buffered, delete_, get, getHeaderValue, header, HostHandler, HttpHandler, patch, post, put} from "../../src";
+import {
+  Buffered,
+  bufferText,
+  delete_,
+  get,
+  getHeaderValue,
+  header,
+  HostHandler,
+  HttpHandler,
+  patch,
+  post,
+  put
+} from "../../src";
 
 export function handlerContract(factory: () => Promise<HttpHandler>, host = Promise.resolve("eu.httpbin.org")) {
   before(async function () {
@@ -21,7 +33,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(post('/post', body, header('Content-Length', body.length)));
     assert.equal(response.status, 200);
 
-    const text = await Buffered.text(response.body);
+    const text = await bufferText(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -30,7 +42,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(put('/put', body, header('Content-Length', body.length)));
     assert.equal(response.status, 200);
 
-    const text = await Buffered.text(response.body);
+    const text = await bufferText(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -39,7 +51,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(patch('/patch', body, header('Content-Length', body.length)));
     assert.equal(response.status, 200);
 
-    const text = await Buffered.text(response.body);
+    const text = await bufferText(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -47,7 +59,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(delete_('/delete', header('Accept', "application/json")));
     assert.equal(response.status, 200);
 
-    const json = JSON.parse(await Buffered.text(response.body));
+    const json = JSON.parse(await bufferText(response.body));
     assert.equal(json.headers['Accept'], "application/json");
   });
 
