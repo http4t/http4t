@@ -2,8 +2,12 @@ import {assert} from 'chai';
 import {BinHandler} from "../../src/handlers";
 
 import {Server} from "../../src/server";
-import {runningInNode} from "../../src/util";
 import {handlerContract} from "./handler.contract";
+
+
+export function runningInNode() {
+  return (typeof process !== 'undefined') && (typeof process.versions.node !== 'undefined');
+}
 
 describe("ClientHandler", function () {
   handlerContract(async () => {

@@ -1,7 +1,21 @@
 import * as stream from "stream";
 import {AsyncIteratorHandler} from "./AsyncIteratorHandler";
 import {Body, Data} from "./contract";
-import {typeDescription} from "./util";
+
+// TODO: this is janky, but nice error messages are nice. Have a think about it
+export function typeDescription(x: any): string {
+  if (x === null)
+    return 'null';
+
+  let t = typeof x;
+  if (t !== 'object') return t;
+
+  const p = Object.getPrototypeOf(x);
+  if (p !== Object.prototype)
+    return p.constructor.name;
+
+  return t
+}
 
 export function isAsyncIterable(instance: any): instance is AsyncIterable<any> {
   return typeof instance == 'object' && Symbol.asyncIterator in instance;
