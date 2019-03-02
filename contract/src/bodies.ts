@@ -12,8 +12,7 @@ export class Stream {
     static binary = streamBinary;
 }
 
-export async function bufferText(body: Body | undefined): Promise<string> {
-    if (!body) return "";
+export async function bufferText(body: Body): Promise<string> {
     if (isPromiseLike(body)) {
         return string(await body);
     }
@@ -29,15 +28,15 @@ export async function bufferText(body: Body | undefined): Promise<string> {
     throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
-export async function bufferBinary(body: Body | undefined): Promise<Uint8Array> {
+export async function bufferBinary(body: Body): Promise<Uint8Array> {
   throw new Error("Not implemented");
 }
 
-export function streamText(body: Body | undefined): AsyncIterable<string> {
+export function streamText(body: Body): AsyncIterable<string> {
   throw new Error("Not implemented");
 }
 
-export function streamBinary(body: Body | undefined): AsyncIterable<Uint8Array> {
+export function streamBinary(body: Body): AsyncIterable<Uint8Array> {
   throw new Error("Not implemented");
 }
 

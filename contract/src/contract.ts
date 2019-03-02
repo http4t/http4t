@@ -107,7 +107,7 @@ export interface ParsedUri {
  */
 export interface HttpMessage {
   readonly headers: Header[],
-  readonly body?: Body
+  readonly body: Body
 }
 
 /**

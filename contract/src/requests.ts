@@ -11,7 +11,7 @@ export function request(method: Method, uri: UriLike, headers?: Header[], body?:
     method,
     uri: Uri.of(uri),
     headers: headers || [],
-    ...body ? {body} : {}
+    body: body ? body : ''
   };
 }
 
