@@ -1,7 +1,7 @@
 import {ParsedUri} from "./contract";
 
 /**
- * UriLike is either a unparsed or parsed
+ * UriLike is either unparsed or parsed
  */
 export type UriLike = string | ParsedUri;
 
