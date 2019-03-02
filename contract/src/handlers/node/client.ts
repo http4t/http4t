@@ -1,7 +1,7 @@
 import * as node from 'http';
 import {TextEncoder} from "util";
 
-import {getHeaderValue, Header, HttpHandler, HttpRequest, HttpResponse, messageBody, sendBodyToStream} from "../../";
+import {Header, host, HttpHandler, HttpRequest, HttpResponse, messageBody, sendBodyToStream} from "../../";
 import {fromRawHeaders} from "./util";
 
 
@@ -18,16 +18,6 @@ function toOutgoingHeaders(headers: Header[]): node.OutgoingHttpHeaders {
     }
     return acc;
   }, {});
-}
-
-// TODO: figure out why IDE is complaining when I make request a node.Request
-function host(request: any): string {
-  if (typeof request.uri.authority != 'undefined')
-    return request.uri.authority;
-
-  const value = getHeaderValue(request.headers, 'Host');
-  if (typeof value != 'string') throw new Error(`Could not get authority from request uri '${request.uri}'`);
-  return value;
 }
 
 function toNodeOpts(request: HttpRequest): node.RequestOptions {
