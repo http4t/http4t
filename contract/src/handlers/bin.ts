@@ -1,4 +1,4 @@
-import {Buffered, bufferText, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
+import {bufferText, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
 import {Random} from "../random";
 
 /**

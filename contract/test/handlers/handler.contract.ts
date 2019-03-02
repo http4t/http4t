@@ -1,17 +1,5 @@
 import {assert} from 'chai';
-import {
-  Buffered,
-  bufferText,
-  delete_,
-  get,
-  getHeaderValue,
-  header,
-  HostHandler,
-  HttpHandler,
-  patch,
-  post,
-  put
-} from "../../src";
+import {bufferText, delete_, get, header, HostHandler, HttpHandler, patch, post, put} from "../../src";
 
 export function handlerContract(factory: () => Promise<HttpHandler>, host = Promise.resolve("eu.httpbin.org")) {
   before(async function () {
