@@ -27,28 +27,28 @@ describe('UriTemplate', () => {
   });
 
   it('extracts captures', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/{?query1,query2}');
+    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/{?query1,query 2}');
 
-    expect(uriTemplate.extract('/part/one/two/part/?query1=value1&query2=value2&query3=value3')).eql({
+    expect(uriTemplate.extract('/part/one/two/part/?query1=value1&query%202=value%202&query3=value3')).eql({
       capture1: 'one',
       capture2: 'two',
       query1: 'value1',
-      query2: 'value2'
+      'query 2': 'value 2'
     });
   });
 
   it('is reversible', () => {
     const uriTemplate1 = UriTemplate.of('/part/{capture1}/part{?query1}');
-    const captures1 = uriTemplate1.extract('/part/one/two/part?query1=value1');
-    expect(uriTemplate1.uriFrom(captures1)).eq('/part/one/two/part?query1=value1');
+    const uri1 = '/part/one/two/part?query1=value1';
+    expect(uriTemplate1.uriFrom(uriTemplate1.extract(uri1))).eq(uri1);
 
     const uriTemplate2 = UriTemplate.of('/part/{capture1}/{capture2}/part{?query1,query2}');
-    const captures2 = uriTemplate2.extract('/part/one/two/part?query1=value1&query2=value2');
-    expect(uriTemplate2.uriFrom(captures2)).eq('/part/one/two/part?query1=value1&query2=value2');
+    const uri2 = '/part/one/two/part?query1=value1&query2=value%202';
+    expect(uriTemplate2.uriFrom(uriTemplate2.extract(uri2))).eq(uri2);
 
-    const uriTemplate3 = UriTemplate.of('/part/{capture1}/{capture2}/part{?query1,query2,query3}');
-    const captures3 = uriTemplate3.extract('/part/one/two/part?query1=value1&query2=value2&query3=value3');
-    expect(uriTemplate3.uriFrom(captures3)).eq('/part/one/two/part?query1=value1&query2=value2&query3=value3');
+    const uriTemplate3 = UriTemplate.of('/part/{capture1}/{capture2}/part{?query1,query2,query 3}');
+    const uri3 = '/part/one/two/part?query1=value1&query2=value%202&query%203=value3';
+    expect(uriTemplate3.uriFrom(uriTemplate3.extract(uri3))).eq(uri3);
   });
 
 });

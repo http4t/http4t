@@ -36,8 +36,8 @@ export class UriTemplate {
     return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
       return rebuilt
         .replace(`{${capture}}`, captures[capture])
-        .replace(`{?${capture}`, `?${capture}=${captures[capture]}`) // start query
-        .replace(new RegExp(`,${capture}}?`), `&${capture}=${captures[capture]}`) // middle or end query
+        .replace(`{?${capture}`, `?${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // start query
+        .replace(new RegExp(`,${capture}}?`), `&${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // middle or end query
     }, this.template).replace(/[{}]/g, '');
   }
 
@@ -47,8 +47,9 @@ export class UriTemplate {
       .replace(/[{}]/g, '')
       .split(',')
       .reduce((captures: Captures, queryParameter: string) => {
-        const regExpMatchArray = query.match(new RegExp(`${queryParameter}=([^&]+)`));
-        captures[queryParameter] = regExpMatchArray![1];
+        const regExpMatchArray = decodeURIComponent(query).match(new RegExp(`${queryParameter}=([^&]+)`));
+        if (!regExpMatchArray) return captures;
+        captures[queryParameter] = decodeURIComponent(regExpMatchArray[1]);
         return captures;
       }, {});
   }
