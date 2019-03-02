@@ -11,7 +11,7 @@ export class BinHandler implements HttpHandler {
     if (method === 'GET' && path.startsWith('/stream-bytes')) {
       const match = /\/stream-bytes\/(.+)/.exec(path);
       return this.streamBytes(Number.parseInt((match && match[1])||"12"));
-    }//TODO: read out of querystring
+    }
     if (method === 'GET') return ok();
     if (method === 'POST') return BinHandler.echo(request);
     if (method === 'PUT') return BinHandler.echo(request);
