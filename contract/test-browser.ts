@@ -63,7 +63,6 @@ task('test-browser', ['bundle'], async () => {
         });
 
     } finally {
-        await promisify(setTimeout)(1000 * 60 * 5);
         await browser.close();
         await server.close();
     }
