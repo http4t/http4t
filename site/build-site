@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+docker build -t http4t/mkdocs .
+docker run -v $(pwd):/http4t.docs http4t/mkdocs mkdocs build
+#docker run -v $(pwd):/http4t.docs http4t/mkdocs mkdocs gh-deploy
+
+TMP=/tmp/http4t.github.io/
+rm -rf ${TMP}
+git clone https://${GH_TOKEN}@github.com/http4t/http4t.github.io.git ${TMP}
+cp -R site/ ${TMP}/
+
+#cp CONTRIBUTING.md ${TMP}docs/contributing/index.md
+#cp CHANGELOG.md ${TMP}docs/changelog/index.md
+#cp README.md ${TMP}docs/index.md
+
+cd ${TMP}
+sed s/\>\</\>`date '+%Y-%m-%d'`\</g sitemap.xml > new ; mv new sitemap.xml
+git add .
+git commit -m "sitemap update"
+git push
+
+cd -
