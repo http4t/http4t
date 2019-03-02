@@ -1,5 +1,4 @@
-import {assert} from 'chai';
-import {handlerContract} from "./handler.contract";
+import {handlerContract} from './handler.contract';
 
 describe("XmlHttpHandler", function () {
   handlerContract(async () => {

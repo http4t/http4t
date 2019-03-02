@@ -1,7 +1,6 @@
 import {expect} from "chai";
 import {AsyncIteratorHandler} from "../src/AsyncIteratorHandler";
 
-
 // TODO: can we simplify this test?
 describe('AsyncIteratorHandler', () => {
 

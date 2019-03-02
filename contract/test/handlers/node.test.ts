@@ -1,8 +1,7 @@
-import {assert} from 'chai';
-import {Server} from "../../src/server";
-import {runningInNode} from "../../src/util";
-import {handlerContract} from "./handler.contract";
-import {BinHandler} from "../../src/handlers";
+import {Server} from '../../src/server';
+import {runningInNode} from '../../src/util';
+import {handlerContract} from './handler.contract';
+import {BinHandler} from '../../src/handlers';
 
 describe("ClientHandler", function () {
     handlerContract(async () => {
