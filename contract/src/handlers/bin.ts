@@ -1,4 +1,4 @@
-import {Buffer, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
+import {Buffered, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
 import {Random} from "../random";
 
 /**
@@ -20,7 +20,7 @@ export class BinHandler implements HttpHandler {
 
     async echo({uri, headers, body}: HttpRequest): Promise<HttpResponse> {
         // TODO convert headers to object instead of array
-        return ok(JSON.stringify({data: await Buffer.text(body), headers}));
+        return ok(JSON.stringify({data: await Buffered.text(body), headers}));
     }
 
     streamBytes(size: number): HttpResponse {

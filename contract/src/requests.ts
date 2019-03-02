@@ -1,5 +1,5 @@
-import {Body, Header, HttpRequest, Method} from "./";
-import {UriLike, Uri} from "./uri";
+import {Body, header, Header, HeaderName, HeaderValue, HttpRequest, Method} from "./";
+import {Uri, UriLike} from "./uri";
 
 export function request(method: Method, uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {
   return {
@@ -28,4 +28,8 @@ export function patch(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequ
 
 export function delete_(uri: UriLike | string, ...headers: Header[]): HttpRequest {
   return request("DELETE", uri, undefined, ...headers);
+}
+
+export function setHeader(req: HttpRequest, name: HeaderName, value: HeaderValue): HttpRequest {
+  return request(req.method, req.uri, req.body, ...[...req.headers, header(name, value)]);
 }

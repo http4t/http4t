@@ -68,7 +68,7 @@ export type HeaderName =
 /**
  * Header value is a string.
  */
-export type HeaderValue = string;
+export type HeaderValue = string ;
 
 /**
  * Data can either be text or binary
@@ -143,4 +143,3 @@ export interface HttpResponse extends HttpMessage {
 export interface HttpHandler {
   handle(request: HttpRequest): Promise<HttpResponse>;
 }
-

@@ -1,11 +1,11 @@
 {
   "name": "@http4t/contract",
-  "version": "1.0.1",
+  "version": "${VERSION}",
   "repository": "git@github.com:http4t/http4t.git",
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
-    "test": "./node_modules/.bin/mocha --require ts-node/register \"test/**/*.test.ts\"",
+    "test": "./node_modules/.bin/mocha --require ts-node/register --exit \"test/**/*.test.ts\"",
     "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src",
     "test": "NODE_ENV=development mocha --require ts-node/register 'test/**/*.test.ts'",
     "madge:circular": "madge --extensions ts --circular src/"
@@ -23,5 +23,10 @@
     "@types/chai": "^4.1.7",
 
     "madge": "^3.2.0"
+  },
+  "optionalDependencies": {
+    "@types/text-encoding": "^0.0.35",
+    "@types/node": "^10.12.18",
+    "text-encoding": "^0.6.4"
   }
 }

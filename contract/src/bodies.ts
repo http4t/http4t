@@ -2,28 +2,28 @@ import {Body, Data} from "./contract";
 import {isAsyncIterable, isData, isIterable, isPromiseLike, toPromiseArray, typeDescription} from "./util";
 import {TextDecoder} from "util";
 
-export class Buffer {
+export class Buffered {
     static text = bufferText;
     static binary = bufferBinary;
 }
 
-export class Stream {
+export class Streamed {
     static text = streamText;
     static binary = streamBinary;
 }
 
 export async function bufferText(body: Body): Promise<string> {
     if (isPromiseLike(body)) {
-        return string(await body);
+        return dataString(await body);
     }
     if (isAsyncIterable(body)) {
-        return (await toPromiseArray(body)).map(string).join("");
+        return (await toPromiseArray(body)).map(dataString).join("");
     }
     if (isData(body)) {
-        return string(body);
+        return dataString(body);
     }
     if (isIterable(body)) {
-        return Array.from(body).map(string).join("")
+        return Array.from(body).map(dataString).join("")
     }
     throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
@@ -40,7 +40,7 @@ export function streamBinary(body: Body): AsyncIterable<Uint8Array> {
   throw new Error("Not implemented");
 }
 
-export function string(data: Data) {
+export function dataString(data: Data) {
     if (typeof data === 'string') return data;
     if (data instanceof Uint8Array) return new TextDecoder("utf-8").decode(data);
     throw new Error(`Not supported ${typeDescription(data)}`)

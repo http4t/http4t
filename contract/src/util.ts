@@ -4,16 +4,10 @@ export function modify<T, K extends keyof T>(instance: T, key: K, handler: (valu
   return {...instance, [key]: handler(instance[key])};
 }
 
-export function replace<T, K extends keyof T>(key: K, value: T[K]): (instance: T) => T {
-  return instance => modify(instance, key, const_(value));
-}
+
 
 export function const_<T>(value: T): () => T {
   return () => value;
-}
-
-export function identity<T>(instance:T): T {
-  return instance;
 }
 
 export function isUint8Array(instance: any): instance is Uint8Array {
@@ -36,6 +30,7 @@ export function isPromiseLike(instance: any): instance is PromiseLike<any> {
   return typeof instance == 'object' && 'then' in instance;
 }
 
+// TODO: this is janky, but nice error messages are nice. Have a think about it
 export function typeDescription(x: any): string {
   if (x === null)
     return 'null';
@@ -55,3 +50,8 @@ export async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]
   for await (const value of iterable) result.push(value);
   return result;
 }
+
+export function runningInNode() {
+  return (typeof process !== 'undefined') && (typeof process.versions.node !== 'undefined');
+}
+
