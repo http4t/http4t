@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {bufferText, delete_, get, header, HostHandler, HttpHandler, patch, post, put} from "../../src";
+import {bufferText, delete_, get, header, HostHandler, HttpHandler, patch, post, put, typeDescription} from "../../src";
 
 export function handlerContract(factory: () => Promise<HttpHandler>, host = Promise.resolve("eu.httpbin.org")) {
   before(async function () {
@@ -56,7 +56,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     assert.equal(response.status, 200);
 
     for await (const chunk of response.body) {
-      assert.instanceOf(chunk, Uint8Array);
+      assert.instanceOf(chunk, Uint8Array, `chunk was a ${typeDescription(chunk)}`);
       assert.equal(chunk.length, 10);
     }
   });

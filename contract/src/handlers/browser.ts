@@ -1,4 +1,4 @@
-import {bufferText} from "../bodies";
+import {bufferText, typeDescription} from "../bodies";
 import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../contract";
 import {host} from "../requests";
 import {response} from "../responses";
@@ -28,9 +28,12 @@ export class XmlHttpHandler implements HttpHandler {
         this.setHeaders(request.headers);
 
         this.handler.addEventListener("load", () => {
+          if(!(this.handler.response instanceof ArrayBuffer))
+            throw new Error(`Not an ArrayBuffer ${typeDescription(this.handler.response)}`);
+
           resolve(response(
             this.handler.status,
-            new Uint8Array(this.handler.response),
+            [new Uint8Array(this.handler.response)],
             ...this.getHeaders()));
         });
 
