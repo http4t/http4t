@@ -1,4 +1,4 @@
-import {streamBinary} from "../../bodies";
+import {bufferBinary, bufferText, streamBinary} from "../../bodies";
 import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../../contract";
 import {header} from "../../headers";
 import {host} from "../../requests";
@@ -49,7 +49,7 @@ const DEFAULT_OPTS: Opts = {
   mode: "cors" // TODO: is this right?
 };
 
-function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Request {
+async function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Promise<Request> {
   const headers = request.headers.reduce((headers, [n, v]) => {
     if (unsafeHeaders.indexOf(n.toLowerCase()) != -1) return headers;
     if (typeof v == 'undefined') return headers;
@@ -62,7 +62,7 @@ function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Request {
     {
       method: request.method,
       headers,
-      ...(request.body ? {body: readableStream(request.body)} : {}),
+      ...(request.body ? {body: await bufferText(request.body)} : {}),//TODO: it would be good if this was streaming
       ...Object.assign({}, DEFAULT_OPTS, opts)
     });
 }
@@ -83,13 +83,14 @@ export class FetchHandler implements HttpHandler {
 
   handle(request: HttpRequest): Promise<HttpResponse> {
     return new Promise<HttpResponse>((resolve, reject) => {
-        const fetchRequest = toFetchRequest(request, this.opts);
 
-        fetch(fetchRequest)
-          .then(fetchResponse => {
-            resolve(toResponse(fetchResponse))
-          })
-          .catch(reject)
+        toFetchRequest(request, this.opts).then(fetchRequest =>
+          fetch(fetchRequest)
+            .then(fetchResponse => {
+              resolve(toResponse(fetchResponse))
+            })
+            .catch(reject)
+        ).catch(reject)
       }
     );
   }

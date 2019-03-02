@@ -1,6 +1,6 @@
 import {handlerContract} from '../handler.contract';
 
-xdescribe("FetchHandler", function () {
+describe("FetchHandler", function () {
   handlerContract(async () => {
     if (typeof fetch == 'undefined') throw new Error("Unsupported");
 
