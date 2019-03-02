@@ -1,4 +1,6 @@
 import {TextDecoder, TextEncoder} from "util";
+import * as stream from "stream";
+import {AsyncIteratorHandler} from "./AsyncIteratorHandler";
 import {Body, Data} from "./contract";
 import {isAsyncIterable, isData, isIterable, isPromiseLike, toPromiseArray, typeDescription} from "./util";
 
@@ -72,3 +74,36 @@ export function dataBinary(data: Data) {
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
+export function messageBody(message: stream.Readable): Body {
+  return {
+    [Symbol.asyncIterator]: function (): AsyncIterator<Uint8Array> {
+      const iterator = new AsyncIteratorHandler<Uint8Array>();
+      message.on("data", chunk => {
+        iterator.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk);
+      });
+      message.on("end", () => {
+        iterator.end()
+      });
+      message.on("error", error => {
+        iterator.error(error)
+      });
+      return iterator;
+    }
+  };
+}
+
+export async function sendBodyToStream(body: Body | undefined, writable: stream.Writable) {
+  if (!body)
+    return writable.end();
+
+  try {
+    for  await (const chunk of  streamBinary(body)) {
+      writable.write(new Buffer(chunk));
+    }
+    writable.end();
+  } catch (e) {
+    // TODO: check this is sensible behaviour
+    writable.emit('error', e);
+    writable.end();
+  }
+}

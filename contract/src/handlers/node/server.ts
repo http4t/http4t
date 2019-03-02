@@ -2,13 +2,13 @@ import * as node from 'http';
 import {
   HttpHandler,
   HttpRequest,
-  HttpResponse,
+  HttpResponse, messageBody,
   ParsedUri,
-  request,
+  request, sendBodyToStream,
   Uri
 } from "../../";
 import {Server} from "../../server";
-import {fromRawHeaders, messageBody, sendBodyToStream} from "./util";
+import {fromRawHeaders} from "./util";
 
 export const adapter = (handler: HttpHandler) => (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
   const req = request(

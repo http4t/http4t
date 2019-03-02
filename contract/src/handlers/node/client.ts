@@ -1,8 +1,8 @@
 import * as node from 'http';
 import {TextEncoder} from "util";
 
-import {getHeaderValue, Header, HttpHandler, HttpRequest, HttpResponse} from "../../";
-import {sendBodyToStream, fromRawHeaders, messageBody} from "./util";
+import {getHeaderValue, Header, HttpHandler, HttpRequest, HttpResponse, messageBody, sendBodyToStream} from "../../";
+import {fromRawHeaders} from "./util";
 
 
 function toOutgoingHeaders(headers: Header[]): node.OutgoingHttpHeaders {
