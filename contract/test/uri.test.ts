@@ -1,6 +1,5 @@
 import {assert} from 'chai';
 import {Uri} from "../src/uri";
-import {get} from "../src";
 
 describe('Uri', function() {
   describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function() {
@@ -41,10 +40,6 @@ describe('Uri', function() {
       assertComponentRecomposition('ldap:///o=University%20of%20Michigan,c=US');
       assertComponentRecomposition('?foo'); // Just a query string
     });
-  });
-
-  it('can extract a Uri from a request ', function () {
-    assert.equal(Uri.of(get('/foo')).path, '/foo');
   });
 
   it('supports toJSON ', function () {

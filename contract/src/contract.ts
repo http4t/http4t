@@ -103,11 +103,6 @@ export interface ParsedUri {
 }
 
 /**
- * UriLike is either a unparsed or parsed
- */
-export type UriLike = string | ParsedUri;
-
-/**
  * HttpMessage contain headers followed by an optional body
  */
 export interface HttpMessage {
@@ -120,7 +115,7 @@ export interface HttpMessage {
  */
 export interface HttpRequest extends HttpMessage {
   readonly method: Method
-  readonly uri: UriLike,
+  readonly uri: ParsedUri,
   /**
    * httpVersion is not available in all implementations so is optional
    */

@@ -1,9 +1,15 @@
-import {Body, Header, HttpRequest, Method, UriLike} from "./";
+import {Body, Header, HttpRequest, Method, ParsedUri, UriLike} from "./";
+import {Uri} from "./uri";
+
+/**
+ * UriLike is either a unparsed or parsed
+ */
+export type UriLike = string | ParsedUri;
 
 export function request(method: Method, uri: UriLike, headers?: Header[], body?: Body): HttpRequest {
   return {
     method,
-    uri: uri,
+    uri: Uri.of(uri),
     headers: headers || [],
     ...body ? {body} : {}
   };

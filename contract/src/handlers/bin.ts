@@ -3,17 +3,14 @@ import {Uri} from "../uri";
 
 export class BinHandler implements HttpHandler {
   async handle(request: HttpRequest): Promise<HttpResponse> {
-    const uri = Uri.of(request);
-    if (request.method === 'GET')
-      if (uri.path === '/stream-bytes') {
-        return this.streamBytes(Number.parseInt(uri.query || "0"));
-      }
-      else
-        return ok();
-    if (request.method === 'POST') return this.echo(request);
-    if (request.method === 'PUT') return this.echo(request);
-    if (request.method === 'PATCH') return this.echo(request);
-    if (request.method === 'DELETE') return this.echo(request);
+    const {method, uri: {path, query}} = request;
+
+    if (method === 'GET' && path === '/stream-bytes') return this.streamBytes(Number.parseInt(query || "0"));
+    if (method === 'GET') return ok();
+    if (method === 'POST') return this.echo(request);
+    if (method === 'PUT') return this.echo(request);
+    if (method === 'PATCH') return this.echo(request);
+    if (method === 'DELETE') return this.echo(request);
 
     return notFound();
   }
@@ -33,11 +30,12 @@ export class BinHandler implements HttpHandler {
   }
 }
 
-function randomBytes(length: number) {
-  const buffer = new Array<number>(Math.round(length / 4) + 1);
-  for (let i = 0; i < buffer.length; i++) {
-    buffer[i] = Math.random();
-  }
+function randomBytes(size: number): Uint8Array {
+  const sizeInFloats = Math.round(size / 4) + 1;
+  const randomFloats = new Array<number>(sizeInFloats);
 
-  return new Uint8Array(Float32Array.from(buffer).buffer).slice(0, length);
+  for (let i = 0; i < randomFloats.length; i++) randomFloats[i] = Math.random();
+
+  const buffer: ArrayBufferLike = Float32Array.from(randomFloats).buffer;
+  return new Uint8Array(buffer).slice(0, size);
 }

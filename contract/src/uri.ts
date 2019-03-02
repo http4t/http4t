@@ -1,4 +1,5 @@
-import {HttpRequest, ParsedUri} from "./contract";
+import {ParsedUri} from "./contract";
+import {UriLike} from "./requests";
 
 export class Uri implements ParsedUri {
     readonly scheme?: string;
@@ -18,16 +19,15 @@ export class Uri implements ParsedUri {
     static RFC_3986 = /^(([^:/?#]+):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
 
     /** {@link https://tools.ietf.org/html/rfc3986#appendix-B } */
-    static parse(uri:string) {
+    static parse(uri: string) {
         const match = Uri.RFC_3986.exec(uri);
         if (!match) throw new Error(`Invalid Uri: ${uri}`);
         const [, , scheme, , authority, path, , query, , fragment] = match;
         return new Uri({scheme, authority, path, query, fragment});
     }
 
-    static of(request: HttpRequest): Uri {
-        const uri = request.uri;
-        if(uri instanceof Uri) return uri;
+    static of(uri: UriLike): Uri {
+        if (uri instanceof Uri) return uri;
         return typeof uri === 'string' ? Uri.parse(uri) : new Uri(uri);
     }
 
@@ -43,7 +43,7 @@ export class Uri implements ParsedUri {
         return result.join('');
     }
 
-    toJSON(){
+    toJSON() {
         return this.toString();
     }
 }
