@@ -2,12 +2,12 @@ import {Body, Data} from "./contract";
 import {isAsyncIterable, isData, isIterable, isPromiseLike, toPromiseArray, typeDescription} from "./util";
 import {TextDecoder} from "util";
 
-export class Buffered {
+export class Buffer {
     static text = bufferText;
     static binary = bufferBinary;
 }
 
-export class Streaming {
+export class Stream {
     static text = streamText;
     static binary = streamBinary;
 }

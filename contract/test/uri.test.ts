@@ -48,7 +48,7 @@ describe('Uri', function() {
   });
 
   it('supports toJSON ', function () {
-    assert.equal(Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related').toJSON(), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
+    assert.equal(JSON.stringify(Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related')), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
   });
 });
 

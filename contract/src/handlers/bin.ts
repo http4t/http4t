@@ -1,4 +1,4 @@
-import {Buffered, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
+import {Buffer, HttpHandler, HttpRequest, HttpResponse, notFound, ok} from "../";
 import {Uri} from "../uri";
 
 export class BinHandler implements HttpHandler {
@@ -19,7 +19,7 @@ export class BinHandler implements HttpHandler {
   }
 
   async echo({uri, headers, body}: HttpRequest): Promise<HttpResponse> {
-    const data = await (body ? Buffered.text(body) : undefined);
+    const data = await (body ? Buffer.text(body) : undefined);
 
     return ok([], JSON.stringify({uri, data, headers}));
   }

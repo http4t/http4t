@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {Buffered,delete_, get, HostHandler, HttpHandler, patch, post, put} from "../src";
+import {Buffer,delete_, get, HostHandler, HttpHandler, patch, post, put} from "../src";
 import {Headers} from "../src/headers";
 
 export function handlerContract(factory: () => Promise<HttpHandler>, host = Promise.resolve("eu.httpbin.org")) {
@@ -22,7 +22,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(post('/post', [['Content-Length', String(body.length)]], body));
     assert.equal(response.status, 200);
 
-    const text = await Buffered.text(response.body);
+    const text = await Buffer.text(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -31,7 +31,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(put('/put', [['Content-Length', String(body.length)]], body));
     assert.equal(response.status, 200);
 
-    const text = await Buffered.text(response.body);
+    const text = await Buffer.text(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -40,7 +40,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(patch('/patch', [['Content-Length', String(body.length)]], body));
     assert.equal(response.status, 200);
 
-    const text = await Buffered.text(response.body);
+    const text = await Buffer.text(response.body);
     assert.equal(JSON.parse(text).data, body);
   });
 
@@ -48,7 +48,7 @@ export function handlerContract(factory: () => Promise<HttpHandler>, host = Prom
     const response = await this.handler.handle(delete_('/delete', [['Accept', "application/json"]]));
     assert.equal(response.status, 200);
 
-    const json = JSON.parse(await Buffered.text(response.body));
+    const json = JSON.parse(await Buffer.text(response.body));
     assert.equal(Headers.get(json.headers,'Accept'), "application/json");
   });
 
