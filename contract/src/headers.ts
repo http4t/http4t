@@ -1,5 +1,4 @@
-import {Header, HeaderName, HeaderValue} from "./contract";
-import {typeDescription} from "./util";
+import {Header, HeaderName, HeaderValue} from './contract';
 
 
 // TODO: clean up this gross namespace
