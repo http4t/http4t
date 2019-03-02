@@ -8,7 +8,7 @@ export class BinHandler implements HttpHandler {
   async handle(request: HttpRequest): Promise<HttpResponse> {
     const {method, uri: {path, query}} = request;
 
-    if (method === 'GET' && path === '/stream-bytes') return this.streamBytes(10);//TODO: read out of querystring
+    if (method === 'GET' && path.startsWith('/stream-bytes')) return this.streamBytes(10);//TODO: read out of querystring
     if (method === 'GET') return ok();
     if (method === 'POST') return BinHandler.echo(request);
     if (method === 'PUT') return BinHandler.echo(request);
