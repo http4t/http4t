@@ -1,4 +1,3 @@
-import {TextDecoder, TextEncoder} from "util";
 import * as stream from "stream";
 import {AsyncIteratorHandler} from "./AsyncIteratorHandler";
 import {Body, Data} from "./contract";
@@ -62,15 +61,29 @@ export async function* streamBinary(body: Body): AsyncIterable<Uint8Array> {
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
+function textDecoder():TextDecoder {
+  if(typeof TextDecoder === 'function')
+    return new TextDecoder('utf-8');
+  const util = require('util');
+  return new util.TextDecoder('utf-8')
+}
+
+function textEncoder():TextEncoder{
+  if(typeof TextEncoder === 'function')
+    return new TextEncoder();
+  const util = require('util');
+  return new util.TextEncoder()
+}
+
 export function dataString(data: Data) {
   if (typeof data === 'string') return data;
-  if (data instanceof Uint8Array) return new TextDecoder("utf-8").decode(data);
+  if (data instanceof Uint8Array) return textDecoder().decode(data);
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
 export function dataBinary(data: Data) {
   if (data instanceof Uint8Array) return data;
-  if (typeof data === 'string') return new TextEncoder().encode(data);
+  if (typeof data === 'string') return textEncoder().encode(data);
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
@@ -79,7 +92,7 @@ export function messageBody(message: stream.Readable): Body {
     [Symbol.asyncIterator]: function (): AsyncIterator<Uint8Array> {
       const iterator = new AsyncIteratorHandler<Uint8Array>();
       message.on("data", chunk => {
-        iterator.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk);
+        iterator.push(typeof chunk === 'string' ? textEncoder().encode(chunk) : chunk);
       });
       message.on("end", () => {
         iterator.end()

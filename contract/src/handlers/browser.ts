@@ -1,16 +1,17 @@
 import {streamBinary} from "../bodies";
 import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../contract";
 import {host} from "../requests";
+import {response} from "../responses";
 import {Uri} from "../uri";
 
-function readableStream(body: Body) : ReadableStream<Uint8Array> {
+function readableStream(body: Body): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
-    start:async controller => {
-      try{
-        for await(const chunk of streamBinary(body)){
+    start: async controller => {
+      try {
+        for await(const chunk of streamBinary(body)) {
           controller.enqueue(chunk);
         }
-      }catch(e){
+      } catch (e) {
         controller.error(e);
       }
       controller.close();
@@ -18,9 +19,26 @@ function readableStream(body: Body) : ReadableStream<Uint8Array> {
   });
 }
 
+function fromReadableStream(stream:ReadableStream<Uint8Array>|undefined): AsyncIterable<Uint8Array> | string {
+  if(!stream)
+    return "";
+
+  return {
+    [Symbol.asyncIterator]: async function* () {
+      const reader = stream.getReader();
+      while(true){
+        const { done, value } = await reader.read();
+        if(done) return;
+        yield value;
+      }
+    }
+  };
+}
+
 async function sendBodyToRequest(body: Body | undefined, request: XMLHttpRequest) {
   if (!body)
     return request.send();
+
   request.send(readableStream(body));
 }
 
@@ -30,20 +48,24 @@ export class XmlHttpHandler implements HttpHandler {
 
   handle(request: HttpRequest): Promise<HttpResponse> {
     return new Promise<HttpResponse>((resolve, reject) => {
+        //TODO: make sure everything that needs finalising and closing gets finalised
         const authority = host(request);
         const uri = Uri.modify(request.uri, {authority});
+
         this.handler.open(request.method, uri.toString(), true);
         this.handler.withCredentials = true;
         this.handler.responseType = 'arraybuffer';
         this.setHeaders(request.headers);
+
         this.handler.addEventListener("load", () => {
-          resolve({
-            status: this.handler.status,
-            headers: this.getHeaders(),
-            body: this.handler.response // TODO: there's no streaming here. OK?
-          });
+          resolve(response(
+            this.handler.status,
+            this.handler.response,
+            ...this.getHeaders()));
         });
+
         this.handler.addEventListener("error", (e) => reject(e));
+
         sendBodyToRequest(request.body, this.handler);
       }
     );

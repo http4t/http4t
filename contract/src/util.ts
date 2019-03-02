@@ -1,15 +1,5 @@
 import {Data} from "./contract";
 
-export function modify<T, K extends keyof T>(instance: T, key: K, handler: (value: T[K]) => T[K]): T {
-  return {...instance, [key]: handler(instance[key])};
-}
-
-
-
-export function const_<T>(value: T): () => T {
-  return () => value;
-}
-
 export function isUint8Array(instance: any): instance is Uint8Array {
   return typeof instance == 'object' && instance instanceof Uint8Array;
 }
