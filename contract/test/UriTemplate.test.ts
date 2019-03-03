@@ -19,13 +19,6 @@ describe('UriTemplate', () => {
     expect(uriTemplate.matches('/part/capture/part/?query=value')).eq(true);
   });
 
-  it('matches query or not', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture}/part/{?query1,query2}');
-
-    expect(uriTemplate.matches('/part/capture/part?query1=value1')).eq(false);
-    expect(uriTemplate.matches('/part/capture/part/?query1=value1&query2=value2')).eq(true);
-  });
-
   it('extracts captures', () => {
     const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/{?query1,query 2}');
 

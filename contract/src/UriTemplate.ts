@@ -18,8 +18,7 @@ export class UriTemplate {
   }
 
   matches(uri: string): boolean {
-    const parsedUri = Uri.parse(uri);
-    return this.matchesPath(parsedUri.path) && this.matchesQuery(parsedUri.query);
+    return this.matchesPath(Uri.parse(uri).path)
   }
 
   extract(uri: string): Captures {
@@ -63,11 +62,5 @@ export class UriTemplate {
 
   private matchesPath(path: string): boolean {
     return new RegExp(this.pathTemplate.replace(/(?:[{}]|\/$)/g, '')).exec(path) !== null;
-  }
-
-  private matchesQuery(against: string | undefined): boolean {
-    if (!against || !this.queryTemplate) return true;
-    const captureGroup = new RegExp('\{([^\\}]+)\}').exec(this.queryTemplate);
-    return captureGroup![1].split(',').every(match => against.includes(match))
   }
 }
