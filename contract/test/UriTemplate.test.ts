@@ -51,5 +51,17 @@ describe('UriTemplate', () => {
     expect(uriTemplate3.uriFrom(uriTemplate3.extract(uri3))).eq(uri3);
   });
 
+  it('encodes / decodes uri segments', () => {
+    const uriTemplate = UriTemplate.of('/part/{capture1}/part/{?query 1}');
+    const uri = '/part/one%20two/part/?query%201=value%201';
+
+    expect(uriTemplate.extract(uri)).eql({
+      capture1: 'one two',
+      'query 1': 'value 1'
+    });
+
+    expect(uriTemplate.uriFrom(uriTemplate.extract(uri))).eq(uri);
+  })
+
 });
 
