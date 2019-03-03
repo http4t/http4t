@@ -5,12 +5,13 @@ export type Captures = { [name: string]: string }
 export class UriTemplate {
   private pathTemplate: string;
   private queryTemplate?: string;
+  private pathCapturingTemplate: RegExp;
 
   constructor(private template: string) {
-    const [pathTemplate, queryTemplate] = this.template.split(/{?\?/);
-
+    const [pathTemplate, queryTemplate] = this.template.split('{?');
     this.pathTemplate = pathTemplate;
-    this.queryTemplate = queryTemplate ? '{' + queryTemplate : undefined
+    this.queryTemplate = queryTemplate ? '{' + queryTemplate : undefined;
+    this.pathCapturingTemplate = this.makeCapturingTemplate();
   }
 
   static of(template: string) {
@@ -18,9 +19,8 @@ export class UriTemplate {
   }
 
   matches(uri: string): boolean {
-    const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
-    const capturingTemplate = noTrailingSlash.replace(new RegExp('{.+}'), '(.+)');
-    return new RegExp(capturingTemplate).exec(Uri.parse(uri).path) !== null
+    console.log(this.pathCapturingTemplate)
+    return new RegExp(this.pathCapturingTemplate).exec(Uri.parse(uri).path) !== null
   }
 
   extract(uri: string): Captures {
@@ -41,10 +41,13 @@ export class UriTemplate {
   }
 
   private extractPathCaptures(path: string): Captures {
-    const pathParamVariableNames = (this.pathTemplate.match(/{([^}]+)}/g) || []).map(name => name.replace(/[{}]/g, ''));
-    const values = new RegExp(this.pathTemplate.replace(/{([^}]+)}/g, '(.+)'), 'g').exec(path);
-    return pathParamVariableNames.reduce((captures: Captures, param, index) => {
-      captures[param] = decodeURIComponent(values![index + 1]);
+    const pathVariableNames = (this.pathTemplate.match(/{([^:}]+)/g) || []).map(name => name.replace('{', ''));
+    const values = new RegExp(this.pathCapturingTemplate).exec(path);
+
+    return pathVariableNames.reduce((captures: Captures, param, index) => {
+      if (values && values[index + 1]) {
+        captures[param] = decodeURIComponent(values[index + 1])
+      }
       return captures;
     }, {});
   }
@@ -60,5 +63,15 @@ export class UriTemplate {
         captures[queryParameter] = decodeURIComponent(regExpMatchArray[1]);
         return captures;
       }, {});
+  }
+
+  private makeCapturingTemplate(): RegExp {
+    const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
+    let match, pathCapturingTemplate = noTrailingSlash;
+    const pathVariables = new RegExp('{([^}]+?)(?::([^}]+))?}', 'g');
+    while (match = pathVariables.exec(noTrailingSlash)) {
+      pathCapturingTemplate = pathCapturingTemplate.replace(/{[^}]+}/, match[2] ? `(${match[2]})` : '(.+)');
+    }
+    return new RegExp(pathCapturingTemplate);
   }
 }

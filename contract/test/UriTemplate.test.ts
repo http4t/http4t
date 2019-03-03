@@ -3,7 +3,7 @@ import { UriTemplate } from "../src/UriTemplate";
 
 describe('UriTemplate', () => {
   it('matches uris or not', () => {
-    const uriTemplate = UriTemplate.of('/part/{name}/part/?query1=value1');
+    const uriTemplate = UriTemplate.of('/part/{name}/part/');
 
     expect(uriTemplate.matches('/doesnt/match')).eq(false);
     expect(uriTemplate.matches('/part/capture/part')).eq(true);
@@ -15,8 +15,6 @@ describe('UriTemplate', () => {
     expect(uriTemplate.matches('/doesnt/match')).eq(false);
     expect(uriTemplate.matches('/part/capture/part')).eq(true);
     expect(uriTemplate.matches('/part/capture/part/')).eq(true);
-    expect(uriTemplate.matches('/part/capture/part?query=value')).eq(true);
-    expect(uriTemplate.matches('/part/capture/part/?query=value')).eq(true);
   });
 
   it('extracts captures', () => {
@@ -54,10 +52,20 @@ describe('UriTemplate', () => {
     });
 
     expect(uriTemplate.expand(uriTemplate.extract(uri))).eq(uri);
-  })
+  });
 
-  // TODO: dont match query
-  // support custom regex
+  it('supports custom regex', () => {
+    const uriTemplate = UriTemplate.of('/part/{capture1:\\d+}/part/{capture2:\\w?}');
+    const uriDoesntMatch = '/part/abc/part/123';
+    const uriDoesMatch = '/part/123/part/a';
+
+    expect(uriTemplate.matches(uriDoesntMatch)).eq(false);
+    expect(uriTemplate.extract(uriDoesMatch)).eql({
+      capture1: '123',
+      capture2: 'a'
+    });
+  });
+
   // variable expansions like {.foo,bar} and {baz*}
 });
 
