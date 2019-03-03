@@ -63,5 +63,8 @@ describe('UriTemplate', () => {
     expect(uriTemplate.uriFrom(uriTemplate.extract(uri))).eq(uri);
   })
 
+  // TODO: dont match query
+  // support custom regex
+  // variable expansions like {.foo,bar} and {baz*}
 });
 

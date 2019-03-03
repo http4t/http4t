@@ -4,14 +4,13 @@ export type Captures = { [name: string]: string }
 
 export class UriTemplate {
   private pathTemplate: string;
-  private queryTemplate: string;
+  private queryTemplate?: string;
 
   constructor(private template: string) {
-    const [pathTemplate, queryTemplate] = this.template
-      .replace('{?', '?{').split('?'); // swap {? cos conforming to RFC is annoying for implementation
+    const [pathTemplate, queryTemplate] = this.template.split(/{?\?/);
 
     this.pathTemplate = pathTemplate;
-    this.queryTemplate = queryTemplate;
+    this.queryTemplate = queryTemplate ? '{' + queryTemplate : undefined
   }
 
   static of(template: string) {
@@ -33,7 +32,6 @@ export class UriTemplate {
 
   uriFrom(captures: Captures): string {
     return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
-      console.log(this.template)
       return rebuilt
         .replace(`{${capture}}`, captures[capture].includes('/') ? captures[capture] : encodeURIComponent(captures[capture]))
         .replace(`{?${capture}`, `?${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // start query
@@ -42,9 +40,9 @@ export class UriTemplate {
   }
 
   private extractQueryCaptures(query: string | undefined): Captures {
-    if (!query) return {};
+    if (!query || !this.queryTemplate) return {};
     return this.queryTemplate
-      .replace(/[{}]/g, '')
+      .replace(/[?{}]/g, '')
       .split(',')
       .reduce((captures: Captures, queryParameter: string) => {
         const regExpMatchArray = decodeURIComponent(query).match(new RegExp(`${queryParameter}=([^&]+)`));
