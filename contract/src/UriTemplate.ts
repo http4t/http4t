@@ -19,7 +19,6 @@ export class UriTemplate {
   }
 
   matches(uri: string): boolean {
-    console.log(this.pathCapturingTemplate)
     return new RegExp(this.pathCapturingTemplate).exec(Uri.parse(uri).path) !== null
   }
 
@@ -32,12 +31,7 @@ export class UriTemplate {
   }
 
   expand(captures: Captures): string {
-    return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
-      return rebuilt
-        .replace(`{${capture}}`, captures[capture].includes('/') ? captures[capture] : encodeURIComponent(captures[capture]))
-        .replace(`{?${capture}`, `?${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // start query
-        .replace(new RegExp(`,${capture}}?`), `&${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // middle or end query
-    }, this.template).replace(/[{}]/g, '');
+    return this.expandPath(captures) + this.expandQuery(captures);
   }
 
   private extractPathCaptures(path: string): Captures {
@@ -55,7 +49,7 @@ export class UriTemplate {
   private extractQueryCaptures(query: string | undefined): Captures {
     if (!query || !this.queryTemplate) return {};
     return this.queryTemplate
-      .replace(/[?{}]/g, '')
+      .replace(/[{}]/g, '')
       .split(',')
       .reduce((captures: Captures, queryParameter: string) => {
         const regExpMatchArray = decodeURIComponent(query).match(new RegExp(`${queryParameter}=([^&]+)`));
@@ -73,5 +67,27 @@ export class UriTemplate {
       pathCapturingTemplate = pathCapturingTemplate.replace(/{[^}]+}/, match[2] ? `(${match[2]})` : '(.+)');
     }
     return new RegExp(pathCapturingTemplate);
+  }
+
+  private expandPath(captures: Captures): string {
+    return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
+      return rebuilt.replace(
+        `{${capture}}`,
+        captures[capture].includes('/') ? captures[capture] : encodeURIComponent(captures[capture]))
+    }, this.pathTemplate).replace(/[{}]/g, '');
+  }
+
+  private expandQuery(captures: Captures): string {
+    if (!this.queryTemplate) return '';
+    return '?' + this.queryTemplate
+      .replace(/[{}]/g, '')
+      .split(',')
+      .map(queryParameter => {
+        return captures[queryParameter]
+          ? `${encodeURIComponent(queryParameter)}=${encodeURIComponent(captures[queryParameter])}`
+          : undefined;
+      })
+      .filter(it => !!it)
+      .join('&');
   }
 }
