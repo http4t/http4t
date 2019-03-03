@@ -5,13 +5,14 @@ export type Captures = { [name: string]: string }
 export class UriTemplate {
   private pathTemplate: string;
   private queryTemplate?: string;
-  private pathCapturingTemplate: RegExp;
+  private pathVariableCapturingRegexp: RegExp;
 
   constructor(private template: string) {
-    const [pathTemplate, queryTemplate] = this.template.split('{?');
+    const queryCaptureIdentifier = '{?';
+    const [pathTemplate, queryTemplate] = this.template.split(queryCaptureIdentifier);
     this.pathTemplate = pathTemplate;
     this.queryTemplate = queryTemplate ? '{' + queryTemplate : undefined;
-    this.pathCapturingTemplate = this.makeCapturingTemplate();
+    this.pathVariableCapturingRegexp = this.makeCapturingTemplate();
   }
 
   static of(template: string) {
@@ -19,7 +20,7 @@ export class UriTemplate {
   }
 
   matches(uri: string): boolean {
-    return new RegExp(this.pathCapturingTemplate).exec(Uri.parse(uri).path) !== null
+    return this.pathVariableCapturingRegexp.exec(Uri.parse(uri).path) !== null
   }
 
   extract(uri: string): Captures {
@@ -36,7 +37,7 @@ export class UriTemplate {
 
   private extractPathCaptures(path: string): Captures {
     const pathVariableNames = (this.pathTemplate.match(/{([^:}]+)/g) || []).map(name => name.replace('{', ''));
-    const values = new RegExp(this.pathCapturingTemplate).exec(path);
+    const values = this.pathVariableCapturingRegexp.exec(path);
 
     return pathVariableNames.reduce((captures: Captures, param, index) => {
       if (values && values[index + 1]) {
@@ -59,16 +60,6 @@ export class UriTemplate {
       }, {});
   }
 
-  private makeCapturingTemplate(): RegExp {
-    const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
-    let match, pathCapturingTemplate = noTrailingSlash;
-    const pathVariables = new RegExp('{([^}]+?)(?::([^}]+))?}', 'g');
-    while (match = pathVariables.exec(noTrailingSlash)) {
-      pathCapturingTemplate = pathCapturingTemplate.replace(/{[^}]+}/, match[2] ? `(${match[2]})` : '(.+)');
-    }
-    return new RegExp(pathCapturingTemplate);
-  }
-
   private expandPath(captures: Captures): string {
     return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
       return rebuilt.replace(
@@ -89,5 +80,15 @@ export class UriTemplate {
       })
       .filter(it => !!it)
       .join('&');
+  }
+
+  private makeCapturingTemplate(): RegExp {
+    const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
+    let match, pathCapturingTemplate = noTrailingSlash;
+    const pathVariables = new RegExp('{([^}]+?)(?::([^}]+))?}', 'g');
+    while (match = pathVariables.exec(noTrailingSlash)) {
+      pathCapturingTemplate = pathCapturingTemplate.replace(/{[^}]+}/, match[2] ? `(${match[2]})` : '(.+?)');
+    }
+    return new RegExp(pathCapturingTemplate);
   }
 }
