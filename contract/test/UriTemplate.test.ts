@@ -3,7 +3,7 @@ import { UriTemplate } from "../src/UriTemplate";
 
 describe('UriTemplate', () => {
   it('matches uris or not', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture}/part/?query1=value1');
+    const uriTemplate = UriTemplate.of('/part/{name}/part/?query1=value1');
 
     expect(uriTemplate.matches('/doesnt/match')).eq(false);
     expect(uriTemplate.matches('/part/capture/part')).eq(true);
@@ -33,15 +33,15 @@ describe('UriTemplate', () => {
   it('is reversible', () => {
     const uriTemplate1 = UriTemplate.of('/part/{capture1}/part{?query1}');
     const uri1 = '/part/one/two/part?query1=value1';
-    expect(uriTemplate1.uriFrom(uriTemplate1.extract(uri1))).eq(uri1);
+    expect(uriTemplate1.expand(uriTemplate1.extract(uri1))).eq(uri1);
 
     const uriTemplate2 = UriTemplate.of('/part/{capture1}/{capture2}/part{?query1,query2}');
     const uri2 = '/part/one/two/part?query1=value1&query2=value%202';
-    expect(uriTemplate2.uriFrom(uriTemplate2.extract(uri2))).eq(uri2);
+    expect(uriTemplate2.expand(uriTemplate2.extract(uri2))).eq(uri2);
 
     const uriTemplate3 = UriTemplate.of('/part/{capture1}/{capture2}/part{?query1,query2,query 3}');
     const uri3 = '/part/one/two/part?query1=value1&query2=value%202&query%203=value3';
-    expect(uriTemplate3.uriFrom(uriTemplate3.extract(uri3))).eq(uri3);
+    expect(uriTemplate3.expand(uriTemplate3.extract(uri3))).eq(uri3);
   });
 
   it('encodes / decodes uri segments', () => {
@@ -53,7 +53,7 @@ describe('UriTemplate', () => {
       'query 1': 'value 1'
     });
 
-    expect(uriTemplate.uriFrom(uriTemplate.extract(uri))).eq(uri);
+    expect(uriTemplate.expand(uriTemplate.extract(uri))).eq(uri);
   })
 
   // TODO: dont match query

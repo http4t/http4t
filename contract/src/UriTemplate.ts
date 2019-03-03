@@ -18,7 +18,9 @@ export class UriTemplate {
   }
 
   matches(uri: string): boolean {
-    return this.matchesPath(Uri.parse(uri).path)
+    const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
+    const capturingTemplate = noTrailingSlash.replace(new RegExp('{.+}'), '(.+)');
+    return new RegExp(capturingTemplate).exec(Uri.parse(uri).path) !== null
   }
 
   extract(uri: string): Captures {
@@ -29,13 +31,22 @@ export class UriTemplate {
     };
   }
 
-  uriFrom(captures: Captures): string {
+  expand(captures: Captures): string {
     return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
       return rebuilt
         .replace(`{${capture}}`, captures[capture].includes('/') ? captures[capture] : encodeURIComponent(captures[capture]))
         .replace(`{?${capture}`, `?${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // start query
         .replace(new RegExp(`,${capture}}?`), `&${encodeURIComponent(capture)}=${encodeURIComponent(captures[capture])}`) // middle or end query
     }, this.template).replace(/[{}]/g, '');
+  }
+
+  private extractPathCaptures(path: string): Captures {
+    const pathParamVariableNames = (this.pathTemplate.match(/{([^}]+)}/g) || []).map(name => name.replace(/[{}]/g, ''));
+    const values = new RegExp(this.pathTemplate.replace(/{([^}]+)}/g, '(.+)'), 'g').exec(path);
+    return pathParamVariableNames.reduce((captures: Captures, param, index) => {
+      captures[param] = decodeURIComponent(values![index + 1]);
+      return captures;
+    }, {});
   }
 
   private extractQueryCaptures(query: string | undefined): Captures {
@@ -49,18 +60,5 @@ export class UriTemplate {
         captures[queryParameter] = decodeURIComponent(regExpMatchArray[1]);
         return captures;
       }, {});
-  }
-
-  private extractPathCaptures(path: string): Captures {
-    const pathParamVariableNames = (this.pathTemplate.match(/{([^}]+)}/g) || []).map(name => name.replace(/[{}]/g, ''));
-    const values = new RegExp(this.pathTemplate.replace(/{([^}]+)}/g, '(.+)'), 'g').exec(path);
-    return pathParamVariableNames.reduce((captures: Captures, param, index) => {
-      captures[param] = decodeURIComponent(values![index + 1]);
-      return captures;
-    }, {});
-  }
-
-  private matchesPath(path: string): boolean {
-    return new RegExp(this.pathTemplate.replace(/(?:[{}]|\/$)/g, '')).exec(path) !== null;
   }
 }
