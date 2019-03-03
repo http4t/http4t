@@ -1,30 +1,13 @@
 import * as node from 'http';
-import {
-  HttpHandler,
-  HttpRequest,
-  HttpResponse, messageBody,
-  ParsedUri,
-  request, sendBodyToStream,
-  Uri
-} from "../../";
+import {HttpHandler, HttpRequest, HttpResponse, ParsedUri, Uri} from "../../";
 import {Server} from "../../server";
-import {fromRawHeaders} from "./client";
+import {requestNodeToHttp4t, responseHttp4tToNode} from "./conversions";
 
 export const adapter = (handler: HttpHandler) => (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
-  const req = request(
-    nodeRequest.method || "",
-    nodeRequest.url || "",
-    messageBody(nodeRequest),
-    ...fromRawHeaders(nodeRequest.rawHeaders));
-
+  const req = requestNodeToHttp4t(nodeRequest);
   (async () => {
     const response = await handler.handle(req);
-    nodeResponse.statusCode = response.status;
-    for (const [name, value] of response.headers) {
-      if (value) nodeResponse.setHeader(name, value);
-    }
-
-    sendBodyToStream(response.body, nodeResponse);
+    responseHttp4tToNode(response, nodeResponse);
   })();
 };
 
