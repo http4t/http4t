@@ -4,14 +4,6 @@ import {host} from "../../requests";
 import {response} from "../../responses";
 import {Uri} from "../../uri";
 
-
-async function sendBodyToRequest(body: Body | undefined, request: XMLHttpRequest) {
-  if (!body)
-    return request.send();
-
-  request.send(await bufferText(body));
-}
-
 export class XmlHttpHandler implements HttpHandler {
   constructor(private readonly handler: XMLHttpRequest = new XMLHttpRequest()) {
   }
@@ -57,4 +49,11 @@ export class XmlHttpHandler implements HttpHandler {
       this.handler.setRequestHeader(name, value);
     });
   }
+}
+
+async function sendBodyToRequest(body: Body | undefined, request: XMLHttpRequest) {
+  if (!body)
+    return request.send();
+
+  request.send(await bufferText(body));
 }

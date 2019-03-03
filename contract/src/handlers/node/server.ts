@@ -3,14 +3,6 @@ import {HttpHandler, HttpRequest, HttpResponse, ParsedUri, Uri} from "../../";
 import {Server} from "../../server";
 import {requestNodeToHttp4t, responseHttp4tToNode} from "./conversions";
 
-export const adapter = (handler: HttpHandler) => (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
-  const req = requestNodeToHttp4t(nodeRequest);
-  (async () => {
-    const response = await handler.handle(req);
-    responseHttp4tToNode(response, nodeResponse);
-  })();
-};
-
 export class ServerHandler implements Server {
   private server: node.Server;
   private uri: Promise<ParsedUri>;
@@ -44,4 +36,10 @@ export class ServerHandler implements Server {
   }
 }
 
-
+export const adapter = (handler: HttpHandler) => (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
+  const req = requestNodeToHttp4t(nodeRequest);
+  (async () => {
+    const response = await handler.handle(req);
+    responseHttp4tToNode(response, nodeResponse);
+  })();
+};

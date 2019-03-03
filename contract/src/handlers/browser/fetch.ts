@@ -5,6 +5,38 @@ import {host} from "../../requests";
 import {response} from "../../responses";
 import {Uri} from "../../uri";
 
+/**
+ * Streams response body, but not request body.
+ *
+ * There is no streaming a fetch body yet. Accepted by WHATWG Jan 2017 https://github.com/whatwg/fetch/pull/425
+ * and in the spec https://fetch.spec.whatwg.org/#bodies but not implemented in Chrome yet, at least, and not looking l
+ * ike it will be for a while: https://bugs.chromium.org/p/chromium/issues/detail?id=688906
+ */
+export class FetchHandler implements HttpHandler {
+  constructor(private readonly opts: Partial<Opts> = {}) {
+  }
+
+  handle(request: HttpRequest): Promise<HttpResponse> {
+    return new Promise<HttpResponse>((resolve, reject) => {
+
+        toFetchRequest(request, this.opts).then(fetchRequest =>
+          fetch(fetchRequest)
+            .then(fetchResponse => {
+              resolve(toResponse(fetchResponse))
+            })
+            .catch(reject)
+        ).catch(reject)
+      }
+    );
+  }
+}
+
+/*
+-----------------------------------
+Helpers
+-----------------------------------
+ */
+
 function readableStream(body: Body): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     start: async controller => {
@@ -49,13 +81,17 @@ const DEFAULT_OPTS: Opts = {
   mode: "cors" // TODO: is this right?
 };
 
-async function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Promise<Request> {
-  const headers = request.headers.reduce((headers, [n, v]) => {
+function toFetchHeaders(request: HttpRequest) {
+  return request.headers.reduce((headers, [n, v]) => {
     if (unsafeHeaders.indexOf(n.toLowerCase()) != -1) return headers;
     if (typeof v == 'undefined') return headers;
     headers.append(n, v);
     return headers
   }, new Headers());
+}
+
+async function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Promise<Request> {
+  const headers = toFetchHeaders(request);
 
   return new Request(
     Uri.of(request.uri).toString(),
@@ -77,21 +113,3 @@ function toResponse(fetchResponse: Response): HttpResponse {
 }
 
 
-export class FetchHandler implements HttpHandler {
-  constructor(private readonly opts: Partial<Opts> = {}) {
-  }
-
-  handle(request: HttpRequest): Promise<HttpResponse> {
-    return new Promise<HttpResponse>((resolve, reject) => {
-
-        toFetchRequest(request, this.opts).then(fetchRequest =>
-          fetch(fetchRequest)
-            .then(fetchResponse => {
-              resolve(toResponse(fetchResponse))
-            })
-            .catch(reject)
-        ).catch(reject)
-      }
-    );
-  }
-}
