@@ -1,8 +1,10 @@
 import {Readable, Writable} from 'stream';
+
 import {AsyncIteratorHandler} from "../../AsyncIteratorHandler";
 
-import {streamBinary, textEncoder} from "../../bodies";
+import {streamBinary} from "../../bodies";
 import {Body} from "../../contract";
+import {textEncoder} from "../../textencoding";
 
 export async function bodyToStream(body: Body | undefined, stream: Writable): Promise<void> {
   if (!body) return stream.end();

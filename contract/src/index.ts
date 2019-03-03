@@ -5,3 +5,5 @@ export * from './requests';
 export * from './responses';
 export * from './handlers';
 export * from './uri';
+export {textEncoder} from "./textencoding";
+export {textDecoder} from "./textencoding";

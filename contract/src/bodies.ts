@@ -1,4 +1,5 @@
 import {Body, Data} from "./contract";
+import {textDecoder, textEncoder} from "./textencoding";
 
 /*
 -----------------------------------
@@ -81,20 +82,6 @@ export function dataBinary(data: Data) {
 Helpers
 -----------------------------------
  */
-
-function textDecoder():TextDecoder {
-  if(typeof TextDecoder === 'function')
-    return new TextDecoder('utf-8');
-  const util = require('util');
-  return new util.TextDecoder('utf-8')
-}
-
-function textEncoder():TextEncoder{
-  if(typeof TextEncoder === 'function')
-    return new TextEncoder();
-  const util = require('util');
-  return new util.TextEncoder()
-}
 
 // TODO: this is janky, but nice error messages are nice. Have a think about it
 export function typeDescription(x: any): string {
