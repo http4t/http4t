@@ -52,7 +52,7 @@ export class UriTemplate {
       .replace(/[{}]/g, '')
       .split(',')
       .reduce((captures: Captures, queryParameter: string) => {
-        const regExpMatchArray = decodeURIComponent(query).match(new RegExp(`${queryParameter}=([^&]+)`));
+        const regExpMatchArray = decodeURIComponent(query).match(new RegExp(`${queryParameter}=([^&]*)`));
         if (!regExpMatchArray) return captures;
         captures[queryParameter] = decodeURIComponent(regExpMatchArray[1]);
         return captures;
@@ -83,7 +83,7 @@ export class UriTemplate {
       .replace(/[{}]/g, '')
       .split(',')
       .map(queryParameter => {
-        return captures[queryParameter]
+        return captures[queryParameter] !== undefined
           ? `${encodeURIComponent(queryParameter)}=${encodeURIComponent(captures[queryParameter])}`
           : undefined;
       })

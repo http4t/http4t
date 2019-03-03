@@ -43,12 +43,13 @@ describe('UriTemplate', () => {
   });
 
   it('expanding null or undefined query parameters', () => {
-    const uriTemplate = UriTemplate.of('/part{?query1,query2}');
-    const uri = '/part?query1=value1';
+    const uriTemplate = UriTemplate.of('/part{?query1,query2,query3}');
+    const uri = '/part?query1=value1&query3=';
     const captures = uriTemplate.extract(uri);
 
     expect(captures).eql({
-      query1: 'value1'
+      query1: 'value1',
+      query3: ''
     });
     expect(uriTemplate.expand(captures)).eq(uri);
   });
