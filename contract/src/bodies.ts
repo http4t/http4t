@@ -1,47 +1,10 @@
 import {Body, Data} from "./contract";
 
-// TODO: this is janky, but nice error messages are nice. Have a think about it
-export function typeDescription(x: any): string {
-  if (x === null)
-    return 'null';
-
-  let t = typeof x;
-  if (t !== 'object') return t;
-
-  const p = Object.getPrototypeOf(x);
-  if (p !== Object.prototype)
-    return p.constructor.name;
-
-  return t
-}
-
-function isAsyncIterable(instance: any): instance is AsyncIterable<any> {
-  return typeof instance == 'object' && Symbol.asyncIterator in instance;
-}
-
-
-function isIterable(instance: any): instance is Iterable<any> {
-  return typeof instance == 'object' && Symbol.iterator in instance;
-}
-
-
-function isUint8Array(instance: any): instance is Uint8Array {
-  return typeof instance == 'object' && instance instanceof Uint8Array;
-}
-
-function isData(instance: any): instance is Data {
-  return typeof instance == 'string' || isUint8Array(instance);
-}
-
-function isPromiseLike(instance: any): instance is PromiseLike<any> {
-  return typeof instance == 'object' && 'then' in instance;
-}
-
-async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
-  const result: T[] = [];
-  for await (const value of iterable) result.push(value);
-  return result;
-}
+/*
+-----------------------------------
+Core functions
+-----------------------------------
+ */
 
 export class Buffered {
   static text = bufferText;
@@ -101,20 +64,6 @@ export async function* streamBinary(body: Body): AsyncIterable<Uint8Array> {
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
-export function textDecoder():TextDecoder {
-  if(typeof TextDecoder === 'function')
-    return new TextDecoder('utf-8');
-  const util = require('util');
-  return new util.TextDecoder('utf-8')
-}
-
-export function textEncoder():TextEncoder{
-  if(typeof TextEncoder === 'function')
-    return new TextEncoder();
-  const util = require('util');
-  return new util.TextEncoder()
-}
-
 export function dataString(data: Data) {
   if (typeof data === 'string') return data;
   if (data instanceof Uint8Array) return textDecoder().decode(data);
@@ -127,4 +76,65 @@ export function dataBinary(data: Data) {
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
+/*
+-----------------------------------
+Helpers
+-----------------------------------
+ */
 
+function textDecoder():TextDecoder {
+  if(typeof TextDecoder === 'function')
+    return new TextDecoder('utf-8');
+  const util = require('util');
+  return new util.TextDecoder('utf-8')
+}
+
+function textEncoder():TextEncoder{
+  if(typeof TextEncoder === 'function')
+    return new TextEncoder();
+  const util = require('util');
+  return new util.TextEncoder()
+}
+
+// TODO: this is janky, but nice error messages are nice. Have a think about it
+export function typeDescription(x: any): string {
+  if (x === null)
+    return 'null';
+
+  let t = typeof x;
+  if (t !== 'object') return t;
+
+  const p = Object.getPrototypeOf(x);
+  if (p !== Object.prototype)
+    return p.constructor.name;
+
+  return t
+}
+
+function isAsyncIterable(instance: any): instance is AsyncIterable<any> {
+  return typeof instance == 'object' && Symbol.asyncIterator in instance;
+}
+
+
+function isIterable(instance: any): instance is Iterable<any> {
+  return typeof instance == 'object' && Symbol.iterator in instance;
+}
+
+
+function isUint8Array(instance: any): instance is Uint8Array {
+  return typeof instance == 'object' && instance instanceof Uint8Array;
+}
+
+function isData(instance: any): instance is Data {
+  return typeof instance == 'string' || isUint8Array(instance);
+}
+
+function isPromiseLike(instance: any): instance is PromiseLike<any> {
+  return typeof instance == 'object' && 'then' in instance;
+}
+
+async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
+  const result: T[] = [];
+  for await (const value of iterable) result.push(value);
+  return result;
+}

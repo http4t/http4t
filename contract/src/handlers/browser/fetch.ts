@@ -1,4 +1,4 @@
-import {bufferBinary, bufferText, streamBinary} from "../../bodies";
+import {bufferText, streamBinary} from "../../bodies";
 import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../../contract";
 import {header} from "../../headers";
 import {host} from "../../requests";
