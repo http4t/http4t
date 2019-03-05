@@ -75,7 +75,12 @@ function publishDocs() {
         mkdir -p ${TMP}/api
         cp -R dist/docs ${TMP}/api/${moduleName}
     fi
-    #push docs back to git here.
+    cd ${TMP}
+    sed s/\>\</\>`date '+%Y-%m-%d'`\</g sitemap.xml > new ; mv new sitemap.xml
+    git add .
+    git commit -m "${moduleName} update"
+    git push
+    cd -
 }
 
 function ci() {
