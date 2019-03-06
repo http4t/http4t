@@ -58,10 +58,10 @@ describe('UriTemplate', () => {
 
   it('encodes / decodes uri segments', () => {
     const uriTemplate = UriTemplate.of('/part/{capture1}/part/{?query 1}');
-    const uri = '/part/one%20two/part/?query%201=value%201';
+    const uri = '/part/one%2Ftwo/part/?query%201=value%201';
 
     expect(uriTemplate.extract(uri)).eql({
-      capture1: 'one two',
+      capture1: 'one/two',
       'query 1': 'value 1'
     });
 

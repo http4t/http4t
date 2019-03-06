@@ -12,7 +12,7 @@ export class UriTemplate {
     const [pathTemplate, queryTemplate] = this.template.split(queryCaptureIdentifier);
     this.pathTemplate = pathTemplate;
     this.queryTemplate = queryTemplate ? '{' + queryTemplate : undefined;
-    this.pathVariableCapturingRegexp = this.makeCapturingTemplate();
+    this.pathVariableCapturingRegexp = this.pathVariableCapturingTemplate();
   }
 
   static of(template: string) {
@@ -61,10 +61,8 @@ export class UriTemplate {
   }
 
   private expandPath(captures: Captures): string {
-    return Object.keys(captures).reduce((rebuilt: string, capture: string) => {
-      return rebuilt.replace(
-        `{${capture}}`,
-        captures[capture].includes('/') ? captures[capture] : encodeURIComponent(captures[capture]))
+    return Object.keys(captures).reduce((path: string, variable: string) => {
+      return path.replace(`{${variable}}`, encodeURIComponent(captures[variable]))
     }, this.pathTemplate).replace(/[{}]/g, '');
   }
 
@@ -78,11 +76,11 @@ export class UriTemplate {
           ? `${encodeURIComponent(queryParameter)}=${encodeURIComponent(captures[queryParameter])}`
           : undefined;
       })
-      .filter(it => !!it)
+      .filter(it => it !== undefined)
       .join('&');
   }
 
-  private makeCapturingTemplate(): RegExp {
+  private pathVariableCapturingTemplate(): RegExp {
     const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
     let match, pathCapturingTemplate = noTrailingSlash;
     const pathVariables = new RegExp('{([^}]+?)(?::([^}]+))?}', 'g');
@@ -91,4 +89,8 @@ export class UriTemplate {
     }
     return new RegExp(pathCapturingTemplate);
   }
+}
+
+export function uriTemplate(template: string): UriTemplate {
+  return new UriTemplate(template)
 }
