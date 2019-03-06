@@ -79,6 +79,5 @@ describe('UriTemplate', () => {
       capture2: 'a'
     });
   });
-
 });
 

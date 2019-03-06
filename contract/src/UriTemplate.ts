@@ -36,6 +36,10 @@ export class UriTemplate {
   }
 
   private extractPathCaptures(path: string): Captures {
+    const message = new Regex('(.+)').matches('/foo/bar/');
+    for (const m of message) {
+      console.log(m)
+    }
     const pathVariableNames = (this.pathTemplate.match(/{([^:}]+)/g) || []).map(name => name.replace('{', ''));
     const values = this.pathVariableCapturingRegexp.exec(path);
 
@@ -81,16 +85,38 @@ export class UriTemplate {
   }
 
   private pathVariableCapturingTemplate(): RegExp {
-    const noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
-    let match, pathCapturingTemplate = noTrailingSlash;
-    const pathVariables = new RegExp('{([^}]+?)(?::([^}]+))?}', 'g');
-    while (match = pathVariables.exec(noTrailingSlash)) {
-      pathCapturingTemplate = pathCapturingTemplate.replace(/{[^}]+}/, match[2] ? `(${match[2]})` : '(.+?)');
-    }
-    return new RegExp(pathCapturingTemplate);
+    let noTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
+    const templateRewritingRegex = new Regex('{([^}]+?)(?::([^}]+))?}');
+    return new RegExp(
+      Array.from(templateRewritingRegex.matches(noTrailingSlash)).reduce((pathVariableCapturingTemplate, match) => {
+        return pathVariableCapturingTemplate.replace(/{[^}]+}/, match && match[2] ? `(${match[2]})` : '(.+?)');
+      }, noTrailingSlash));
   }
 }
 
 export function uriTemplate(template: string): UriTemplate {
   return new UriTemplate(template)
+}
+
+export class Regex {
+  private matched: RegExpExecArray | null;
+
+  constructor(private pattern: string) {
+    this.matched = null;
+  }
+
+  [Symbol.iterator]() {
+    return this.matches('foo')[Symbol.iterator]()
+  }
+
+  match(against: string) {
+    return new RegExp(this.pattern).exec(against)
+  }
+
+  * matches(against: string): Iterable<RegExpExecArray | null> {
+    const regex = new RegExp(this.pattern, 'g');
+    while (this.matched = regex.exec(against)) {
+      yield this.matched;
+    }
+  }
 }
