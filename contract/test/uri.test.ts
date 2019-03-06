@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {Uri} from "../src/uri";
+import {Uri} from "../src";
 
 describe('Uri', function() {
   describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function() {

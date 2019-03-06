@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import {TextEncoder} from "util";
-import {bufferText} from "../src/bodies";
+import {TextEncoder} from "text-encoding"; // TODO: implement this- library is a bit dead
+import {bufferText} from "../src/";
 
 describe('text()', () => {
     it('handles strings', async () => {

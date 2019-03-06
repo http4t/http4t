@@ -1,12 +1,17 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "../contract";
-import {Headers} from "../headers";
-import {modify} from "../util";
+import * as requests from "../requests";
+import {Uri} from "../uri";
+import {FetchHandler} from "./browser";
 
 export class HostHandler implements HttpHandler {
   constructor(private handler: HttpHandler, private host: string) {
   }
 
   handle(request: HttpRequest): Promise<HttpResponse> {
-    return this.handler.handle(modify(request, 'headers', Headers.replace('Host', this.host)));
+    // TODO: this is so, so wrong
+    if(this.handler instanceof FetchHandler)
+      return this.handler.handle(requests.modifyRequest(request,{uri:Uri.modify(request.uri, {authority:this.host})}));
+
+    return this.handler.handle(requests.setHeader(request, 'Host', this.host));
   }
 }

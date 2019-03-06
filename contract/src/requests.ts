@@ -1,5 +1,5 @@
-import {Body, Header, HttpRequest, Method} from "./";
-import {UriLike, Uri} from "./uri";
+import {Body, getHeaderValue, header, Header, HeaderName, HeaderValue, HttpRequest, Method} from "./";
+import {Uri, UriLike} from "./uri";
 
 export function request(method: Method, uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {
   return {
@@ -8,6 +8,10 @@ export function request(method: Method, uri: UriLike, body?: Body, ...headers: H
     headers: headers,
     body: body ? body : ''
   };
+}
+
+export function modifyRequest(request: HttpRequest, modifications: Partial<HttpRequest>): HttpRequest {
+  return Object.assign({}, request, modifications);
 }
 
 export function get(uri: UriLike, ...headers: Header[]): HttpRequest {
@@ -28,4 +32,17 @@ export function patch(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequ
 
 export function delete_(uri: UriLike | string, ...headers: Header[]): HttpRequest {
   return request("DELETE", uri, undefined, ...headers);
+}
+
+export function setHeader(req: HttpRequest, name: HeaderName, value: HeaderValue): HttpRequest {
+  return modifyRequest(req, {headers: [...req.headers, header(name, value)]});
+}
+
+export function host(request: HttpRequest): string {
+  if (typeof request.uri.authority != 'undefined')
+    return request.uri.authority;
+
+  const value = getHeaderValue(request.headers, 'Host');
+  if (typeof value != 'string') throw new Error(`Could not get authority from request uri '${request.uri}'`);
+  return value;
 }

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+
+docker build -t http4t/mkdocs .
+docker run -v $(pwd):/http4t.docs http4t/mkdocs mkdocs build

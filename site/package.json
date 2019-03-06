@@ -1,0 +1,11 @@
+{
+  "name": "@http4t/site",
+  "version": "${VERSION}",
+  "repository": "git@github.com:http4t/http4t.git",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "./build-site",
+    "docs": "echo no-op",
+    "test": "echo no-op"
+  }
+}
