@@ -19,12 +19,13 @@ export class UriTemplate {
     return new UriTemplate(template)
   }
 
-  matches(uri: string): boolean {
-    return this.pathVariableCapturingRegexp.exec(Uri.parse(uri).path) !== null
+  matches(uri: Uri | string): boolean {
+    const path = typeof uri === 'string' ? Uri.parse(uri).path : uri.path;
+    return this.pathVariableCapturingRegexp.exec(path) !== null
   }
 
-  extract(uri: string): Captures {
-    const parsedUri = Uri.parse(uri);
+  extract(uri: Uri | string): Captures {
+    const parsedUri = typeof uri === 'string' ? Uri.parse(uri) : uri;
     return {
       ...this.extractPathCaptures(parsedUri.path),
       ...this.extractQueryCaptures(parsedUri.query)
@@ -36,10 +37,6 @@ export class UriTemplate {
   }
 
   private extractPathCaptures(path: string): Captures {
-    const message = new Regex('(.+)').matches('/foo/bar/');
-    for (const m of message) {
-      console.log(m)
-    }
     const pathVariableNames = (this.pathTemplate.match(/{([^:}]+)/g) || []).map(name => name.replace('{', ''));
     const values = this.pathVariableCapturingRegexp.exec(path);
 
