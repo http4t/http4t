@@ -7,6 +7,7 @@
 /**
  * The standard HTTP method type as defined by [RFC 7230](https://tools.ietf.org/html/rfc7230) or an extension
  */
+
 export type Method =
   'GET'
   | 'POST'
@@ -99,6 +100,23 @@ export interface ParsedUri {
   readonly path: string;
   readonly query?: string;
   readonly fragment?: string;
+}
+
+/**
+ * ParsedAuthority as specified by [RFC 3986](https://tools.ietf.org/html/rfc3986)
+ */
+export interface ParsedAuthority {
+  readonly host?: string;
+  readonly port?: string;
+  readonly userInfo?: ParsedUserInfo;
+}
+
+/**
+ * ParsedUserInfo as specified by [RFC 3986](https://tools.ietf.org/html/rfc3986)
+ */
+export interface ParsedUserInfo {
+  readonly username?: string;
+  readonly password?: string;
 }
 
 /**

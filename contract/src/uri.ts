@@ -1,4 +1,4 @@
-import {ParsedUri} from "./contract";
+import { ParsedAuthority, ParsedUri, ParsedUserInfo } from "./contract";
 
 /**
  * UriLike is either a unparsed or parsed
@@ -12,7 +12,7 @@ export class Uri implements ParsedUri {
   readonly query?: string;
   readonly fragment?: string;
 
-  constructor({scheme, authority, path, query, fragment}: ParsedUri) {
+  constructor({ scheme, authority, path, query, fragment }: ParsedUri) {
     this.scheme = scheme;
     this.authority = authority;
     this.path = path;
@@ -27,7 +27,7 @@ export class Uri implements ParsedUri {
     const match = Uri.RFC_3986.exec(uri);
     if (!match) throw new Error(`Invalid Uri: ${uri}`);
     const [, , scheme, , authority, path, , query, , fragment] = match;
-    return new Uri({scheme, authority, path, query, fragment});
+    return new Uri({ scheme, authority, path, query, fragment });
   }
 
   static of(uri: UriLike): Uri {
@@ -56,3 +56,52 @@ export class Uri implements ParsedUri {
   }
 }
 
+export class Authority implements ParsedAuthority {
+  readonly host?: string;
+  readonly port?: string;
+  readonly userInfo?: ParsedUserInfo;
+  private readonly AUTHORITY = "([^:]+)(?:\:([^@]+)@)?([^:]+)(?:\:(\\d+))?";
+
+  constructor(authority?: string) {
+    const match = regex(this.AUTHORITY).match(authority || '');
+    const [_, username = '', password = '', host = '', port = ''] = match;
+    this.userInfo = { username, password };
+    this.host = host;
+    this.port = port;
+  }
+
+  static from(authority: string) {
+    return new Authority(authority);
+  }
+}
+
+export function authority(authority: string): Authority {
+  return new Authority(authority);
+}
+
+function regex(pattern: string): Regex {
+  return new Regex(pattern);
+}
+
+class Regex {
+  private matched: RegExpExecArray | null;
+
+  constructor(private pattern: string) {
+    this.matched = null;
+  }
+
+  [Symbol.iterator]() {
+    return this.matches('foo')[Symbol.iterator]()
+  }
+
+  match(against: string) {
+    return new RegExp(this.pattern).exec(against)
+  }
+
+  * matches(against: string): Iterable<RegExpExecArray | null> {
+    const regex = new RegExp(this.pattern, 'g');
+    while (this.matched = regex.exec(against)) {
+      yield this.matched;
+    }
+  }
+}

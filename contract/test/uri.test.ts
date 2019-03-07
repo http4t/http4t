@@ -1,5 +1,5 @@
-import {assert} from 'chai';
-import {Uri} from "../src";
+import {assert, expect} from 'chai';
+import { authority, Uri } from "../src";
 
 describe('Uri', function() {
   describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function() {
@@ -44,6 +44,13 @@ describe('Uri', function() {
 
   it('supports toJSON ', function () {
     assert.equal(JSON.stringify(Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related')), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
+  });
+
+  it('parses authority', function () {
+    expect(authority('user:password@tld.domain.com:443').userInfo).eql({ username: 'user', password: 'password'});
+    assert.equal(authority('user:password@tld.domain.com:443').host, 'tld.domain.com');
+    assert.equal(authority('user:password@tld.domain.com:443').port, '443');
+    assert.equal(authority('user:password@0.0.0.0:443').host, '0.0.0.0');
   });
 });
 
