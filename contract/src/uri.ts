@@ -27,7 +27,8 @@ export class Uri implements ParsedUri {
     const match = Uri.RFC_3986.exec(uri);
     if (!match) throw new Error(`Invalid Uri: ${uri}`);
     const [, , scheme, , authority, path, , query, , fragment] = match;
-    return new Uri({ scheme, authority: Authority.from(authority), path, query, fragment });
+    const parsedAuthority = typeof authority != 'undefined' ? Authority.from(authority) : undefined;
+    return new Uri({ scheme, authority: parsedAuthority, path, query, fragment });
   }
 
   static of(uri: UriLike): Uri {
@@ -62,7 +63,7 @@ export class Authority implements ParsedAuthority {
   private readonly AUTHORITY = regex("(?:([^:]+)(?:\:([^@]*)@))?([^:]+)(?:\:(\\d+))?");
 
   constructor(authority?: string) {
-    const match = this.AUTHORITY.match(authority || '');
+    const match = this.AUTHORITY.match(authority || '') || [];
     const [_, username, password = '', host = '', port] = match;
     this.userInfo = username ? { username, password } : undefined;
     this.host = host;
