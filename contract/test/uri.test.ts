@@ -11,7 +11,7 @@ describe('Uri', function() {
     it('can parse example from #appendix-B', function() {
       const uri = Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related');
       assert.equal(uri.scheme, 'http');
-      assert.equal(uri.authority, 'www.ics.uci.edu');
+      assert.equal(uri.authority!.toString(), 'www.ics.uci.edu');
       assert.equal(uri.path, '/pub/ietf/uri/');
       assert.equal(uri.query, undefined);
       assert.equal(uri.fragment, 'Related');
@@ -40,17 +40,34 @@ describe('Uri', function() {
       assertComponentRecomposition('ldap:///o=University%20of%20Michigan,c=US');
       assertComponentRecomposition('?foo'); // Just a query string
     });
+
+    it('parses authority and userinfo', function () {
+      expect(authority('user:password@tld.domain.com:443').userInfo).eql({ username: 'user', password: 'password'});
+      assert.equal(authority('user:password@tld.domain.com:443').host, 'tld.domain.com');
+      assert.equal(authority('user:password@tld.domain.com:443').port, '443');
+      assert.equal(authority('user:password@0.0.0.0:443').host, '0.0.0.0');
+    });
+
+    it('ignores if authority and userinfo not present', function () {
+      expect(authority('tld.domain.com:443').userInfo).eql(undefined);
+    });
+
+    it('defaults password', function () {
+      expect(authority('user:@tld.domain.com:443').userInfo).eql({username: 'user', password: ''});
+    });
+
+    it('no port', function () {
+      assert.equal(authority('tld.domain.com').port, undefined);
+    });
+
+    it('supports toString()', function () {
+      const string = 'user:password@tld.domain.com:443';
+      assert.equal(authority(string).toString(), string);
+    });
   });
 
   it('supports toJSON ', function () {
     assert.equal(JSON.stringify(Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related')), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
-  });
-
-  it('parses authority', function () {
-    expect(authority('user:password@tld.domain.com:443').userInfo).eql({ username: 'user', password: 'password'});
-    assert.equal(authority('user:password@tld.domain.com:443').host, 'tld.domain.com');
-    assert.equal(authority('user:password@tld.domain.com:443').port, '443');
-    assert.equal(authority('user:password@0.0.0.0:443').host, '0.0.0.0');
   });
 });
 

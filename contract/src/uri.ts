@@ -7,7 +7,7 @@ export type UriLike = string | ParsedUri;
 
 export class Uri implements ParsedUri {
   readonly scheme?: string;
-  readonly authority?: string;
+  readonly authority?: ParsedAuthority;
   readonly path: string;
   readonly query?: string;
   readonly fragment?: string;
@@ -27,7 +27,7 @@ export class Uri implements ParsedUri {
     const match = Uri.RFC_3986.exec(uri);
     if (!match) throw new Error(`Invalid Uri: ${uri}`);
     const [, , scheme, , authority, path, , query, , fragment] = match;
-    return new Uri({ scheme, authority, path, query, fragment });
+    return new Uri({ scheme, authority: Authority.from(authority), path, query, fragment });
   }
 
   static of(uri: UriLike): Uri {
@@ -38,9 +38,8 @@ export class Uri implements ParsedUri {
   /** {@link https://tools.ietf.org/html/rfc3986#section-5.3} */
   toString() {
     const result: string[] = [];
-
     if (typeof this.scheme != 'undefined') result.push(this.scheme, ":");
-    if (typeof this.authority != 'undefined') result.push("//", this.authority);
+    if (typeof this.authority != 'undefined' && typeof this.authority.host != 'undefined') result.push("//", this.authority.toString());
     result.push(this.path);
     if (typeof this.query != 'undefined') result.push("?", this.query);
     if (typeof this.fragment != 'undefined') result.push("#", this.fragment);
@@ -60,18 +59,32 @@ export class Authority implements ParsedAuthority {
   readonly host?: string;
   readonly port?: string;
   readonly userInfo?: ParsedUserInfo;
-  private readonly AUTHORITY = "([^:]+)(?:\:([^@]+)@)?([^:]+)(?:\:(\\d+))?";
+  private readonly AUTHORITY = regex("(?:([^:]+)(?:\:([^@]*)@))?([^:]+)(?:\:(\\d+))?");
 
   constructor(authority?: string) {
-    const match = regex(this.AUTHORITY).match(authority || '');
-    const [_, username = '', password = '', host = '', port = ''] = match;
-    this.userInfo = { username, password };
+    const match = this.AUTHORITY.match(authority || '');
+    const [_, username, password = '', host = '', port] = match;
+    this.userInfo = username ? { username, password } : undefined;
     this.host = host;
     this.port = port;
   }
 
-  static from(authority: string) {
+  static from(authority?: string) {
     return new Authority(authority);
+  }
+
+  toString() {
+    const result: string[] = [];
+
+    if (this.userInfo) {
+      if (typeof this.userInfo.username != 'undefined') result.push(this.userInfo.username, ":");
+      if (typeof this.userInfo.password != 'undefined') result.push(this.userInfo.password);
+      if (this.host != undefined) result.push('@');
+    }
+    if (this.host != undefined) result.push(this.host);
+    if (this.port != undefined) result.push(':', this.port);
+
+    return result.join('');
   }
 }
 

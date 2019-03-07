@@ -96,7 +96,7 @@ export type Body = SyncBody | AsyncBody;
  */
 export interface ParsedUri {
   readonly scheme?: string;
-  readonly authority?: string;
+  readonly authority?: ParsedAuthority;
   readonly path: string;
   readonly query?: string;
   readonly fragment?: string;
