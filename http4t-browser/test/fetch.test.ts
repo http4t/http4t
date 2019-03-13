@@ -4,7 +4,7 @@ describe("FetchHandler", function () {
   handlerContract(async () => {
     if (typeof fetch == 'undefined') throw new Error("Unsupported");
 
-    const {FetchHandler} = await import('../../http4t-core/src');
+    const {FetchHandler} = await import('../src/fetch');
     return new FetchHandler();
   });
 });
