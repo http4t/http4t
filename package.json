@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "workspaces": [
+    "http4t-*",
+    "http4t-*/src"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.11.3",
+    "chai": "^4.1.7",
+    "madge": "^3.2.0",
+    "mocha": "^5.2.0",
+    "ts-node": "^8.0.3",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.3.3333"
+  }
+}

@@ -20,8 +20,9 @@ if [[ ! $(command -v yarn) ]]; then
     npm install -g yarn
 fi
 
-if [[ -f "package.json" ]]; then
+if [[ ! -d  ".git" ]]; then
     yarn install
+    yarn clean
     yarn build
     yarn test
     #yarn test-browser
@@ -30,11 +31,11 @@ if [[ -f "package.json" ]]; then
     dist=dist
     out=out
 else
-    for module in */package.json; do
+    for module in */run; do
         modulePath=`dirname ${module}`
         echo "Running for module ${modulePath}"
-        pushd ${modulePath}
-        ./run $@
+        pushd "${modulePath}"
+        ./run "$@"
         cd ..
     done
 fi

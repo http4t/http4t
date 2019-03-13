@@ -1,0 +1,11 @@
+import { Body, Header, HeaderName, HeaderValue, HttpRequest, Method } from "./contract";
+import { UriLike } from "./uri";
+export declare function request(method: Method, uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest;
+export declare function modifyRequest(request: HttpRequest, modifications: Partial<HttpRequest>): HttpRequest;
+export declare function get(uri: UriLike, ...headers: Header[]): HttpRequest;
+export declare function post(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest;
+export declare function put(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest;
+export declare function patch(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest;
+export declare function delete_(uri: UriLike | string, ...headers: Header[]): HttpRequest;
+export declare function setHeader(req: HttpRequest, name: HeaderName, value: HeaderValue): HttpRequest;
+export declare function host(request: HttpRequest): string;
