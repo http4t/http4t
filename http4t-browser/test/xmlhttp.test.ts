@@ -4,7 +4,7 @@ describe("XmlHttpHandler", function () {
   handlerContract(async () => {
     if (typeof XMLHttpRequest == 'undefined') throw new Error("Unsupported");
 
-    const {XmlHttpHandler} = await import('../../http4t-core/src');
+    const {XmlHttpHandler} = await import('../src/xmlhttp');
     return new XmlHttpHandler();
   });
 });

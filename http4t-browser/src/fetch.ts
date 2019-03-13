@@ -1,9 +1,8 @@
-import {bufferText, streamBinary} from "../../http4t-core/src/bodies";
-import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../../http4t-core/src/contract";
-import {header} from "../../http4t-core/src/headers";
-import {host} from "../../http4t-core/src/requests";
-import {response} from "../../http4t-core/src/responses";
-import {Uri} from "../../http4t-core/src/uri";
+import {bufferText, streamBinary} from "@http4t/core/bodies";
+import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {header} from "@http4t/core/headers";
+import {response} from "@http4t/core/responses";
+import {Uri} from "@http4t/core/uri";
 
 /**
  * Streams response body, but not request body.

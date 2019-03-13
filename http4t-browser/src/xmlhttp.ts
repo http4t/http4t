@@ -1,8 +1,8 @@
-import {bufferText, typeDescription} from "../../http4t-core/src/bodies";
-import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "../../http4t-core/src/contract";
-import {host} from "../../http4t-core/src/requests";
-import {response} from "../../http4t-core/src/responses";
-import {Uri} from "../../http4t-core/src/uri";
+import {bufferText, typeDescription} from "@http4t/core/bodies";
+import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {host} from "@http4t/core/requests";
+import {response} from "@http4t/core/responses";
+import {Uri} from "@http4t/core/uri";
 
 export class XmlHttpHandler implements HttpHandler {
   constructor(private readonly handler: XMLHttpRequest = new XMLHttpRequest()) {
