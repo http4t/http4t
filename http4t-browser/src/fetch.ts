@@ -1,8 +1,8 @@
-import {bufferText, streamBinary} from "@http4t/core/bodies";
 import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
 import {response} from "@http4t/core/responses";
 import {Uri} from "@http4t/core/uri";
+import {bufferText, streamBinary} from "@http4t/core/bodies";
 
 /**
  * Streams response body, but not request body.

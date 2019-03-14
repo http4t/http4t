@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "http4t-*",
-    "http4t-*/src"
+    "http4t-*/src",
+    "http4t-*/test"
   ],
   "devDependencies": {
     "@types/chai": "^4.1.7",
