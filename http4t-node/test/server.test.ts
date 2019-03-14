@@ -2,7 +2,7 @@ import {assert} from 'chai';
 import {runningInNode} from "./client.test";
 import {Server} from "@http4t/core/server";
 import {BinHandler} from "@http4t/core/bin";
-import {handlerContract} from "@http4t/core-test/test/handler.contract";
+import {handlerContract} from "@http4t/core-test/handler.contract";
 
 describe("ServerHandler", function () {
     let server = new Promise<Server>(async (resolve, reject) => {

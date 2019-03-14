@@ -1,4 +1,4 @@
-import {handlerContract} from "@http4t/core-test/test/handler.contract";
+import {handlerContract} from "@http4t/core-test/handler.contract";
 
 export function runningInNode() {
   return (typeof process !== 'undefined') && (typeof process.versions.node !== 'undefined');

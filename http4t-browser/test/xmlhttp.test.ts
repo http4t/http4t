@@ -1,4 +1,4 @@
-import {handlerContract} from '../../http4t-core/test/handler.contract';
+import {handlerContract} from '@http4t/core-test/handler.contract';
 
 describe("XmlHttpHandler", function () {
   handlerContract(async () => {

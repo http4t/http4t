@@ -1,5 +1,5 @@
 {
-  "name": "@http4t/browser-test",
+  "name": "@http4t/browser-project",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -8,5 +8,8 @@
     "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src",
     "test": "NODE_ENV=development mocha --require ts-node/register --exit  'test/**/*.test.ts'",
     "test-browser": "ts-node test-browser.ts"
+  },
+  "dependencies": {
+    "@http4t/core": "0.0.1"
   }
 }
