@@ -20,7 +20,11 @@ if [[ ! $(command -v yarn) ]]; then
     npm install -g yarn
 fi
 
-if [[ ! -d  ".git" ]]; then
+function build() {
+    if [[ -n "$1" ]]; then
+        pushd $1
+    fi
+
     yarn install
     yarn clean
     yarn build
@@ -28,18 +32,11 @@ if [[ ! -d  ".git" ]]; then
     #yarn test-browser
     yarn docs
 
-    dist=dist
-    out=out
-else
-    for module in */run; do
-        modulePath=`dirname ${module}`
-        echo "Running for module ${modulePath}"
-        pushd "${modulePath}"
-        ./run "$@"
-        cd ..
-    done
-fi
+    if [[ -n "$1" ]]; then
+        popd
+    fi
 
+}
 
 function package() {
     if [[ ! $(command -v envsubst) ]]; then
@@ -88,6 +85,16 @@ function ci() {
     package
 #    publish
 }
+
+if [[ -d  ".git" ]]; then
+    # Have to build in correct order
+    build http4t-core
+    build http4t-node
+    build http4t-browser
+    build site
+else
+    build
+fi
 
 if [[ -n "$1" ]]; then
     "$1"
