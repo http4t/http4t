@@ -10,6 +10,6 @@
     "test-browser": "ts-node test-browser.ts"
   },
   "dependencies": {
-    "@http4t/core": "0.0.1"
+    "@http4t/core": "0.0.2"
   }
 }
