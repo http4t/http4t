@@ -39,23 +39,40 @@ function build() {
 }
 
 function package() {
-    if [[ ! $(command -v envsubst) ]]; then
-        sudo apt-get install gettext
-    fi
+    pushd $1
 
-    mkdir -p ${dist}
-    envsubst < package.json > ${dist}/package.json
-    cp -r ${out}/src/* ${dist}
-    cp README.md LICENSE ${dist}
+    rm -rf dist
+    mkdir -p dist
+
+    cp -r src/* dist
+    cp ../LICENSE dist
+
+    popd
 }
 
 function publish() {
+    if [[ ! -n "$1" ]]; then
+        echo "ERROR: Specify directory"
+        exit 1
+    fi
+    if [[ ! -n "$NPM_TOKEN" ]]; then
+        echo "ERROR: Specify NPM_TOKEN"
+        exit 1
+    fi
+    if [[ ! -n "$TAG" ]]; then
+        echo "ERROR: Specify TAG"
+        exit 1
+    fi
+
+    dist=$1/dist
+
     mkdir -p ${dist}
     cat >${dist}/.npmrc <<EOL
 @http4t:registry=https://registry.npmjs.org
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}
 EOL
     pushd ${dist}
+    sed "s/\$\{BUILD_NUM\}/${CIRCLE_BUILD_NUM}/g" package.json
     npm publish --tag ${TAG} --access public
     popd
 }
@@ -81,9 +98,14 @@ function publishDocs() {
     cd -
 }
 
+
 function ci() {
-    package
-#    publish
+    modules=$(ls | grep "http4t-.*")
+
+    for module in $modules; do
+        package $module
+        publish $module
+    done
 }
 
 if [[ -d  ".git" ]]; then
