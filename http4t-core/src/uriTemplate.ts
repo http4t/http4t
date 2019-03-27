@@ -1,4 +1,5 @@
 import { Uri } from "./uri";
+import { Regex } from "./regex";
 
 export type Captures = { [name: string]: string|string[] }
 
@@ -61,16 +62,16 @@ export class UriTemplate {
       .reduce((captures: Captures, queryParameter: string) => {
         const matches = Array.from(new Regex(`${queryParameter}=([^&]*)`).matches(decodeURIComponent(query)));
         if (matches.length === 0) return captures;
-        matches.forEach(match => {
-          if (match) {
+        matches.forEach((match: [RegExpMatchArray|null, string]) => {
+          if (match[0]) {
             if (captures[queryParameter]) {
               if (typeof captures[queryParameter] === 'string') {
-                captures[queryParameter] = [captures[queryParameter] as string, decodeURIComponent(match[1])];
+                captures[queryParameter] = [captures[queryParameter] as string, decodeURIComponent(match[0][1])];
               } else {
-                (captures[queryParameter] as string[]).push(decodeURIComponent(match[1]))
+                (captures[queryParameter] as string[]).push(decodeURIComponent(match[0][1]))
               }
             } else {
-              captures[queryParameter] = decodeURIComponent(match[1]);
+              captures[queryParameter] = decodeURIComponent(match[0][1]);
             }
           }
         });
@@ -104,8 +105,8 @@ export class UriTemplate {
     const templateNoTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
     const templateRewritingRegex = new Regex('{([^}]+?)(?::([^}]+))?}');
     const matches = Array.from(templateRewritingRegex.matches(templateNoTrailingSlash));
-    const pathVariableCapturingTemplate = matches.reduce((pathVariableCapturingTemplate: string, match: RegExpMatchArray|null) => {
-      return pathVariableCapturingTemplate.replace(/{[^}]+}/, match && match[2] ? `(${match[2]})` : '(.+?)');
+    const pathVariableCapturingTemplate = matches.reduce((pathVariableCapturingTemplate: string, match: [RegExpMatchArray|null, string]) => {
+      return pathVariableCapturingTemplate.replace(/{[^}]+}/, match[0] && match[0][2] ? `(${match[0][2]})` : '(.+?)');
     }, templateNoTrailingSlash);
     return new Regex(pathVariableCapturingTemplate);
   }
@@ -115,21 +116,3 @@ export function uriTemplate(template: string): UriTemplate {
   return new UriTemplate(template)
 }
 
-export class Regex {
-  private matched: RegExpExecArray | null;
-
-  constructor(private pattern: string) {
-    this.matched = null;
-  }
-
-  match(against: string) {
-    return new RegExp(this.pattern).exec(against)
-  }
-
-  *matches(against: string): Iterable<RegExpExecArray | null> {
-    const regex = new RegExp(this.pattern, 'g');
-    while (this.matched = regex.exec(against)) {
-      yield this.matched;
-    }
-  }
-}
