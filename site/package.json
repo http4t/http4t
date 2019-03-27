@@ -4,6 +4,7 @@
   "repository": "git@github.com:http4t/http4t.git",
   "license": "Apache-2.0",
   "scripts": {
+    "clean": "echo ...",
     "build": "./build-site",
     "docs": "echo no-op",
     "test": "echo no-op"
