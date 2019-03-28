@@ -29,9 +29,9 @@ describe('UriTemplate', () => {
   });
 
   it('extracts uri ending', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2:.*}');
+    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2:.*}/five');
 
-    expect(uriTemplate.extract('/part/one/two/three/four')).eql({
+    expect(uriTemplate.extract('/part/one/two/three/four/five')).eql({
       capture1: 'one',
       capture2: 'two/three/four'
     });
