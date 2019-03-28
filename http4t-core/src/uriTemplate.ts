@@ -53,9 +53,11 @@ export class UriTemplate {
   }
 
   private expandPath(captures: Captures): string {
-    return Object.keys(captures).reduce((path: string, variable: string) => {
-      return path.replace(`{${variable}}`, encodeURIComponent(captures[variable] as string))
-    }, this.pathTemplate).replace(/[{}]/g, '');
+    return Object.keys(captures)
+      .reduce(
+        (name, value) => name.replace(`{${value}}`, encodeURIComponent(captures[value] as string)),
+        this.pathTemplate)
+      .replace(/[{}]/g, '');
   }
 
   private extractQueryCaptures(query: string | undefined): Captures {
