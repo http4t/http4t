@@ -1,31 +1,34 @@
 export class Regex {
-  private matched: RegExpExecArray | null;
-  private ahead: RegExpExecArray | null;
+  matched: (RegExpExecArray | null)[] = [];
+  nonMatched: string[] = [];
 
   constructor(private pattern: string) {
-    this.matched = null;
-    this.ahead = null;
+    this.matched = [];
+    this.nonMatched = [];
   }
 
   match(against: string) {
     return new RegExp(this.pattern).exec(against)
   }
 
-  * matches(against: string): Iterable<[RegExpExecArray | null, string]> {
+  * matches(against: string): Iterable<RegExpExecArray | null> {
     const regex = new RegExp(this.pattern, 'g');
     let start = 0;
     let nonMatch = '';
     let rest = '';
-    while (this.matched = regex.exec(against)) {
-      if (this.matched) {
-        const end = against.indexOf(this.matched[0]);
+    let match;
+    while (match = regex.exec(against)) {
+      if (match) {
+        const end = against.indexOf(match[0]);
         nonMatch = against.slice(start, end);
-        start = end + this.matched[0].length;
+        start = end + match[0].length;
         rest = against.slice(start);
-        yield [this.matched, nonMatch];
+        this.matched.push(match);
+        this.nonMatched.push(nonMatch);
+
+        yield match;
       }
     }
-    if (rest.length > 0) yield [null, rest];
   }
 }
 

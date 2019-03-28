@@ -62,16 +62,16 @@ export class UriTemplate {
       .reduce((captures: Captures, queryParameter: string) => {
         const matches = Array.from(new Regex(`${queryParameter}=([^&]*)`).matches(decodeURIComponent(query)));
         if (matches.length === 0) return captures;
-        matches.forEach((match: [RegExpMatchArray|null, string]) => {
-          if (match[0]) {
+        matches.forEach(match => {
+          if (match) {
             if (captures[queryParameter]) {
               if (typeof captures[queryParameter] === 'string') {
-                captures[queryParameter] = [captures[queryParameter] as string, decodeURIComponent(match[0][1])];
+                captures[queryParameter] = [captures[queryParameter] as string, decodeURIComponent(match[1])];
               } else {
-                (captures[queryParameter] as string[]).push(decodeURIComponent(match[0][1]))
+                (captures[queryParameter] as string[]).push(decodeURIComponent(match[1]))
               }
             } else {
-              captures[queryParameter] = decodeURIComponent(match[0][1]);
+              captures[queryParameter] = decodeURIComponent(match[1]);
             }
           }
         });
@@ -105,8 +105,8 @@ export class UriTemplate {
     const templateNoTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
     const templateRewritingRegex = new Regex('{([^}]+?)(?::([^}]+))?}');
     const matches = Array.from(templateRewritingRegex.matches(templateNoTrailingSlash));
-    const pathVariableCapturingTemplate = matches.reduce((pathVariableCapturingTemplate: string, match: [RegExpMatchArray|null, string]) => {
-      return pathVariableCapturingTemplate.replace(/{[^}]+}/, match[0] && match[0][2] ? `(${match[0][2]})` : '(.+?)');
+    const pathVariableCapturingTemplate = matches.reduce((pathVariableCapturingTemplate: string, match: RegExpMatchArray|null) => {
+      return pathVariableCapturingTemplate.replace(/{[^}]+}/, match && match[2] ? `(${match[2]})` : '(.+?)');
     }, templateNoTrailingSlash);
     return new Regex(pathVariableCapturingTemplate);
   }

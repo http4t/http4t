@@ -24,40 +24,25 @@ describe('Regex', () => {
   it('match many iterator', () => {
     const match = Array.from(new Regex('\/([^\/]+)').matches('/ab/cd'));
 
-    expect(match[0]).eql([
+    expect(match).eql([
       ['/ab', 'ab'],
-      ''
-    ]);
-
-    expect(match[1]).eql([
       ['/cd', 'cd'],
-      ''
     ]);
-
-    expect(match[2]).eq(undefined)
   });
 
   it('gives you non-matched', () => {
-    const match = Array.from(new Regex('\/(\\w+)').matches('!!/ab/@@/cd/££/ef/$$'));
+    const regex = new Regex('\/(\\w+)');
+    Array.from(regex.matches('!!/ab/@@/cd/££/ef/$$'));
 
-    expect(match[0]).eql([
+    expect(regex.matched).eql([
       ['/ab', 'ab'],
-      '!!'
-    ]);
-
-    expect(match[1]).eql([
       ['/cd', 'cd'],
-      '/@@'
+      ['/ef', 'ef']
     ]);
-
-    expect(match[2]).eql([
-      ['/ef', 'ef'],
+    expect(regex.nonMatched).eql([
+      '!!',
+      '/@@',
       '/££'
-    ]);
-
-    expect(match[3]).eql([
-      null,
-      "/$$"
     ]);
   });
 });
