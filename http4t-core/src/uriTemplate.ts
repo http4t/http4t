@@ -1,7 +1,12 @@
-import { Uri } from "./uri";
-import { Regex } from "./regex";
+import {Regex} from "./regex";
+import {Uri} from "./uri";
 
-export type Captures = { [name: string]: string|string[] }
+export type Captures = { [name: string]: string | string[] }
+
+function ensureArray<T>(value: T | T[]): T[] {
+  return value instanceof Array ? value : [value];
+
+}
 
 export class UriTemplate {
   private pathTemplate: string;
@@ -20,12 +25,11 @@ export class UriTemplate {
   }
 
   matches(uri: Uri | string): boolean {
-    const path = typeof uri === 'string' ? Uri.parse(uri).path : uri.path;
-    return this.pathVariableCapturingRegexp.match(path) !== null
+    return this.pathVariableCapturingRegexp.match(Uri.of(uri).path) !== null
   }
 
   extract(uri: Uri | string): Captures {
-    const parsedUri = typeof uri === 'string' ? Uri.parse(uri) : uri;
+    const parsedUri = Uri.of(uri);
     return {
       ...this.extractPathCaptures(parsedUri.path),
       ...this.extractQueryCaptures(parsedUri.query)
@@ -84,18 +88,11 @@ export class UriTemplate {
     return '?' + this.queryTemplate
       .replace(/[{}]/g, '')
       .split(',')
-      .map(queryParameter => {
-        if (captures[queryParameter] !== undefined) {
-          if (typeof captures[queryParameter] === 'string') {
-            return `${encodeURIComponent(queryParameter)}=${encodeURIComponent(captures[queryParameter] as string)}`;
-          } else {
-            return (captures[queryParameter] as string[]).map(queryCapture => {
-              return `${encodeURIComponent(queryParameter)}=${encodeURIComponent(queryCapture)}`
-            }).join('&')
-          }
-        } else {
-          return undefined;
-        }
+      .map(name => {
+        if (captures[name] === undefined) return undefined;
+        return ensureArray(captures[name])
+          .map(value => `${encodeURIComponent(name)}=${encodeURIComponent(value)}`)
+          .join('&');
       })
       .filter(it => it !== undefined)
       .join('&');
@@ -105,7 +102,7 @@ export class UriTemplate {
     const templateNoTrailingSlash = this.pathTemplate.replace(/\/$/g, '');
     const templateRewritingRegex = new Regex('{([^}]+?)(?::([^}]+))?}');
     const matches = Array.from(templateRewritingRegex.matches(templateNoTrailingSlash));
-    const pathVariableCapturingTemplate = matches.reduce((pathVariableCapturingTemplate: string, match: RegExpMatchArray|null) => {
+    const pathVariableCapturingTemplate = matches.reduce((pathVariableCapturingTemplate: string, match: RegExpMatchArray | null) => {
       return pathVariableCapturingTemplate.replace(/{[^}]+}/, match && match[2] ? `(${match[2]})` : '(.+?)');
     }, templateNoTrailingSlash);
     return new Regex(pathVariableCapturingTemplate);
