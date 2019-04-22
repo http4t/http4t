@@ -8,7 +8,7 @@ function ensureArray<T>(value: T | T[]): T[] {
 
 }
 
-export class UriTemplate {
+export class UriTemplatee {
   private pathTemplate: string;
   private queryTemplate?: string;
   private pathVariableCapturingRegexp: Regex;
@@ -21,7 +21,7 @@ export class UriTemplate {
   }
 
   static of(template: string) {
-    return new UriTemplate(template)
+    return new UriTemplatee(template)
   }
 
   matches(uri: Uri | string): boolean {
@@ -111,7 +111,7 @@ export class UriTemplate {
   }
 }
 
-export function uriTemplate(template: string): UriTemplate {
-  return new UriTemplate(template)
+export function uriTemplate(template: string): UriTemplatee {
+  return new UriTemplatee(template)
 }
 
