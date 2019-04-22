@@ -10,8 +10,6 @@ jobs:
       - run:
           name: Build & Deploy
           command: ./run ci
-          working_directory: contract
-
 workflows:
   version: 2
   build-deploy:
