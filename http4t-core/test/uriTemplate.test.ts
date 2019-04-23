@@ -18,9 +18,9 @@ describe('UriTemplate', () => {
   });
 
   it('extracts captures', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/part/{capture2}/{?query1,query 2}');
+    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/{?query1,query 2}');
 
-    expect(uriTemplate.extract('/part/one/part/two/?query1=value1&query1=value1&query%202=value%202&query3=value3')).eql({
+    expect(uriTemplate.extract('/part/one/two/part/?query1=value1&query1=value1&query%202=value%202&query3=value3')).eql({
       capture1: 'one',
       capture2: 'two',
       query1: ['value1', 'value1'],
