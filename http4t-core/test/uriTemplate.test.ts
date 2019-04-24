@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import {UriTemplate} from "../src/UriTemplate";
+import { UriTemplate } from "../src/UriTemplate";
 
 describe('UriTemplate', () => {
   it('matches uris or not', () => {
@@ -7,6 +7,7 @@ describe('UriTemplate', () => {
 
     expect(uriTemplate.matches('/doesnt/match')).eq(false);
     expect(uriTemplate.matches('/part/capture/part')).eq(true);
+    expect(uriTemplate.matches('/part/capture/part/more')).eq(false);
   });
 
   it('ignores trailing slashes', () => {
