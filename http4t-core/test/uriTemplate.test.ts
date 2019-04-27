@@ -51,7 +51,7 @@ describe('UriTemplate', () => {
 
   it('encodes / decodes uri segments', () => {
     const uriTemplate = UriTemplate.of('/part/{capture1}/part/');
-    const uri = '/part/one%2Ftwo/part';
+    const uri = '/part/one%2Ftwo/part/';
 
     expect(uriTemplate.extract(uri)).eql({
       capture1: 'one/two'
