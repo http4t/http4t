@@ -1,8 +1,8 @@
-import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {header} from "@http4t/core/headers";
-import {response} from "@http4t/core/responses";
-import {Uri} from "@http4t/core/uri";
-import {bufferText, streamBinary} from "@http4t/core/bodies";
+import { Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse } from "@http4t/core/contract";
+import { header } from "@http4t/core/headers";
+import { response } from "@http4t/core/responses";
+import { Uri } from "@http4t/core/uri";
+import { bufferText, streamBinary } from "@http4t/core/bodies";
 
 /**
  * Streams response body, but not request body.
@@ -60,7 +60,7 @@ function fromReadableStream(stream: ReadableStream<Uint8Array> | null): AsyncIte
     [Symbol.asyncIterator]: async function* () {
       const reader = stream.getReader();
       while (true) {
-        const {done, value} = await reader.read();
+        const { done, value } = await reader.read();
         if (done) return;
         yield value;
       }
@@ -97,7 +97,7 @@ async function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Promis
     {
       method: request.method,
       headers,
-      ...(request.body ? {body: await bufferText(request.body)} : {}),//TODO: it would be good if this was streaming
+      ...(request.body ? { body: await bufferText(request.body) } : {}),//TODO: it would be good if this was streaming
       ...Object.assign({}, DEFAULT_OPTS, opts)
     });
 }
