@@ -10,7 +10,7 @@ function getPackageJson(path: string) {
   const write = process.argv.slice(2)[0] === 'write';
 
   const circleBuildNumber = process.env.CIRCLE_BUILD_NUM;
-  const tldPackageJson = getPackageJson('.');
+  const tldPackageJson = getPackageJson('./package.json');
   const localVersionNumber = tldPackageJson.version;
   const latestVersion = circleBuildNumber || localVersionNumber;
   tldPackageJson.version = latestVersion;
@@ -32,7 +32,7 @@ function getPackageJson(path: string) {
       }
 
       if (write) {
-        fs.writeFileSync(path, JSON.stringify(packageJson))
+        fs.writeFileSync(path, JSON.stringify(packageJson, undefined, 2))
       }
     })
 
