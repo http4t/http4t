@@ -12,7 +12,9 @@ function getPackageJson(path: string) {
   const circleBuildNumber = process.env.CIRCLE_BUILD_NUM;
   const tldPackageJson = getPackageJson('./package.json');
   const localVersionNumber = tldPackageJson.version;
-  const latestVersion = circleBuildNumber || localVersionNumber;
+  const majorAndMinorVersion = localVersionNumber.slice(0, localVersionNumber.lastIndexOf('.'));
+
+  const latestVersion = circleBuildNumber ? `${majorAndMinorVersion}.${circleBuildNumber}` : localVersionNumber;
   tldPackageJson.version = latestVersion;
 
   const packages = fs.readdirSync('.').filter(it => it.match(/http4t\-/));
