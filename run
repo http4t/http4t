@@ -19,6 +19,10 @@ function build() {
 
 }
 
+function getLatestVersion () {
+    yarn run getLatestVersion
+}
+
 function bumpVersion () {
     yarn run bumpVersion
 }

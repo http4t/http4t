@@ -1,5 +1,5 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.82",
   "private": true,
   "workspaces": [
     "http4t-*",
@@ -7,7 +7,8 @@
     "http4t-*/test"
   ],
   "scripts": {
-    "bumpVersion": "./node_modules/.bin/ts-node BumpVersion.ts write"
+    "bumpVersion": "./node_modules/.bin/ts-node BumpVersion write",
+    "getLatestVersion": "./node_modules/.bin/ts-node GetLatestVersion write"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
