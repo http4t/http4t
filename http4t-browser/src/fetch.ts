@@ -17,7 +17,6 @@ export class FetchHandler implements HttpHandler {
 
   handle(request: HttpRequest): Promise<HttpResponse> {
     return new Promise<HttpResponse>((resolve, reject) => {
-
         toFetchRequest(request, this.opts).then(fetchRequest =>
           fetch(fetchRequest)
             .then(fetchResponse => {
