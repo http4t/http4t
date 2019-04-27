@@ -27,6 +27,27 @@ describe('UriTemplate', () => {
     });
   });
 
+  it('extracts all queries', () => {
+    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/');
+
+    expect(uriTemplate.extract('/part/one/two/part/?a=1&a=2&b=3')).eql({
+      capture1: 'one',
+      capture2: 'two',
+      a: ['1', '2'],
+      b: '3'
+    });
+  });
+
+  it('path extractions win', () => {
+    const uriTemplate = UriTemplate.of('/part/{a}/{b}/part/');
+
+    expect(uriTemplate.extract('/part/one/two/part/?a=1&a=2&b=3&c=4')).eql({
+      a: 'one',
+      b: 'two',
+      c: '4'
+    });
+  });
+
   it('extracts uri ending', () => {
     const uriTemplate1 = UriTemplate.of('/part/{capture1}/{capture2:.*}/');
     const uriTemplate2 = UriTemplate.of('/part/{capture1}/{capture2:.*}/five');

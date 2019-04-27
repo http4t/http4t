@@ -20,7 +20,10 @@ export class UriTemplate {
   }
 
   extract(uri: Uri | string): Captures {
-    return this.extractPathCaptures(Uri.of(uri).path.replace(/\/$/g, ''))
+    return {
+      ...this.extractQueryCaptures(uri),
+      ...this.extractPathCaptures(Uri.of(uri).path.replace(/\/$/g, ''))
+    }
   }
 
   expand(captures: Captures): string {
@@ -36,6 +39,24 @@ export class UriTemplate {
     return pathVariableNames.reduce((captures: Captures, pathParam: string, index: number) => {
       if (values && values[index + 1]) captures[pathParam] = decodeURIComponent(values[index + 1]);
       return captures;
+    }, {});
+  }
+
+  private extractQueryCaptures(uri: Uri | string): Captures {
+    const query = Uri.of(uri).query;
+    if (!query) return {};
+    return (query).split('&').reduce((capture: Captures, query: string) => {
+      const [key, value] = query.split('=');
+      if (capture[key]) {
+        if (typeof capture[key] === 'string') {
+          capture[key] = [capture[key] as string, decodeURIComponent(value)];
+        } else {
+          (capture[key] as string[]).push(decodeURIComponent(value))
+        }
+      } else {
+        capture[key] = decodeURIComponent(value);
+      }
+      return capture;
     }, {});
   }
 
