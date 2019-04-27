@@ -1,6 +1,6 @@
 {
   "name": "@http4t/node-project",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "clean": "find src test -name '*.js' -o -name '*.map' -o -name '*.d.ts' | xargs rm -f",
@@ -10,6 +10,6 @@
     "test-browser": "ts-node test-browser.ts"
   },
   "dependencies": {
-    "@http4t/core": "0.0.2"
+    "@http4t/core": "0.0.3"
   }
 }
