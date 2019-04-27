@@ -40,10 +40,6 @@ function publish() {
         echo "ERROR: Specify NPM_TOKEN"
         exit 1
     fi
-    if [[ ! -n "$TAG" ]]; then
-        echo "ERROR: Specify TAG"
-        exit 1
-    fi
 
     dist=$1/dist
 
@@ -54,7 +50,7 @@ function publish() {
 EOL
     pushd ${dist}
     yarn run bumpVersion
-    npm publish --tag ${TAG} --access public
+    npm publish --access public
     popd
 }
 

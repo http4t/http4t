@@ -2,4 +2,4 @@
 set -x
 
 docker build -t http4t/mkdocs .
-docker run -v $(pwd):/http4t.docs http4t/mkdocs ls
+docker run -v $(pwd):/http4t.docs http4t/mkdocs ls -al && ls -al ..
