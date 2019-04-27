@@ -19,6 +19,10 @@ function build() {
 
 }
 
+function bumpVersion () {
+    yarn run bumpVersion
+}
+
 function package() {
     pushd $1
 
@@ -49,7 +53,6 @@ function publish() {
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}
 EOL
     pushd ${dist}
-    yarn run bumpVersion
     npm publish --access public
     popd
 }
@@ -77,8 +80,9 @@ function publishDocs() {
 
 
 function ci() {
-    modules=$(ls | grep "http4t-.*")
+    bumpVersion
 
+    modules=$(ls | grep "http4t-.*")
     for module in $modules; do
         package $module
         publish $module
