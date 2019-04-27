@@ -19,51 +19,42 @@ describe('UriTemplate', () => {
   });
 
   it('extracts captures', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/{?query1,query 2}');
+    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/');
 
-    expect(uriTemplate.extract('/part/one/two/part/?query1=value1&query1=value1&query%202=value%202&query3=value3')).eql({
+    expect(uriTemplate.extract('/part/one/two/part')).eql({
       capture1: 'one',
-      capture2: 'two',
-      query1: ['value1', 'value1'],
-      'query 2': 'value 2'
+      capture2: 'two'
     });
   });
 
   it('extracts uri ending', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2:.*}/five');
+    const uriTemplate1 = UriTemplate.of('/part/{capture1}/{capture2:.*}/');
+    const uriTemplate2 = UriTemplate.of('/part/{capture1}/{capture2:.*}/five');
 
-    expect(uriTemplate.extract('/part/one/two/three/four/five')).eql({
+    expect(uriTemplate1.extract('/part/one/two/three/four')).eql({
+      capture1: 'one',
+      capture2: 'two/three/four'
+    });
+
+    expect(uriTemplate2.extract('/part/one/two/three/four/five')).eql({
       capture1: 'one',
       capture2: 'two/three/four'
     });
   });
 
   it('is reversible', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part{?query1,query2,query 3}');
-    const uri = '/part/one/two/part?query1=value1&query2=value%202&query%203=value3';
+    const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part');
+    const uri = '/part/one/two/part';
 
     expect(uriTemplate.expand(uriTemplate.extract(uri))).eq(uri);
   });
 
-  it('expanding null or undefined query parameters', () => {
-    const uriTemplate = UriTemplate.of('/part{?query1,query2,query3}');
-    const uri = '/part?query1=value1&query1=value1&query3=';
-    const captures = uriTemplate.extract(uri);
-
-    expect(captures).eql({
-      query1: ['value1', 'value1'],
-      query3: ''
-    });
-    expect(uriTemplate.expand(captures)).eq(uri);
-  });
-
   it('encodes / decodes uri segments', () => {
-    const uriTemplate = UriTemplate.of('/part/{capture1}/part/{?query 1}');
-    const uri = '/part/one%2Ftwo/part/?query%201=value%201';
+    const uriTemplate = UriTemplate.of('/part/{capture1}/part/');
+    const uri = '/part/one%2Ftwo/part';
 
     expect(uriTemplate.extract(uri)).eql({
-      capture1: 'one/two',
-      'query 1': 'value 1'
+      capture1: 'one/two'
     });
 
     expect(uriTemplate.expand(uriTemplate.extract(uri))).eq(uri);
@@ -80,5 +71,6 @@ describe('UriTemplate', () => {
       capture2: 'a'
     });
   });
+
 });
 

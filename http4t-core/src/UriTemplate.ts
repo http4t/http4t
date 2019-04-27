@@ -3,19 +3,12 @@ import { Uri } from "./uri";
 
 export type Captures = { [name: string]: string | string[] }
 
-function ensureArray<T>(value: T | T[]): T[] {
-  return value instanceof Array ? value : [value];
-}
-
 export class UriTemplate {
   private pathTemplate: string;
-  private queryTemplate?: string;
   private pathVariableCapturingRegexp: Regex;
 
   constructor(private template: string) {
-    const [pathTemplate, queryTemplate] = this.template.split('{?');
-    this.pathTemplate = pathTemplate;
-    this.queryTemplate = queryTemplate ? '{' + queryTemplate : undefined;
+    this.pathTemplate = this.template;
     this.pathVariableCapturingRegexp = new Regex(`^${this.pathVariableCapturingTemplate()}$`);
   }
 
@@ -29,15 +22,13 @@ export class UriTemplate {
   }
 
   extract(uri: Uri | string): Captures {
-    const parsedUri = Uri.of(uri);
-    return {
-      ...this.extractPathCaptures(parsedUri.path.replace(/\/$/g, '')),
-      ...this.extractQueryCaptures(parsedUri.query)
-    };
+    return this.extractPathCaptures(Uri.of(uri).path.replace(/\/$/g, ''))
   }
 
   expand(captures: Captures): string {
-    return this.expandPath(captures) + this.expandQuery(captures);
+    return Object.keys(captures).reduce((name, value) => {
+      return name.replace(`{${value}}`, encodeURIComponent(captures[value] as string));
+    }, this.pathTemplate).replace(/[{}]/g, '')
   }
 
   private extractPathCaptures(path: string): Captures {
@@ -50,54 +41,6 @@ export class UriTemplate {
       }
       return captures;
     }, {});
-  }
-
-  private expandPath(captures: Captures): string {
-    return Object.keys(captures)
-      .reduce(
-        (name, value) => name.replace(`{${value}}`, encodeURIComponent(captures[value] as string)),
-        this.pathTemplate)
-      .replace(/[{}]/g, '');
-  }
-
-  private extractQueryCaptures(query: string | undefined): Captures {
-    if (!query || !this.queryTemplate) return {};
-    return this.queryTemplate
-      .replace(/[{}]/g, '')
-      .split(',')
-      .reduce((captures: Captures, queryParameter: string) => {
-        const matches = Array.from(new Regex(`${queryParameter}=([^&]*)`).matches(decodeURIComponent(query)));
-        if (matches.length === 0) return captures;
-        matches.forEach(match => {
-          if (match) {
-            if (captures[queryParameter]) {
-              if (typeof captures[queryParameter] === 'string') {
-                captures[queryParameter] = [captures[queryParameter] as string, decodeURIComponent(match[1])];
-              } else {
-                (captures[queryParameter] as string[]).push(decodeURIComponent(match[1]))
-              }
-            } else {
-              captures[queryParameter] = decodeURIComponent(match[1]);
-            }
-          }
-        });
-        return captures;
-      }, {});
-  }
-
-  private expandQuery(captures: Captures): string {
-    if (!this.queryTemplate) return '';
-    return '?' + this.queryTemplate
-      .replace(/[{}]/g, '')
-      .split(',')
-      .map(name => {
-        if (captures[name] === undefined) return undefined;
-        return ensureArray(captures[name])
-          .map(value => `${encodeURIComponent(name)}=${encodeURIComponent(value)}`)
-          .join('&');
-      })
-      .filter(it => it !== undefined)
-      .join('&');
   }
 
   private pathVariableCapturingTemplate(): string {
