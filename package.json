@@ -6,6 +6,9 @@
     "http4t-*/src",
     "http4t-*/test"
   ],
+  "scripts": {
+    "bumpVersion": "./node_modules/.bin/ts-node BumpVersion.ts write"
+  },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
