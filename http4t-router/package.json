@@ -1,5 +1,5 @@
 {
-  "name": "@http4t/node-project",
+  "name": "@http4t/router-project",
   "version": "0.0.82",
   "private": true,
   "scripts": {
