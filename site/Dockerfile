@@ -1,4 +1,4 @@
 FROM python:2.7
-WORKDIR /mnt/site
 RUN pip install mkdocs
+COPY . .
 EXPOSE 8080
