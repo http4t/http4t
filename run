@@ -119,7 +119,6 @@ fi
 
 if [[ -d  ".git" ]]; then
     yarn install
-    getLatestVersion
     # Have to build in correct order
     build http4t-core
     build http4t-node
