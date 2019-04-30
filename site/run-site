@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -x
+
+docker build -t http4t/mkdocs .
+docker run http4t/mkdocs mkdocs build
+docker run -p 8000:8000 http4t/mkdocs mkdocs serve --dev-addr=0.0.0.0:8000
