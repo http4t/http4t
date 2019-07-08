@@ -47,3 +47,13 @@ export function host(request: HttpRequest): string {
   if (typeof value != 'string') throw new Error(`Could not get authority from request uri '${request.uri}'`);
   return value;
 }
+
+export function uri(request: HttpRequest): Uri {
+  return Uri.of(request.uri);
+}
+
+export function uriString(request: HttpRequest): string {
+  return typeof request.uri === 'string'
+    ? request.uri
+    : Uri.of(request.uri).toString();
+}
