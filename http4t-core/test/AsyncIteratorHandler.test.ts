@@ -124,6 +124,6 @@ describe('AsyncIteratorHandler', () => {
 
     expect(() => handler.push("1")).throws(/Iterator is closed/);
     expect(() => handler.error(new Error())).throws(/Iterator is closed/);
-    expect(() => handler.end()).throws(/Iterator is closed/);
+    expect(() => handler.end()).not.throws(/Iterator is closed/);
   });
 });

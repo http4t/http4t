@@ -35,6 +35,7 @@ export class AsyncIteratorHandler<T> implements AsyncIterator<T> {
     this.close(([resolve, _]: PromiseCallbacks<T>) => resolve({
       done: true,
       value: undefined as any as T/* they got the interface wrong*/}));
+    this.end = ()=>{};
   }
 
   error(e: any): void {
