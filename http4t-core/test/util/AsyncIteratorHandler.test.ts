@@ -1,6 +1,6 @@
 import {it, describe} from "mocha";
 import {expect} from "chai";
-import {AsyncIteratorHandler} from "../src/AsyncIteratorHandler";
+import {AsyncIteratorHandler} from "../../src/util/AsyncIteratorHandler";
 
 // TODO: can we simplify this test?
 describe('AsyncIteratorHandler', () => {

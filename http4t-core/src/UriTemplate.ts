@@ -1,4 +1,4 @@
-import { Regex } from "./regex";
+import { Regex } from "./util/regex";
 import { Uri } from "./uri";
 
 export type Captures = { [name: string]: string | string[] }

@@ -1,4 +1,4 @@
-import {Random} from "./random";
+import {Random} from "./util/random";
 import {HttpHandler, HttpRequest, HttpResponse} from "./contract";
 import {notFound, ok} from "./responses";
 import {bufferText} from "./bodies";

@@ -1,5 +1,5 @@
 import {Body, Data} from "./contract";
-import {textDecoder, textEncoder} from "./textencoding";
+import {textDecoder, textEncoder} from "./util/textencoding";
 
 /*
 -----------------------------------

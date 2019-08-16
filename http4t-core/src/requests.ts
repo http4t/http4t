@@ -1,6 +1,6 @@
 import {Body, Header, HeaderName, HeaderValue, HttpRequest, Method} from "./contract";
 import {getHeaderValue, header} from "./headers";
-import {modify} from "./objects";
+import {modify} from "./util/objects";
 import {Uri, UriLike} from "./uri";
 
 export function request(method: Method, uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {

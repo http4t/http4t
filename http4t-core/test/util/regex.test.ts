@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Regex } from "../src/regex";
+import { Regex } from "../../src/util/regex";
 
 describe('Regex', () => {
   it('match one', () => {

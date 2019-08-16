@@ -1,7 +1,7 @@
 import {it, describe} from "mocha";
 import {expect} from "chai";
 import {bufferText} from "../src/bodies";
-import {textEncoder} from "../src/textencoding";
+import {textEncoder} from "../src/util/textencoding";
 
 describe('text()', () => {
     it('handles strings', async () => {

@@ -1,6 +1,6 @@
 import {bufferText} from "./bodies";
 import {Body, Data, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./contract";
-import {modify} from "./objects";
+import {modify} from "./util/objects";
 
 async function* yieldStringify(data: object): AsyncIterable<Data> {
   yield JSON.stringify(data)
