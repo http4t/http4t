@@ -109,6 +109,10 @@ export interface HttpMessage {
   readonly body: Body
 }
 
+export function isMessage(value: any): value is HttpMessage {
+  return value.hasOwnProperty('body') && value.hasOwnProperty('headers');
+}
+
 /**
  * HttpRequest is made up of a method, uri and optional version followed by the headers and optional body
  */
