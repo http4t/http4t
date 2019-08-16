@@ -16,7 +16,7 @@ export class JsonBody<T = any> implements AsyncIterable<Data> {
 }
 
 /**
- * A JsonBody is an AsyncIterator<Data> (and is therefore a Body), which will lazily yield
+ * A JsonBody is an AsyncIterable<Data> (and is therefore a Body), which will lazily yield
  * JSON.stringify(data) when asked to stream, but also contains the original data without
  * needing to be deserialised.
  *
@@ -33,7 +33,7 @@ export async function bodyJson<T>(message: HttpMessage): Promise<T>;
  * Parse json from body or message.body.
  *
  * If body is already a JsonBody, it will not be parsed again, and
- * this function will simply return body.json.
+ * this function will simply return body.data.
  *
  * Use the parseJson function
  */
