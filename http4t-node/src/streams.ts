@@ -1,8 +1,8 @@
-import {Readable, Writable} from 'stream';
-import {AsyncIteratorHandler} from "@http4t/core/AsyncIteratorHandler";
-import {textEncoder} from "@http4t/core/textencoding";
-import {Body} from "@http4t/core/contract";
-import {streamBinary} from "@http4t/core/bodies";
+import { Readable, Writable } from 'stream';
+import { Body } from "@http4t/core/contract";
+import { streamBinary } from "@http4t/core/bodies";
+import { AsyncIteratorHandler } from "@http4t/core/util/AsyncIteratorHandler";
+import { textEncoder } from "@http4t/core/util/textencoding";
 
 
 export async function bodyToStream(body: Body, stream: Writable): Promise<void> {
