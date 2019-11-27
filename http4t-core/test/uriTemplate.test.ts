@@ -22,8 +22,11 @@ describe('UriTemplate', () => {
     const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/');
 
     expect(uriTemplate.extract('/part/one/two/part')).eql({
-      capture1: 'one',
-      capture2: 'two'
+      path: {
+        capture1: 'one',
+        capture2: 'two'
+      },
+      query: {}
     });
   });
 
@@ -31,20 +34,30 @@ describe('UriTemplate', () => {
     const uriTemplate = UriTemplate.of('/part/{capture1}/{capture2}/part/');
 
     expect(uriTemplate.extract('/part/one/two/part/?a=1&a=2&b=3')).eql({
-      capture1: 'one',
-      capture2: 'two',
-      a: ['1', '2'],
-      b: '3'
+      path: {
+        capture1: 'one',
+        capture2: 'two'
+      },
+      query: {
+        a: ['1', '2'],
+        b: '3'
+      }
     });
   });
 
-  it('path extractions win', () => {
+  it('overlapping variables are ok', () => {
     const uriTemplate = UriTemplate.of('/part/{a}/{b}/part/');
 
     expect(uriTemplate.extract('/part/one/two/part/?a=1&a=2&b=3&c=4')).eql({
-      a: 'one',
-      b: 'two',
-      c: '4'
+      path: {
+        a: 'one',
+        b: 'two'
+      },
+      query: {
+        a: ['1', '2'],
+        b: '3',
+        c: '4'
+      }
     });
   });
 
@@ -53,13 +66,19 @@ describe('UriTemplate', () => {
     const uriTemplate2 = UriTemplate.of('/part/{capture1}/{capture2:.*}/five');
 
     expect(uriTemplate1.extract('/part/one/two/three/four')).eql({
-      capture1: 'one',
-      capture2: 'two/three/four'
+      path: {
+        capture1: 'one',
+        capture2: 'two/three/four'
+      },
+      query: {}
     });
 
     expect(uriTemplate2.extract('/part/one/two/three/four/five')).eql({
-      capture1: 'one',
-      capture2: 'two/three/four'
+      path: {
+        capture1: 'one',
+        capture2: 'two/three/four'
+      },
+      query: {}
     });
   });
 
@@ -75,7 +94,10 @@ describe('UriTemplate', () => {
     const uri = '/part/one%2Ftwo/part/';
 
     expect(uriTemplate.extract(uri)).eql({
-      capture1: 'one/two'
+      path: {
+        capture1: 'one/two'
+      },
+      query: {}
     });
 
     expect(uriTemplate.expand(uriTemplate.extract(uri))).eq(uri);
@@ -88,8 +110,11 @@ describe('UriTemplate', () => {
 
     expect(uriTemplate.matches(uriDoesntMatch)).eq(false);
     expect(uriTemplate.extract(uriDoesMatch)).eql({
-      capture1: '123',
-      capture2: 'a'
+      path: {
+        capture1: '123',
+        capture2: 'a'
+      },
+      query: {}
     });
   });
 

@@ -1,7 +1,11 @@
 import { Regex } from "./util/regex";
 import { Uri } from "./uri";
 
-export type Captures = { [name: string]: string | string[] }
+export type UriTemplateCaptures = {
+  query: Captures;
+  path: Captures;
+}
+type Captures = { [name: string]: string | string[] }
 
 export class UriTemplate {
   private pathVariableValuesCapturingRegexp: Regex;
@@ -19,16 +23,16 @@ export class UriTemplate {
     return this.pathVariableValuesCapturingRegexp.match(pathNoTrailingSlash) !== null
   }
 
-  extract(uri: Uri | string): Captures {
+  extract(uri: Uri | string): UriTemplateCaptures {
     return {
-      ...this.extractQueryCaptures(uri),
-      ...this.extractPathCaptures(Uri.of(uri).path.replace(/\/$/g, ''))
+      query: this.extractQueryCaptures(uri),
+      path: this.extractPathCaptures(Uri.of(uri).path.replace(/\/$/g, ''))
     }
   }
 
-  expand(captures: Captures): string {
-    return Object.keys(captures).reduce((uri, captureName) => {
-      return uri.replace(`{${captureName}}`, encodeURIComponent(captures[captureName] as string));
+  expand(captures: UriTemplateCaptures): string {
+    return Object.keys(captures.path).reduce((uri, captureName) => {
+      return uri.replace(`{${captureName}}`, encodeURIComponent(captures.path[captureName] as string));
     }, this.template)
   }
 
