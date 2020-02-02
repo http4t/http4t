@@ -1,9 +1,8 @@
-import * as node from 'http';
-import {Readable, Writable} from 'stream';
 import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {host, request} from "@http4t/core/requests";
 import {response} from "@http4t/core/responses";
-import {streamToBody, bodyToStream} from "./streams";
+import * as node from 'http';
+import {bodyToStream, streamToBody} from "./streams";
 
 
 /*
@@ -62,8 +61,8 @@ function toOutgoingHeaders(headers: Header[]): node.OutgoingHttpHeaders {
     const existing: string | string[] | number | undefined = acc[n];
     if (!existing) {
       acc[n] = v;
-    } else if (typeof existing === 'string') {
-      acc[n] = [existing, v];
+    } else if (typeof existing === 'string' || typeof existing === 'number') {
+      acc[n] = [existing.toString(), v];
     } else {
       acc[n] = [...existing, v];
     }
