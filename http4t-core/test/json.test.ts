@@ -49,4 +49,9 @@ describe('JsonBody', async () => {
     expect(await bodyJson(parsed)).deep.eq({some: "data"});
     expect(await parseJson(parsed)).eq(parsed);
   });
+
+  it('handles undefined', async () => {
+    const body = jsonBody(undefined);
+    expect(await bodyJson(body)).eq(undefined);
+  });
 });

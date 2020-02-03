@@ -3,7 +3,7 @@ import {Body, Data, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./c
 import {modify} from "./util/objects";
 
 async function* yieldStringify(data: object): AsyncIterable<Data> {
-  yield JSON.stringify(data)
+  yield typeof data ==='undefined' ? "" : JSON.stringify(data)
 }
 
 export class JsonBody<T = any> implements AsyncIterable<Data> {
@@ -37,11 +37,13 @@ export async function bodyJson<T>(message: HttpMessage): Promise<T>;
  *
  * Use the parseJson function
  */
-export async function bodyJson<T>(value: Body | HttpMessage): Promise<T> {
+export async function bodyJson<T>(value: Body | HttpMessage): Promise<T | undefined> {
   const body = isMessage(value) ? value.body : value;
   if (body instanceof JsonBody)
     return body.data;
-  return JSON.parse(await bufferText(body));
+  const text = await bufferText(body);
+  if(text === "") return undefined;
+  return JSON.parse(text);
 }
 
 /**
@@ -54,5 +56,6 @@ export async function parseJson<T extends HttpRequest | HttpResponse>(message: T
   if (message.body instanceof JsonBody)
     return message;
 
-  return modify(message, {body: jsonBody(bodyJson(message.body))} as any);
+  const parsed = bodyJson(message.body);
+  return modify(message, {body: jsonBody(parsed)} as any);
 }

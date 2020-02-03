@@ -3,6 +3,9 @@ import {Header, HeaderName, HeaderValue} from './contract';
 
 // TODO: clean up this gross namespace
 
+/**
+ * Case insensitive on name
+ */
 export function getHeaderValue(headers: Header[], name: HeaderName): HeaderValue | undefined {
   if(!headers)
     return undefined;
