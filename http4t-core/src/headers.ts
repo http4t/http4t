@@ -1,6 +1,8 @@
 import {Header, HeaderName, HeaderValue} from './contract';
 
-/** Case insensitive on name */
+/**
+ * Case insensitive on name
+ */
 export function getHeaderValue(headers: readonly Header[], name: HeaderName): HeaderValue | undefined {
   if (!headers)
     return undefined;
