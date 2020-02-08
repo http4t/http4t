@@ -1,6 +1,5 @@
-import {HttpBody, Header, HeaderName, HeaderValue, HttpRequest, Method} from "./contract";
-import {getHeaderValue, header} from "./headers";
-import {modify} from "./util/objects";
+import {Header, HttpBody, HttpRequest, Method} from "./contract";
+import {getHeaderValue} from "./headers";
 import {Uri, UriLike} from "./uri";
 
 export function request(method: Method, uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
@@ -30,10 +29,6 @@ export function patch(uri: UriLike, body?: HttpBody, ...headers: Header[]): Http
 
 export function delete_(uri: UriLike | string, ...headers: Header[]): HttpRequest {
   return request("DELETE", uri, undefined, ...headers);
-}
-
-export function setHeader(req: HttpRequest, name: HeaderName, value: HeaderValue): HttpRequest {
-  return modify(req, {headers: [...req.headers, header(name, value)]});
 }
 
 export function host(request: HttpRequest): string {

@@ -1,11 +1,11 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "./contract";
-import * as requests from "./requests";
+import {setHeader} from "./messages";
 
 export class HostHandler implements HttpHandler {
   constructor(private handler: HttpHandler, private host: string) {
   }
 
   handle(request: HttpRequest): Promise<HttpResponse> {
-    return this.handler.handle(requests.setHeader(request, 'Host', this.host));
+    return this.handler.handle(setHeader(request, 'Host', this.host));
   }
 }
