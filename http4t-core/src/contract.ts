@@ -88,7 +88,7 @@ export type AsyncBody = Promise<Data> | AsyncIterable<Data>;
 /**
  * Body can either be synchronous or asynchronous
  */
-export type Body = SyncBody | AsyncBody;
+export type HttpBody = SyncBody | AsyncBody;
 
 /**
  * ParsedUri as specified by [RFC 3986](https://tools.ietf.org/html/rfc3986)
@@ -106,7 +106,7 @@ export interface ParsedUri {
  */
 export interface HttpMessage {
   readonly headers: Header[],
-  readonly body: Body
+  readonly body: HttpBody
 }
 
 export function isMessage(value: any): value is HttpMessage {

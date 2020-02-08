@@ -1,4 +1,4 @@
-import {Data, Body} from "./contract";
+import {Data, HttpBody} from "./contract";
 import {textDecoder, textEncoder} from "./util/textencoding";
 
 /*
@@ -6,7 +6,7 @@ import {textDecoder, textEncoder} from "./util/textencoding";
 Core functions
 -----------------------------------
  */
-export async function bufferText(body: Body): Promise<string> {
+export async function bufferText(body: HttpBody): Promise<string> {
   if (isPromiseLike(body)) {
     return asString(await body);
   }
@@ -26,7 +26,7 @@ export async function bufferText(body: Body): Promise<string> {
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
-export async function bufferBinary(body: Body): Promise<Uint8Array> {
+export async function bufferBinary(body: HttpBody): Promise<Uint8Array> {
   if (isPromiseLike(body)) {
     return asBinary(await body);
   }
@@ -46,7 +46,7 @@ export async function bufferBinary(body: Body): Promise<Uint8Array> {
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
-export async function* streamText(body: Body): AsyncIterable<string> {
+export async function* streamText(body: HttpBody): AsyncIterable<string> {
   if (isPromiseLike(body)) {
     yield asString(await body);
     return;
@@ -73,7 +73,7 @@ export async function* streamText(body: Body): AsyncIterable<string> {
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
-export async function* streamBinary(body: Body): AsyncIterable<Uint8Array> {
+export async function* streamBinary(body: HttpBody): AsyncIterable<Uint8Array> {
   if (isPromiseLike(body)) {
     yield asBinary(await body);
     return;

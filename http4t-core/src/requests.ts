@@ -1,9 +1,9 @@
-import {Body, Header, HeaderName, HeaderValue, HttpRequest, Method} from "./contract";
+import {HttpBody, Header, HeaderName, HeaderValue, HttpRequest, Method} from "./contract";
 import {getHeaderValue, header} from "./headers";
 import {modify} from "./util/objects";
 import {Uri, UriLike} from "./uri";
 
-export function request(method: Method, uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {
+export function request(method: Method, uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
   return {
     method,
     uri: Uri.of(uri),
@@ -16,15 +16,15 @@ export function get(uri: UriLike, ...headers: Header[]): HttpRequest {
   return request("GET", uri, undefined, ...headers);
 }
 
-export function post(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {
+export function post(uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
   return request("POST", uri, body, ...headers);
 }
 
-export function put(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {
+export function put(uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
   return request("PUT", uri, body, ...headers);
 }
 
-export function patch(uri: UriLike, body?: Body, ...headers: Header[]): HttpRequest {
+export function patch(uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
   return request("PATCH", uri, body, ...headers);
 }
 

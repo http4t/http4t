@@ -1,5 +1,5 @@
 import {bufferText} from "./bodies";
-import {Body, Data, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./contract";
+import {HttpBody, Data, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./contract";
 import {modify} from "./util/objects";
 
 async function* yieldStringify(data: object): AsyncIterable<Data> {
@@ -27,7 +27,7 @@ export function jsonBody<T>(data: T): JsonBody<T> {
   return new JsonBody(data);
 }
 
-export async function bodyJson<T>(body: Body): Promise<T>;
+export async function bodyJson<T>(body: HttpBody): Promise<T>;
 export async function bodyJson<T>(message: HttpMessage): Promise<T>;
 /**
  * Parse json from body or message.body.
@@ -37,7 +37,7 @@ export async function bodyJson<T>(message: HttpMessage): Promise<T>;
  *
  * Use the parseJson function
  */
-export async function bodyJson<T>(value: Body | HttpMessage): Promise<T | undefined> {
+export async function bodyJson<T>(value: HttpBody | HttpMessage): Promise<T | undefined> {
   const body = isMessage(value) ? value.body : value;
   if (body instanceof JsonBody)
     return body.data;
