@@ -1,5 +1,5 @@
 import {bufferText, typeDescription} from "@http4t/core/bodies";
-import {Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {HttpBody, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {host} from "@http4t/core/requests";
 import {response} from "@http4t/core/responses";
 import {Uri} from "@http4t/core/uri";
@@ -51,7 +51,7 @@ export class XmlHttpHandler implements HttpHandler {
   }
 }
 
-async function sendBodyToRequest(body: Body | undefined, request: XMLHttpRequest) {
+async function sendBodyToRequest(body: HttpBody | undefined, request: XMLHttpRequest) {
   if (!body)
     return request.send();
 

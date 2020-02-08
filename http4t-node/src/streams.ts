@@ -1,11 +1,11 @@
 import { Readable, Writable } from 'stream';
-import { Body } from "@http4t/core/contract";
+import { HttpBody } from "@http4t/core/contract";
 import { streamBinary } from "@http4t/core/bodies";
 import { AsyncIteratorHandler } from "@http4t/core/util/AsyncIteratorHandler";
 import { textEncoder } from "@http4t/core/util/textencoding";
 
 
-export async function bodyToStream(body: Body, stream: Writable): Promise<void> {
+export async function bodyToStream(body: HttpBody, stream: Writable): Promise<void> {
   try {
     for  await (const chunk of streamBinary(body)) {
       stream.write(new Buffer(chunk));
@@ -18,7 +18,7 @@ export async function bodyToStream(body: Body, stream: Writable): Promise<void> 
   }
 }
 
-export function streamToBody(stream: Readable): Body {
+export function streamToBody(stream: Readable): HttpBody {
   return {
     [Symbol.asyncIterator]: function (): AsyncIterator<Uint8Array> {
       const iterator = new AsyncIteratorHandler<Uint8Array>();

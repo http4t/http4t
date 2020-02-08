@@ -1,4 +1,4 @@
-import { Body, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse } from "@http4t/core/contract";
+import { HttpBody, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse } from "@http4t/core/contract";
 import { header } from "@http4t/core/headers";
 import { response } from "@http4t/core/responses";
 import { Uri } from "@http4t/core/uri";
@@ -35,7 +35,7 @@ Helpers
 -----------------------------------
  */
 
-function readableStream(body: Body): ReadableStream<Uint8Array> {
+function readableStream(body: HttpBody): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     start: async controller => {
       try {

@@ -35,6 +35,9 @@ export class Uri implements ParsedUri {
     return typeof uri === 'string' ? Uri.parse(uri) : new Uri(uri);
   }
 
+  static modify(uri: ParsedUri, modifications: Partial<ParsedUri>): Uri {
+    return new Uri(Object.assign({}, uri, modifications))
+  }
   /** {@link https://tools.ietf.org/html/rfc3986#section-5.3} */
   toString() {
     const result: string[] = [];
@@ -50,9 +53,20 @@ export class Uri implements ParsedUri {
   toJSON() {
     return this.toString();
   }
-
-  static modify(uri: ParsedUri, modifications: Partial<ParsedUri>): Uri {
-    return new Uri(Object.assign({}, uri, modifications))
-  }
 }
 
+export const leading = /^\/*/;
+export const trailing = /\/*$/;
+
+export function stripSlashes(path: string): string {
+  return path
+    .replace(leading, '')
+    .replace(trailing, '');
+}
+
+export function joinPaths(...segments: string[]): string {
+  return segments.reduce((acc, segment) => segment === '/'
+    ? acc
+    : `${acc}/${stripSlashes(segment)}`,
+    "")
+}
