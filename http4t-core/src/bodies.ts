@@ -1,4 +1,4 @@
-import {Body, Data} from "./contract";
+import {Data, Body} from "./contract";
 import {textDecoder, textEncoder} from "./util/textencoding";
 
 /*
@@ -6,72 +6,104 @@ import {textDecoder, textEncoder} from "./util/textencoding";
 Core functions
 -----------------------------------
  */
-
-export class Buffered {
-  static text = bufferText;
-  static binary = bufferBinary;
-}
-
-export class Streamed {
-  static text = streamText;
-  static binary = streamBinary;
-}
-
 export async function bufferText(body: Body): Promise<string> {
   if (isPromiseLike(body)) {
-    return dataString(await body);
+    return asString(await body);
   }
   if (isAsyncIterable(body)) {
-    return (await toPromiseArray(body)).map(dataString).join("");
+    let result = "";
+    for await (const data of body) {
+      result += asString(data);
+    }
+    return result;
   }
   if (isData(body)) {
-    return dataString(body);
+    return asString(body);
   }
   if (isIterable(body)) {
-    return Array.from(body).map(dataString).join("")
+    return Array.from(body).map(asString).join("")
   }
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
 export async function bufferBinary(body: Body): Promise<Uint8Array> {
-  throw new Error("Not implemented");
-}
-
-export function streamText(body: Body): AsyncIterable<string> {
-  throw new Error("Not implemented");
-}
-
-export async function* streamBinary(body: Body): AsyncIterable<Uint8Array> {
   if (isPromiseLike(body)) {
-    yield dataBinary(await body);
-    return;
+    return asBinary(await body);
   }
   if (isAsyncIterable(body)) {
-    for await(const chunk of body) {
-      yield dataBinary(chunk);
+    let result = undefined;
+    for await (const data of body) {
+      result = merge(result, asBinary(data));
+    }
+    return result || new Uint8Array();
+  }
+  if (isData(body)) {
+    return asBinary(body);
+  }
+  if (isIterable(body)) {
+    return Array.from(body).map(asBinary).reduce(merge)
+  }
+  throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
+}
+
+export async function* streamText(body: Body): AsyncIterable<string> {
+  if (isPromiseLike(body)) {
+    yield asString(await body);
+    return;
+  }
+
+  if (isAsyncIterable(body)) {
+    for await (const data of body) {
+      yield asString(data);
     }
     return;
   }
+
   if (isData(body)) {
-    yield dataBinary(body);
+    yield asString(body);
     return;
   }
+
   if (isIterable(body)) {
-    for (const chunk of body) {
-      yield dataBinary(chunk);
+    for await (const data of body) {
+      yield asString(data);
     }
     return;
   }
   throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
 }
 
-export function dataString(data: Data) {
+export async function* streamBinary(body: Body): AsyncIterable<Uint8Array> {
+  if (isPromiseLike(body)) {
+    yield asBinary(await body);
+    return;
+  }
+  if (isAsyncIterable(body)) {
+    for await(const chunk of body) {
+      yield asBinary(chunk);
+    }
+    return;
+  }
+  if (isData(body)) {
+    yield asBinary(body);
+    return;
+  }
+  if (isIterable(body)) {
+    for (const chunk of body) {
+      yield asBinary(chunk);
+    }
+    return;
+  }
+  throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
+}
+
+export function asString(data: Data): string {
   if (typeof data === 'string') return data;
   if (data instanceof Uint8Array) return textDecoder().decode(data);
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
-export function dataBinary(data: Data) {
+export function asBinary(data: Data): Uint8Array {
   if (data instanceof Uint8Array) return data;
   if (typeof data === 'string') return textEncoder().encode(data);
   throw new Error(`Not supported ${typeDescription(data)}`)
@@ -98,30 +130,34 @@ export function typeDescription(x: any): string {
   return t
 }
 
-function isAsyncIterable(instance: any): instance is AsyncIterable<any> {
+export function isAsyncIterable(instance: any): instance is AsyncIterable<any> {
   return typeof instance == 'object' && Symbol.asyncIterator in instance;
 }
 
 
-function isIterable(instance: any): instance is Iterable<any> {
+export function isIterable(instance: any): instance is Iterable<any> {
   return typeof instance == 'object' && Symbol.iterator in instance;
 }
 
 
-function isUint8Array(instance: any): instance is Uint8Array {
+export function isUint8Array(instance: any): instance is Uint8Array {
   return typeof instance == 'object' && instance instanceof Uint8Array;
 }
 
-function isData(instance: any): instance is Data {
+export function isData(instance: any): instance is Data {
   return typeof instance == 'string' || isUint8Array(instance);
 }
 
-function isPromiseLike(instance: any): instance is PromiseLike<any> {
+export function isPromiseLike(instance: any): instance is PromiseLike<any> {
   return typeof instance == 'object' && 'then' in instance;
 }
 
-async function toPromiseArray<T>(iterable: AsyncIterable<T>): Promise<T[]> {
-  const result: T[] = [];
-  for await (const value of iterable) result.push(value);
+export function merge(a: Uint8Array | undefined, b: Uint8Array): Uint8Array {
+  if (!a) return b;
+  if (a.length === 0) return b;
+  if (b.length === 0) return a;
+  const result = new Uint8Array(a.length + b.length);
+  result.set(a);
+  result.set(b, a.length);
   return result;
 }
