@@ -13,6 +13,10 @@ export class JsonBody<T = any> implements AsyncIterable<Data> {
   [Symbol.asyncIterator](): AsyncIterator<Data> {
     return yieldStringify(this.data)[Symbol.asyncIterator]();
   }
+
+  toJSON() {
+    return this.data;
+  }
 }
 
 /**
