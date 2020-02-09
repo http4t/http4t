@@ -1,3 +1,4 @@
+import {isFailure, success} from "@http4t/result";
 import {join as joinPath} from "path";
 import {PathMatch, PathMatcher} from "./index";
 import {NoopPath} from "./NoopPath";
@@ -9,17 +10,19 @@ export class Joined<A, B> implements PathMatcher<A & B> {
 
   consume(path: string): PathMatch<A & B> {
     const a = this.a.consume(path);
-    if (typeof a === 'undefined') return a;
+    if (isFailure(a)) return a;
 
-    const b = this.b.consume(a.remaining);
-    if (typeof b === 'undefined') return b;
+    const b = this.b.consume(a.value.remaining);
+    if (isFailure(b)) return b;
 
-    const value = {...a.value, ...b.value};
+    const value = {...a.value.value, ...b.value.value};
 
-    return {
-      value,
-      remaining: b.remaining
-    };
+    return success(
+      {
+        value,
+        remaining: b.value.remaining
+      }
+    );
 
   }
 

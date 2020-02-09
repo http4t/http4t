@@ -10,6 +10,7 @@ export class UnionLens<A, B, TMessage extends HttpMessage> implements MessageLen
   async extract(message: TMessage): Promise<Result<A & B>> {
     const aResult = await this.a.extract(message);
     const bResult = await this.b.extract(message);
+
     if (isFailure(aResult)) {
       return isFailure(bResult) ? merge(aResult, bResult) : aResult;
     }

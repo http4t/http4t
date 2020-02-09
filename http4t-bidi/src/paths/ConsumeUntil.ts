@@ -1,3 +1,4 @@
+import {failure, success} from "@http4t/result";
 import {
   consume,
   endOfPath,
@@ -35,12 +36,12 @@ export class ConsumeUntil implements PathMatcher<string> {
 
   consume(path: string): PathMatch<string> {
     const consumed = consume(path, this.consumer);
-    if (typeof consumed === 'undefined') return undefined;
+    if (!consumed) return failure("path did not match");
 
-    return {
+    return success({
       value: consumed.captured,
       remaining: consumed.remaining
-    };
+    });
   }
 
   expand(value: string): string {

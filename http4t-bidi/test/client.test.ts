@@ -38,6 +38,24 @@ describe('Client', () => {
     expect(await client.example({})).deep.eq("hello world");
   });
 
+  it('supports root path', async () => {
+    const routes = {
+      example: route(
+        $request('GET', "/"),
+        json()
+      )
+    };
+
+    async function example(): Promise<string> {
+      return "hello world"
+    }
+
+    const server = buildServer(routes, {example});
+    const client = buildClient(routes, server);
+
+    expect(await client.example({})).deep.eq("hello world");
+  });
+
   it('supports path variables', async () => {
     type Vars = {
       first: string,
@@ -68,7 +86,7 @@ describe('Client', () => {
 
   it('supports variables containing restOfPath', async () => {
     type Vars = {
-      path: string,
+      path: string[],
     }
     const paths: VariablePaths<Vars> = {
       path: v.restOfPath
@@ -76,7 +94,7 @@ describe('Client', () => {
 
     const routes = {
       example: route(
-        $request('GET', path(paths, v => ["prefix",v.path])),
+        $request('GET', path(paths, v => ["prefix", v.path])),
         json<Vars>()
       )
     };
@@ -88,8 +106,8 @@ describe('Client', () => {
     const server = buildServer(routes, {example});
     const client = buildClient(routes, server);
 
-    expect(await client.example({path:"some/long/path"}))
-      .deep.eq({path:"some/long/path"});
+    expect(await client.example({path: ["some", "long", "path"]}))
+      .deep.eq({path: ["some", "long", "path"]});
   });
 
   it('throws ResultError on response lens failure', async () => {

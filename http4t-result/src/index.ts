@@ -92,3 +92,13 @@ export function failure(first: string | Problem, second: Problem | JsonPath | un
   return new Failure(problems)
 }
 
+export function map<T, U>(result: Result<T>,
+                          onSuccess: (t: T) => U,
+                          onFailure: (f: Failure) => Result<U> = f => f): Result<U> {
+  return isFailure(result) ? onFailure(result) : success(onSuccess(result.value));
+}
+
+export function prefixFailure<T>(result: Result<T>,
+                                    path: JsonPath): Result<T> {
+  return map(result, s => s, f => prefix(f, path));
+}

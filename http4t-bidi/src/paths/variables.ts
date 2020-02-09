@@ -1,11 +1,29 @@
+import {map} from "@http4t/result";
+import {exactlyChars, exactlySegments, upToChars, upToSegments} from "./consume";
 import {ConsumeUntil} from "./ConsumeUntil";
 import {PathMatch, PathMatcher} from "./index";
 import {join} from "./Joined";
 import {literal} from "./Literal";
+import {FloatPath} from "./parsers/FloatPath";
+import {IntPath} from "./parsers/IntParser";
+import {SplitStringPath} from "./parsers/SplitStringPath";
 
 export const v = {
   segment: ConsumeUntil.nextSlashOrEnd,
-  restOfPath: ConsumeUntil.endOfPath,
+  upToChars: (count: number) => new ConsumeUntil(upToChars(count)),
+  exactlyChars: (count: number) => new ConsumeUntil(exactlyChars(count)),
+  upToSegments: (count: number) => new SplitStringPath(
+    new ConsumeUntil(upToSegments(count)),
+    '/'),
+  exactlySegments: (count: number) => new SplitStringPath(
+    new ConsumeUntil(exactlySegments(count)),
+    '/'),
+  restOfPath: new SplitStringPath(ConsumeUntil.endOfPath, '/'),
+  restOfPathSegments: new SplitStringPath(ConsumeUntil.endOfPath, '/'),
+  float: new FloatPath(ConsumeUntil.nextSlashOrEnd),
+  int: new IntPath(ConsumeUntil.nextSlashOrEnd),
+  binary: new IntPath(ConsumeUntil.nextSlashOrEnd, 2),
+  hex: new IntPath(ConsumeUntil.nextSlashOrEnd, 16),
 };
 
 export type VariablePaths<T> = { [K in keyof T]: PathMatcher<T[K]> };
@@ -22,12 +40,9 @@ export class VariablePath<T, K extends keyof T> implements PathMatcher<{ K: T[K]
   }
 
   consume(path: string): PathMatch<{ K: T[K] }> {
-    const result = this.value.consume(path);
-    if (typeof result === 'undefined') return result;
-    return {
-      ...result,
-      value: {[this.key]: result.value} as { K: T[K] }
-    };
+    return map(
+      this.value.consume(path),
+      value => ({...value, value: {[this.key]: value.value} as { K: T[K] }}));
   }
 
   expand(value: { K: T[K] }): string {
