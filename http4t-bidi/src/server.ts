@@ -18,7 +18,7 @@ export class Server<T extends Routes> implements HttpHandler {
       }
 
       const handler = this.handlers[key];
-      const result = await handler(requestObject);
+      const result = await handler(requestObject.value);
       return lens.response.inject(result, response(200))
     }
     return response(404);

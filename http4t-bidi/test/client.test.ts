@@ -4,6 +4,8 @@ import {failure, Result} from "@http4t/result";
 import {expect} from 'chai';
 import {buildClient} from "../src/client";
 import {json} from "../src/lenses/JsonLens";
+import {path} from "../src/paths/index";
+import {v, VariablePaths} from "../src/paths/variables";
 import {$request} from "../src/requests";
 import {route} from "../src/routes";
 import {buildServer} from "../src/server";
@@ -34,6 +36,60 @@ describe('Client', () => {
     const client = buildClient(routes, server);
 
     expect(await client.example({})).deep.eq("hello world");
+  });
+
+  it('supports path variables', async () => {
+    type Vars = {
+      first: string,
+      second: string,
+    }
+    const paths: VariablePaths<Vars> = {
+      first: v.segment,
+      second: v.segment
+    };
+
+    const routes = {
+      example: route(
+        $request('GET', path(paths, v => [v.first, v.second])),
+        json<Vars>()
+      )
+    };
+
+    async function example(vars: Vars): Promise<Vars> {
+      return vars;
+    }
+
+    const server = buildServer(routes, {example});
+    const client = buildClient(routes, server);
+
+    expect(await client.example({first: "one", second: "two"}))
+      .deep.eq({first: "one", second: "two"});
+  });
+
+  it('supports variables containing restOfPath', async () => {
+    type Vars = {
+      path: string,
+    }
+    const paths: VariablePaths<Vars> = {
+      path: v.restOfPath
+    };
+
+    const routes = {
+      example: route(
+        $request('GET', path(paths, v => ["prefix",v.path])),
+        json<Vars>()
+      )
+    };
+
+    async function example(vars: Vars): Promise<Vars> {
+      return vars;
+    }
+
+    const server = buildServer(routes, {example});
+    const client = buildClient(routes, server);
+
+    expect(await client.example({path:"some/long/path"}))
+      .deep.eq({path:"some/long/path"});
   });
 
   it('throws ResultError on response lens failure', async () => {

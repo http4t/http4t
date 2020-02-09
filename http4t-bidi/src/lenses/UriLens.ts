@@ -1,7 +1,7 @@
 import {ParsedUri} from "@http4t/core/contract";
-import {joinPaths} from "@http4t/core/uri";
+import {joinPaths, stripSlashes} from "@http4t/core/uri";
 import {failure, Result, success} from "@http4t/result";
-import {isMatchFailure, PathMatcher} from "../paths";
+import {PathMatcher} from "../paths";
 import {BiDiLens} from "../routes";
 
 export class UriLens<T> implements BiDiLens<T, ParsedUri> {
@@ -11,10 +11,10 @@ export class UriLens<T> implements BiDiLens<T, ParsedUri> {
   async extract(uri: ParsedUri): Promise<Result<T>> {
     const result = this.path.consume(uri.path);
 
-    if (isMatchFailure(result))
+    if (!result)
       return failure("Path did not match", ["path"]);
 
-    if (result.remaining.length !== 0)
+    if (stripSlashes(result.remaining).length !== 0)
       return failure(`Path did not fully match uri. Remaining: "${result.remaining}"`, ["path"]);
 
     return success(result.value as T);

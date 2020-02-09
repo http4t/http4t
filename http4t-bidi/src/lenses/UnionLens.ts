@@ -25,5 +25,4 @@ export class UnionLens<A, B, TMessage extends HttpMessage> implements MessageLen
       value,
       await this.a.inject(value, message));
   }
-
 }

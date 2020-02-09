@@ -12,7 +12,8 @@ import {MessageLens} from "../routes";
  */
 export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T, TMessage> {
   async extract(message: TMessage): Promise<Result<T>> {
-    return success(await bodyJson(message.body));
+    const value = await bodyJson<T>(message.body);
+    return success(value);
   }
 
   async inject(value: T, message: TMessage): Promise<TMessage> {
@@ -24,6 +25,6 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T,
   }
 }
 
-export function json<T, TMessage extends HttpMessage>(): JsonLens<T, TMessage> {
+export function json<T, TMessage extends HttpMessage=HttpMessage>(): JsonLens<T, TMessage> {
   return new JsonLens<T, TMessage>();
 }

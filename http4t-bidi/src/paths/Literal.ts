@@ -1,30 +1,32 @@
-import {HttpRequest} from "@http4t/core/contract";
-import {uri} from "@http4t/core/requests";
-import {joinPaths} from "@http4t/core/uri";
-import {failure, Result, success} from "@http4t/result";
-import {RequestLens} from "../routes";
+import {stripSlashes} from "@http4t/core/uri";
+import {ConsumeUntil} from "./ConsumeUntil";
+import {PathMatch, PathMatcher} from "./index";
 
-export class Literal implements RequestLens<undefined> {
-  constructor(private readonly value: string) {
+export class Literal implements PathMatcher<undefined> {
+  private readonly strippedText: string;
+  private readonly base: ConsumeUntil;
+
+  constructor(private readonly text: string) {
+    const strippedText = stripSlashes(text);
+    const consumer = (path: string) => path.startsWith(strippedText) ? strippedText.length : -1;
+    this.base = new ConsumeUntil(consumer);
+    this.strippedText = stripSlashes(text);
   }
 
-  async extract(request: HttpRequest): Promise<Result<undefined>> {
-    if (request.uri.path.startsWith(this.value)) return success(undefined);
-    return failure("path did not match", ['uri', 'path']);
-  }
-
-  async inject(value: undefined, message: HttpRequest): Promise<HttpRequest> {
-    const path = joinPaths(message.uri.path, this.value);
+  consume(path: string): PathMatch<undefined> {
+    const result = this.base.consume(path);
+    if (typeof result === 'undefined') return result;
     return {
-      ...message,
-      uri: {
-        ...message.uri,
-        path
-      }
+      ...result,
+      value: undefined
     };
+  }
+
+  expand(value: undefined): string {
+    return this.text;
   }
 }
 
-export function literal(text: string): Literal {
+export function literal(text: string): PathMatcher<undefined> {
   return new Literal(text);
 }

@@ -10,7 +10,7 @@ export interface BiDiLens<TIn, TOut> {
 /**
  * Serializes/deserializes a value into/out of a message
  */
-export interface MessageLens<T, TMessage extends HttpMessage> extends BiDiLens<T, TMessage> {
+export interface MessageLens<T, TMessage extends HttpMessage = HttpMessage> extends BiDiLens<T, TMessage> {
 }
 
 export interface RequestLens<T> extends MessageLens<T, HttpRequest> {
@@ -49,7 +49,10 @@ export type Handler<T> = T extends Route<infer TReq, infer TRes>
 export type Api<TRoute extends Routes> = { [K in keyof TRoute]: Handler<TRoute[K]> };
 
 export function route<TRequest, TResponse>(
-  request: RequestLens<TRequest>,
-  response: ResponseLens<TResponse>): Route<TRequest, TResponse> {
-  return {request, response};
+  request: RequestLens<TRequest> | MessageLens<TRequest>,
+  response: ResponseLens<TResponse> | MessageLens<TResponse>): Route<TRequest, TResponse> {
+  return {
+    request: request as RequestLens<TRequest>,
+    response: response as ResponseLens<TResponse>
+  };
 }
