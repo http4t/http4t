@@ -14,8 +14,8 @@ sending the wrong shaped requests to my server.
 
 ### Fully type-safe contracts for both client and server
 
-If I have a route `GET /widgets/{widgetId}` that returns a `Widget`, I want to be able
-to give my server a handler function that knows nothing about http, like:
+If I have a route `GET /widgets/{widgetId}` that returns a json-serialised response body containing a `Widget`, 
+I want to be able to give my server a handler function that knows nothing about http, like:
 
 ```typescript
 (args: {widgetId: string}) => Promise<Widget>
