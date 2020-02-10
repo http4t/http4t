@@ -3,7 +3,7 @@ set -e
 
 function build() {
     if [[ -n "$1" ]]; then
-        pushd $1
+        pushd "$1"
     fi
 
     yarn install
@@ -28,7 +28,7 @@ function bumpVersion () {
 }
 
 function package() {
-    pushd $1
+    pushd "$1"
 
     rm -rf dist
     mkdir -p dist
@@ -40,23 +40,23 @@ function package() {
 }
 
 function publish() {
-    if [[ ! -n "$1" ]]; then
+    if [[ -z "$1" ]]; then
         echo "ERROR: Specify directory"
         exit 1
     fi
-    if [[ ! -n "$NPM_TOKEN" ]]; then
+    if [[ -z "$NPM_TOKEN" ]]; then
         echo "ERROR: Specify NPM_TOKEN"
         exit 1
     fi
 
     dist=$1/dist
 
-    mkdir -p ${dist}
-    cat >${dist}/.npmrc <<EOL
+    mkdir -p "${dist}"
+    cat >"${dist}/.npmrc" <<EOL
 @http4t:registry=https://registry.npmjs.org
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}
 EOL
-    pushd ${dist}
+    pushd "${dist}"
     npm publish --access public
     popd
 }
@@ -64,7 +64,7 @@ EOL
 function publishDocs() {
     TMP=/tmp/http4t.github.io/
     rm -rf ${TMP}
-    git clone https://${GH_TOKEN}@github.com/http4t/http4t.github.io.git ${TMP}
+    git clone "https://${GH_TOKEN}@github.com/http4t/http4t.github.io.git" ${TMP}
     moduleName=${PWD##*/}
     if [[ ${moduleName} == "http4t" ]]; then
         echo "ignored"
@@ -72,10 +72,10 @@ function publishDocs() {
         cp -R dist/docs/ ${TMP}
     else
         mkdir -p ${TMP}/api
-        cp -R dist/docs ${TMP}/api/${moduleName}
+        cp -R dist/docs ${TMP}/api/"${moduleName}"
     fi
     cd ${TMP}
-    sed s/\>\</\>`date '+%Y-%m-%d'`\</g sitemap.xml > new ; mv new sitemap.xml
+    sed s/\>\</\>"$(date '+%Y-%m-%d')"\</g sitemap.xml > new ; mv new sitemap.xml
     git add .
     git commit -m "${moduleName} update"
     git push
@@ -86,10 +86,11 @@ function publishDocs() {
 function ci() {
     bumpVersion
 
+    # shellcheck disable=SC2010
     modules=$(ls | grep "http4t-.*")
     for module in $modules; do
-        package $module
-        publish $module
+        package "$module"
+        publish "$module"
     done
 }
 
@@ -100,12 +101,13 @@ function ci() {
 export NVM_DIR=$HOME/.nvm
 
 if [[ ! -d $NVM_DIR ]]; then
-  mkdir -p $NVM_DIR
+  mkdir -p "$NVM_DIR"
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 fi
 
 if [[ ! $(command -v nvm) ]]; then
   set +e
+  # shellcheck source=/dev/null
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   set -e
 fi
@@ -116,8 +118,8 @@ if [[ ! $(command -v yarn) ]]; then
     npm install -g yarn
 fi
 
-
 if [[ -d  ".git" ]]; then
+    # If we're in  the root directory, build everything
     yarn install
     # Have to build in correct order
     build http4t-core
