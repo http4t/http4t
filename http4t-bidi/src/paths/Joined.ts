@@ -1,7 +1,7 @@
 import {isFailure, success} from "@http4t/result";
 import {join as joinPath} from "path";
-import {PathMatch, PathMatcher} from "./index";
 import {NoopPath} from "./NoopPath";
+import {PathMatch, PathMatcher} from "./PathMatcher";
 
 export class Joined<A, B> implements PathMatcher<A & B> {
   constructor(private readonly a: PathMatcher<A>,

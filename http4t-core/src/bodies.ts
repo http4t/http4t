@@ -99,12 +99,14 @@ export async function* streamBinary(body: HttpBody): AsyncIterable<Uint8Array> {
 
 export function asString(data: Data): string {
   if (typeof data === 'string') return data;
+  // noinspection SuspiciousTypeOfGuard
   if (data instanceof Uint8Array) return textDecoder().decode(data);
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
 export function asBinary(data: Data): Uint8Array {
   if (data instanceof Uint8Array) return data;
+  // noinspection SuspiciousTypeOfGuard
   if (typeof data === 'string') return textEncoder().encode(data);
   throw new Error(`Not supported ${typeDescription(data)}`)
 }
@@ -115,7 +117,9 @@ Helpers
 -----------------------------------
  */
 
-// TODO: this is janky, but nice error messages are nice. Have a think about it
+/**
+ * This is janky but the error messages are so useful when you screw something up
+ */
 export function typeDescription(x: any): string {
   if (x === null)
     return 'null';

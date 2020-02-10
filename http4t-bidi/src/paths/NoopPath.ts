@@ -1,5 +1,5 @@
 import {success} from "@http4t/result";
-import {PathMatch, PathMatcher} from "./index";
+import {PathMatch, PathMatcher} from "./PathMatcher";
 
 export class NoopPath implements PathMatcher<undefined> {
   consume(path: string): PathMatch<undefined> {

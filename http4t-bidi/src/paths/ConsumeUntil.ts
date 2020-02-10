@@ -9,7 +9,7 @@ import {
   upToChars,
   upToSegments
 } from "./consume";
-import {PathMatch, PathMatcher} from "./index";
+import {PathMatch, PathMatcher} from "./PathMatcher";
 
 export class ConsumeUntil implements PathMatcher<string> {
   static nextSlashOrEnd = new ConsumeUntil(nextSlashOrEnd);

@@ -1,7 +1,7 @@
 import {stripSlashes} from "@http4t/core/uri";
 import {map} from "@http4t/result";
 import {ConsumeUntil} from "./ConsumeUntil";
-import {PathMatch, PathMatcher} from "./index";
+import {PathMatch, PathMatcher} from "./PathMatcher";
 
 export class Literal implements PathMatcher<undefined> {
   private readonly strippedText: string;

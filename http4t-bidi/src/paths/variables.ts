@@ -1,12 +1,12 @@
 import {map} from "@http4t/result";
 import {exactlyChars, exactlySegments, upToChars, upToSegments} from "./consume";
 import {ConsumeUntil} from "./ConsumeUntil";
-import {PathMatch, PathMatcher} from "./index";
 import {join} from "./Joined";
 import {literal} from "./Literal";
 import {FloatPath} from "./parsers/FloatPath";
 import {IntPath} from "./parsers/IntParser";
 import {SplitStringPath} from "./parsers/SplitStringPath";
+import {PathMatch, PathMatcher} from "./PathMatcher";
 
 export const v = {
   segment: ConsumeUntil.nextSlashOrEnd,

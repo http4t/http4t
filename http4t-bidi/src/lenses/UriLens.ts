@@ -1,7 +1,7 @@
 import {ParsedUri} from "@http4t/core/contract";
 import {joinPaths, stripSlashes} from "@http4t/core/uri";
 import {failure, isFailure, prefix, Result, success} from "@http4t/result";
-import {PathMatcher} from "../paths";
+import {PathMatcher} from "../paths/PathMatcher";
 import {BiDiLens} from "../routes";
 
 export class UriLens<T> implements BiDiLens<T, ParsedUri> {

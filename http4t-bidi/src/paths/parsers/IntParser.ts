@@ -1,5 +1,5 @@
 import {failure, Result, success} from "@http4t/result";
-import {PathMatcher} from "../index";
+import {PathMatcher} from "../PathMatcher";
 import {Parser, ParserPath} from "./index";
 
 const validInt = /^[0-9]+$/;

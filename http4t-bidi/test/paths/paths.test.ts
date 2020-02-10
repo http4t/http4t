@@ -1,3 +1,4 @@
+import {failure, success} from "@http4t/result";
 import {expect} from 'chai';
 import {path} from "../../src/paths/index";
 import {v, VariablePath} from "../../src/paths/variables";
@@ -16,27 +17,29 @@ const componentPath = path(componentVars, v =>
 describe('path()', () => {
   it('can extract matching path', async () => {
     expect(componentPath.consume("/widgets/123/components/456"))
-      .deep.eq({
-      value: {
-        widgetId: "123",
-        componentId: "456"
-      },
-      remaining: ""
-    })
+      .deep.eq(
+      success({
+        value: {
+          widgetId: "123",
+          componentId: "456"
+        },
+        remaining: ""
+      })
+    )
   });
   it('fails if path does not match', async () => {
     expect(componentPath.consume("/widgets/123/components"))
-      .deep.eq(undefined)
+      .deep.eq(failure("path did not match"))
   });
   it('leaves non-matching remainder of path', async () => {
     expect(componentPath.consume("/widgets/123/components/456/doesnotmatch"))
-      .deep.eq({
+      .deep.eq(success({
       value: {
         widgetId: "123",
         componentId: "456"
       },
       remaining: "/doesnotmatch"
-    })
+    }))
   });
   it('can inject', async () => {
     expect(componentPath.expand({widgetId: "123", componentId: "456"}))

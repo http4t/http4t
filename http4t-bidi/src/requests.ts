@@ -3,8 +3,8 @@ import {MethodLens} from "./lenses/MethodLens";
 import {RequestUriLens} from "./lenses/RequestUriLens";
 import {UnionLens} from "./lenses/UnionLens";
 import {UriLens} from "./lenses/UriLens";
-import {isPathMatcher, PathMatcher} from "./paths/index";
 import {literal} from "./paths/Literal";
+import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
 import {RequestLens} from "./routes";
 
 export function $request<TPath>(method: Method, path: RequestLens<TPath> | PathMatcher<TPath>): RequestLens<TPath>;

@@ -1,5 +1,5 @@
 import {isFailure, map, Result} from "@http4t/result";
-import {PathMatch, PathMatcher} from "../index";
+import {PathMatch, PathMatcher} from "../PathMatcher";
 
 export interface Parser<T> {
   parse(value: string): Result<T>;
