@@ -6,7 +6,7 @@ import {buildClient} from "../src/client";
 import {json} from "../src/lenses/JsonLens";
 import {path} from "../src/paths/index";
 import {v, VariablePaths} from "../src/paths/variables";
-import {$request} from "../src/requests";
+import {request} from "../src/requests";
 import {route} from "../src/routes";
 import {buildServer} from "../src/server";
 
@@ -23,7 +23,7 @@ describe('Client', () => {
   it('serialises request, sends to http handler, and then deserialises response', async () => {
     const routes = {
       example: route(
-        $request('GET', "/some/path"),
+        request('GET', "/some/path"),
         json()
       )
     };
@@ -41,7 +41,7 @@ describe('Client', () => {
   it('supports root path', async () => {
     const routes = {
       example: route(
-        $request('GET', "/"),
+        request('GET', "/"),
         json()
       )
     };
@@ -68,7 +68,7 @@ describe('Client', () => {
 
     const routes = {
       example: route(
-        $request('GET', path(paths, v => [v.first, v.second])),
+        request('GET', path(paths, v => [v.first, v.second])),
         json<Vars>()
       )
     };
@@ -94,7 +94,7 @@ describe('Client', () => {
 
     const routes = {
       example: route(
-        $request('GET', path(paths, v => ["prefix", v.path])),
+        request('GET', path(paths, v => ["prefix", v.path])),
         json<Vars>()
       )
     };
@@ -113,7 +113,7 @@ describe('Client', () => {
   it('throws ResultError on response lens failure', async () => {
     const routes = {
       example: route(
-        $request('GET', "/some/path"),
+        request('GET', "/some/path"),
         {
           inject: async (input: string, output: HttpResponse): Promise<HttpResponse> => {
             return setBody(output, input)

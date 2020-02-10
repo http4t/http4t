@@ -7,9 +7,9 @@ import {literal} from "./paths/Literal";
 import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
 import {RequestLens} from "./routes";
 
-export function $request<TPath>(method: Method, path: RequestLens<TPath> | PathMatcher<TPath>): RequestLens<TPath>;
-export function $request(method: Method, path: string): RequestLens<{}>;
-export function $request<TPath>(
+export function request<TPath>(method: Method, path: RequestLens<TPath> | PathMatcher<TPath>): RequestLens<TPath>;
+export function request(method: Method, path: string): RequestLens<{}>;
+export function request<TPath>(
   method: Method,
   pathOrString: RequestLens<TPath> | PathMatcher<TPath> | string
 ): RequestLens<TPath> {
