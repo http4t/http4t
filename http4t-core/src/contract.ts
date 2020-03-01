@@ -95,10 +95,16 @@ export type HttpBody = SyncBody | AsyncBody;
  */
 export interface ParsedUri {
   readonly scheme?: string;
-  readonly authority?: string;
+  readonly authority?: ParsedAuthority;
   readonly path: string;
   readonly query?: string;
   readonly fragment?: string;
+}
+
+export interface ParsedAuthority {
+  readonly user?: string;
+  readonly host: string;
+  readonly port?: number;
 }
 
 /**

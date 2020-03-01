@@ -1,6 +1,6 @@
-import {Header, HttpBody, HttpRequest, Method} from "./contract";
+import {Header, HttpBody, HttpRequest, Method, ParsedAuthority} from "./contract";
 import {getHeaderValue} from "./headers";
-import {Uri, UriLike} from "./uri";
+import {Authority, Uri, UriLike} from "./uri";
 
 export function request(method: Method, uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
   return {
@@ -31,13 +31,14 @@ export function delete_(uri: UriLike | string, ...headers: Header[]): HttpReques
   return request("DELETE", uri, undefined, ...headers);
 }
 
-export function host(request: HttpRequest): string {
+export function authority(request: HttpRequest): ParsedAuthority {
   if (typeof request.uri.authority != 'undefined')
     return request.uri.authority;
 
   const value = getHeaderValue(request.headers, 'Host');
   if (typeof value != 'string') throw new Error(`Could not get authority from request uri '${request.uri}'`);
-  return value;
+
+  return Authority.parse(value);
 }
 
 export function uri(request: HttpRequest): Uri {

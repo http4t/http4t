@@ -1,6 +1,6 @@
 import {bufferText, typeDescription} from "@http4t/core/bodies";
-import {HttpBody, Header, HeaderName, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {host} from "@http4t/core/requests";
+import {Header, HeaderName, HttpBody, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {authority} from "@http4t/core/requests";
 import {response} from "@http4t/core/responses";
 import {Uri} from "@http4t/core/uri";
 
@@ -11,8 +11,7 @@ export class XmlHttpHandler implements HttpHandler {
   handle(request: HttpRequest): Promise<HttpResponse> {
     return new Promise<HttpResponse>((resolve, reject) => {
         //TODO: make sure everything that needs finalising and closing gets finalised
-        const authority = host(request);
-        const uri = Uri.modify(request.uri, {authority});
+        const uri = Uri.modify(request.uri, {authority: authority(request)});
 
         this.handler.open(request.method, uri.toString(), true);
         this.handler.withCredentials = true;
@@ -20,7 +19,7 @@ export class XmlHttpHandler implements HttpHandler {
         this.setHeaders(request.headers);
 
         this.handler.addEventListener("load", () => {
-          if(!(this.handler.response instanceof ArrayBuffer))
+          if (!(this.handler.response instanceof ArrayBuffer))
             throw new Error(`Not an ArrayBuffer ${typeDescription(this.handler.response)}`);
 
           resolve(response(

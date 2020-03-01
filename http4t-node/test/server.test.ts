@@ -1,3 +1,4 @@
+import {Authority} from "@http4t/core/uri";
 import {assert} from 'chai';
 import {runningInNode} from "./client.test";
 import {Server} from "@http4t/core/server";
@@ -25,7 +26,7 @@ describe("ServerHandler", function () {
     async function host(): Promise<string> {
         const s = await server;
         const url = await s.url();
-        if (url.authority) return url.authority;
+        if (url.authority) return Authority.of(url.authority).toString();
         throw new Error("Should never get here");
     }
 
@@ -34,7 +35,8 @@ describe("ServerHandler", function () {
 
         const {ClientHandler} = await import('../src/client');
         return new ClientHandler();
-    }, runningInNode() ? host() : null as any);
+    },
+      runningInNode() ? host() : null as any);
 
     after(async function () {
         try {

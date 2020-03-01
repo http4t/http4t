@@ -1,5 +1,5 @@
 import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {host, request} from "@http4t/core/requests";
+import {authority, request} from "@http4t/core/requests";
 import {response} from "@http4t/core/responses";
 import * as node from 'http';
 import {bodyToStream, streamToBody} from "./streams";
@@ -12,12 +12,12 @@ Core functions
  */
 
 export function requestHttp4tToNode(request: HttpRequest): node.RequestOptions {
-  const [hostname, port = 80] = host(request).split(':');
+  const {host,port=80} = authority(request);
   const uri = request.uri;
   return {
     method: request.method,
     path: `${uri.path}${uri.query ? `?${uri.query}` : ''}`,
-    hostname: hostname,
+    hostname: host,
     port: port,
     headers: toOutgoingHeaders(request.headers)
   };
