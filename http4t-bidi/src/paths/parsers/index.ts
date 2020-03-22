@@ -15,6 +15,7 @@ export abstract class ParserPath<T> implements PathMatcher<T> {
   consume(path: string): PathMatch<T> {
     const result = this.base.consume(path);
     if (isFailure(result)) return result;
+
     const parsed = this.parser.parse(result.value.value);
 
     return map(

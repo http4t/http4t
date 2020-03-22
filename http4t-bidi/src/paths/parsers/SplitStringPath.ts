@@ -6,8 +6,8 @@ class SplitStringParser implements Parser<string[]> {
   constructor(private readonly separator: string) {
   }
 
-  parse(value: string): Result<string[]> {
-    return success(value.split(this.separator));
+  parse(pathSegment: string): Result<string[]> {
+    return success(pathSegment.split(this.separator));
   }
 
   unparse(value: string[]): string {

@@ -3,8 +3,8 @@ import {PathMatcher} from "../PathMatcher";
 import {Parser, ParserPath} from "./index";
 
 class FloatParser implements Parser<number> {
-  parse(value: string): Result<number> {
-    const parsed = +value;
+  parse(pathSegment: string): Result<number> {
+    const parsed = +pathSegment;
 
     if (Number.isNaN(parsed)) return failure("expected a number");
 

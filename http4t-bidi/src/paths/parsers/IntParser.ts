@@ -8,10 +8,10 @@ export class IntParser implements Parser<number> {
   constructor(private readonly radix?: number) {
   }
 
-  parse(value: string): Result<number> {
-    const parsed = Number.parseInt(value, this.radix);
+  parse(pathSegment: string): Result<number> {
+    const parsed = Number.parseInt(pathSegment, this.radix);
 
-    if (Number.isNaN(parsed) || !value.match(validInt)) return failure("expected an integer");
+    if (Number.isNaN(parsed) || !pathSegment.match(validInt)) return failure("expected an integer");
 
     return success(parsed);
   }
