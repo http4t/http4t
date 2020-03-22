@@ -20,7 +20,7 @@ function validator<T, TMessage extends HttpMessage>(
   }
 }
 
-export function $routeClient<TReq, TRes>(
+export function routeClient<TReq, TRes>(
   route: Route<TReq, TRes>,
   http: HttpHandler,
   opts: Partial<ResultErrorOpts> = {})
@@ -37,7 +37,7 @@ export function buildClient<TRoutes extends Routes>(
   http: HttpHandler): Api<TRoutes> {
   return Object.entries(routes)
     .reduce((acc, [key, route]) => {
-        acc[key as keyof TRoutes] = $routeClient(route, http) as any;
+        acc[key as keyof TRoutes] = routeClient(route, http) as any;
         return acc;
       },
       {} as Api<TRoutes>);
