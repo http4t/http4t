@@ -10,19 +10,29 @@ import {PathMatch, PathMatcher} from "./PathMatcher";
 
 export const v = {
   segment: ConsumeUntil.nextSlashOrEnd,
+
   upToChars: (count: number) => new ConsumeUntil(upToChars(count)),
+
   exactlyChars: (count: number) => new ConsumeUntil(exactlyChars(count)),
+
   upToSegments: (count: number) => new SplitStringPath(
     new ConsumeUntil(upToSegments(count)),
     '/'),
+
   exactlySegments: (count: number) => new SplitStringPath(
     new ConsumeUntil(exactlySegments(count)),
     '/'),
+
   restOfPath: new SplitStringPath(ConsumeUntil.endOfPath, '/'),
+
   restOfPathSegments: new SplitStringPath(ConsumeUntil.endOfPath, '/'),
+
   float: new FloatPath(ConsumeUntil.nextSlashOrEnd),
+
   int: new IntPath(ConsumeUntil.nextSlashOrEnd),
+
   binary: new IntPath(ConsumeUntil.nextSlashOrEnd, 2),
+
   hex: new IntPath(ConsumeUntil.nextSlashOrEnd, 16),
 };
 
@@ -30,8 +40,6 @@ export type VariablePaths<T> = { [K in keyof T]: PathMatcher<T[K]> };
 
 export type Variable<T, K extends keyof T = keyof T> = { key: K };
 export type Variables<T> = { [K in keyof T]: Variable<T, K> };
-
-export type SegmentFn<T extends object> = (vars: Variables<T>) => (Variable<T> | string)[];
 
 export class VariablePath<T, K extends keyof T> implements PathMatcher<{ K: T[K] }> {
   constructor(
@@ -51,9 +59,11 @@ export class VariablePath<T, K extends keyof T> implements PathMatcher<{ K: T[K]
 
 }
 
+export type SegmentsFn<T extends object> = (vars: Variables<T>) => (Variable<T> | string)[];
+
 export function variablesPath<T extends object>(
   variablePaths: VariablePaths<T>,
-  segmentFn: SegmentFn<T>)
+  segmentFn: SegmentsFn<T>)
   : PathMatcher<T> {
 
   const variables = Object.keys(variablePaths).reduce((acc, key) => {

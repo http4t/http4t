@@ -3,15 +3,33 @@ import {map} from "@http4t/result";
 import {ConsumeUntil} from "./ConsumeUntil";
 import {PathMatch, PathMatcher} from "./PathMatcher";
 
+/**
+ * PathMatcher that consumes {text} from a uri path
+ *
+ * {test} may include slashes
+ *
+ * Matcher will consume leading slashes, i.e.
+ *
+ * `new Literal("widgets/on-sale")` will match any of these:
+ *
+ * ```
+ * widgets/on-sale/100
+ * //widgets/on-sale/100
+ * /widgets/on-sale/100
+ * ```
+ */
 export class Literal implements PathMatcher<undefined> {
   private readonly strippedText: string;
   private readonly base: ConsumeUntil;
 
   constructor(private readonly text: string) {
-    const strippedText = stripSlashes(text);
-    const consumer = (path: string) => path.startsWith(strippedText) ? strippedText.length : -1;
-    this.base = new ConsumeUntil(consumer);
     this.strippedText = stripSlashes(text);
+
+    const consumer = (path: string) => path.startsWith(this.strippedText)
+      ? this.strippedText.length
+      : -1;
+
+    this.base = new ConsumeUntil(consumer);
   }
 
   consume(path: string): PathMatch<undefined> {
