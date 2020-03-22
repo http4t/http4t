@@ -1,10 +1,10 @@
-/**
- * Given a path with leading slashes removed, tell me which index to consume until.
- *
- * Return -1 if nothing can be consumed (e.g. path is empty, not long enough, etc.)
- */
 import {leading} from "@http4t/core/uri";
 
+/**
+ * Function which, given a path with leading slashes removed, tells me which index to consume until.
+ *
+ * Returning -1 if nothing can be consumed (e.g. path is empty, not long enough, etc.)
+ */
 export type PathConsumer = (pathNoLeadingSlashes: string) => number;
 
 export type Consumed = {
@@ -15,9 +15,8 @@ export type Consumed = {
 
 /**
  * 1. consume leading slashes from path
- * 2. use consumer to capture some substring of what's left, e.g. everything until the first '/'
+ * 2. use consumer to capture some substring of what's left, e.g. everything until the index of the first '/'
  * 3. consume leading slashes from the remaining path
- *
  */
 export function consume(path: string, consumer: PathConsumer): Consumed | undefined {
   const prefix = path.match(leading)?.[0] || "";

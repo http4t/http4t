@@ -33,7 +33,7 @@ describe('consume()', () => {
     expect(result).eq(undefined)
   });
 
-  it('throws helpful exception if consumer return impossible index', async () => {
+  it('throws helpful exception if consumer returns impossible index', async () => {
     expect(() => consume("/12345678", () => 9))
       .throws("cannot consume 9 characters from 8 character path '12345678'")
   });
