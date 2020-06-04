@@ -1,4 +1,4 @@
-import {HttpResponse} from "@http4t/core/contract";
+import {HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {setBody} from "@http4t/core/messages";
 import {failure, Result} from "@http4t/result";
 import {expect} from 'chai';
@@ -6,7 +6,7 @@ import {buildClient} from "../src/client";
 import {json} from "../src/lenses/JsonLens";
 import {path} from "../src/paths/index";
 import {v, VariablePaths} from "../src/paths/variables";
-import {request} from "../src/requests";
+import {request, RequestBodyLens} from "../src/requests";
 import {route} from "../src/routes";
 import {buildServer} from "../src/server";
 
@@ -36,6 +36,25 @@ describe('Client', () => {
     const client = buildClient(routes, server);
 
     expect(await client.example({})).deep.eq("hello world");
+  });
+
+  it('serialises post request', async () => {
+    const routes = {
+      example: route(
+        request('POST', "/some/path", {foo: 'bar'}),
+        new RequestBodyLens()
+      )
+    };
+
+    async function example(req: any): Promise<string> {
+      return req
+    }
+
+    const server = buildServer(routes, {example});
+    const client = buildClient(routes, server);
+
+    const newVar = await client.example({});
+    expect(newVar).deep.eq("hello world");
   });
 
   it('supports root path', async () => {
