@@ -2,7 +2,7 @@ import {HttpMessage} from "@http4t/core/contract";
 import {isFailure, merge, Result, success} from "@http4t/result";
 import {MessageLens} from "../routes";
 
-export class UnionLens<A, B, TMessage extends HttpMessage> implements MessageLens<A & B, TMessage> {
+export class IntersectionLens<A, B, TMessage extends HttpMessage> implements MessageLens<A & B, TMessage> {
   constructor(private readonly a: MessageLens<A, TMessage>,
               private readonly b: MessageLens<B, TMessage>) {
   }

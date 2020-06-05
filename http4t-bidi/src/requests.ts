@@ -1,7 +1,7 @@
 import {Method} from "@http4t/core/contract";
 import {MethodLens} from "./lenses/MethodLens";
 import {RequestUriLens} from "./lenses/RequestUriLens";
-import {UnionLens} from "./lenses/UnionLens";
+import {IntersectionLens} from "./lenses/IntersectionLens";
 import {UriLens} from "./lenses/UriLens";
 import {literal} from "./paths/Literal";
 import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
@@ -21,7 +21,7 @@ export function request<TPath>(
       ? new RequestUriLens(new UriLens<TPath>(pathOrString))
       : pathOrString;
 
-  return new UnionLens(
+  return new IntersectionLens(
     new MethodLens(method),
     path);
 }
