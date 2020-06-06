@@ -14,6 +14,8 @@ jobs:
           command: ./run ci
       - store_artifacts:
           path: /tmp/.npm/_logs/workflows
+workflows:
+  version: 2
   build-deploy:
     jobs:
       - contract:
