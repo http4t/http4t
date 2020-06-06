@@ -8,10 +8,16 @@ import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
 import {RequestLens} from "./routes";
 
 export function request<TPath>(method: Method, path: RequestLens<TPath> | PathMatcher<TPath>): RequestLens<TPath>;
-export function request(method: Method, path: string): RequestLens<{}>;
-export function request<TPath>(
+export function request<TPath, TBody>(
   method: Method,
-  pathOrString: RequestLens<TPath> | PathMatcher<TPath> | string
+  path: RequestLens<TPath> | PathMatcher<TPath>,
+  body: RequestLens<TBody>): RequestLens<TPath & TBody>;
+
+export function request(method: Method, path: string): RequestLens<{}>;
+export function request<TPath, TBody>(
+  method: Method,
+  pathOrString: RequestLens<TPath> | PathMatcher<TPath> | string,
+  body?: RequestLens<TBody>
 ): RequestLens<TPath> {
 
   const path: RequestLens<TPath> =
@@ -21,7 +27,10 @@ export function request<TPath>(
       ? new RequestUriLens(new UriLens<TPath>(pathOrString))
       : pathOrString;
 
-  return new IntersectionLens(
+  const methodAndPath = new IntersectionLens(
     new MethodLens(method),
     path);
+  return body
+    ? new IntersectionLens(methodAndPath, body)
+    : methodAndPath;
 }

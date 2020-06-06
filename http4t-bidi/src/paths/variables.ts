@@ -39,10 +39,10 @@ export const v = {
   hex: new IntPath(ConsumeUntil.nextSlashOrEnd, 16),
 };
 
-export type VariablePaths<T> = { [K in keyof T]: PathMatcher<T[K]> };
+export type VariablePaths<T extends object> = { readonly [K in keyof T]: PathMatcher<T[K]> };
 
 export type Variable<T, K extends keyof T = keyof T> = { key: K };
-export type Variables<T> = { [K in keyof T]: Variable<T, K> };
+export type Variables<T extends object> = { readonly [K in keyof T]: Variable<T, K> };
 
 export class VariablePath<T, K extends keyof T> implements PathMatcher<{ K: T[K] }> {
   constructor(
