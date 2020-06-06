@@ -20,3 +20,5 @@ workflows:
           filters:
             branches:
               only: master
+      - store_artifacts:
+          path: /home/circleci/.npm/_logs/
