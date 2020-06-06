@@ -1,0 +1,29 @@
+{
+  "name": "@http4t/bidi-eg",
+  "version": "0.0.82",
+  "private": true,
+  "scripts": {
+    "clean": "find src test -name '*.js' -o -name '*.map' -o -name '*.d.ts' | xargs rm -f",
+    "build": "tsc && madge --extensions ts --circular src/",
+    "docs": "typedoc --includeDeclarations --excludeExternals --out dist/docs src",
+    "test": "NODE_ENV=development mocha --require ts-node/register --exit  'test/**/*.test.ts'",
+    "test-browser": "ts-node test-browser.ts"
+  },
+  "dependencies": {
+    "@types/uuid": "^3.4.7",
+    "@http4t/bidi": "0.0.82",
+    "@http4t/node": "0.0.82",
+    "uuid": "^3.4.0",
+    "pg": "7.9.0",
+    "ts-node": "8.1.0",
+    "typescript": "^3.9.5"
+  },
+  "devDependencies": {
+    "@types/chai": "4.1.7",
+    "@types/mocha": "5.2.6",
+    "@types/node": "11.11.6",
+    "@types/pg": "7.4.14",
+    "chai": "4.2.0",
+    "mocha": "6.1.3"
+  }
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+docker run --rm -d -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:12-alpine
