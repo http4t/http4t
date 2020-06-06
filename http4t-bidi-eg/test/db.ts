@@ -1,1 +1,1 @@
-export const testDatabase = {database: "postgres", user: "postgres", password: "password"};
+export const testDatabase = {database: "bidi-example", user: "bidi-example", password: "password"};
