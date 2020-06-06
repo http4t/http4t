@@ -4,7 +4,6 @@ jobs:
   contract:
     docker:
       - image: circleci/node:10
-    working_directory: /tmp
     steps:
       - setup_remote_docker:
           docker_layer_caching: false
@@ -13,7 +12,7 @@ jobs:
           name: Build & Deploy
           command: ./run ci
       - store_artifacts:
-          path: /tmp/.npm/_logs/workflows
+          path: /home/circleci/.npm/_logs/workflows
 workflows:
   version: 2
   build-deploy:
