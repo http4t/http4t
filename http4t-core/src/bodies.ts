@@ -31,7 +31,7 @@ export async function bufferBinary(body: HttpBody): Promise<Uint8Array> {
     return asBinary(await body);
   }
   if (isAsyncIterable(body)) {
-    let result = undefined;
+    let result: Uint8Array | undefined = undefined;
     for await (const data of body) {
       result = merge(result, asBinary(data));
     }
