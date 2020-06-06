@@ -122,6 +122,7 @@ if [[ -d  ".git" ]]; then
     build http4t-node
     build http4t-browser
     build http4t-bidi
+    build http4t-bidi-eg
     build site
 else
     build

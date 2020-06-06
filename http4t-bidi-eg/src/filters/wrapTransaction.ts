@@ -1,11 +1,12 @@
 import { HttpHandler, HttpRequest, HttpResponse } from "@http4t/core/contract";
-import { toHttpHandler } from "../utils/http";
 import { Transaction } from "../TransactionPool";
 import { Filter } from "../utils/Filter";
+import {toHttpHandler} from "../utils/http";
 
-export function inTransaction(transaction: Transaction): Filter {
+export function wrapTransaction(transaction: Transaction): Filter {
   return (decorated: HttpHandler): HttpHandler => {
     return toHttpHandler(async (request: HttpRequest): Promise<HttpResponse> => {
+
       await transaction.query('BEGIN');
       try {
         const response = await decorated.handle(request);

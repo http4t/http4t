@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import {json} from "../src/lenses/JsonLens";
 import {request} from "../src/requests";
 import {route} from "../src/routes";
-import {buildServer} from "../src/server";
+import {buildRouter} from "../src/router";
 
 describe('Server', () => {
   it('matches route and calls handler', async () => {
@@ -18,7 +18,7 @@ describe('Server', () => {
       return "hello world"
     }
 
-    const s = buildServer(routes, {example});
+    const s = buildRouter(routes, {example});
 
     const response = await s.handle(get('/'));
 
@@ -37,7 +37,7 @@ describe('Server', () => {
       return "hello world"
     }
 
-    const s = buildServer(routes, {example});
+    const s = buildRouter(routes, {example});
 
     const response = await s.handle(get('/some/path/'));
 
@@ -56,7 +56,7 @@ describe('Server', () => {
       return "hello world"
     }
 
-    const s = buildServer(routes, {example});
+    const s = buildRouter(routes, {example});
 
     const response = await s.handle(get('/'));
 

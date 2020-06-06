@@ -12,12 +12,8 @@ export class Problem {
   ) {
   }
 
-  private _toString?: string;
-
   toString(): string {
-    if (!this._toString)
-      this._toString = `${unparse(this.path)}: ${this.message}`;
-    return this._toString
+    return `${unparse(this.path)}: ${this.message}`
   }
 }
 
@@ -25,12 +21,8 @@ export class Failure {
   constructor(readonly problems: Readonly<Problem[]>) {
   }
 
-  private _toString?: string;
-
   toString(): string {
-    if (!this._toString)
-      this._toString = this.problems.map(problem => problem.toString()).join('\r\n');
-    return this._toString
+    return this.problems.map(problem => problem.toString()).join('\r\n');
   }
 }
 

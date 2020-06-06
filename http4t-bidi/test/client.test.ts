@@ -8,8 +8,8 @@ import {named} from "../src/lenses/NamedLenses";
 import {path} from "../src/paths";
 import {v, VariablePaths} from "../src/paths/variables";
 import {request} from "../src/requests";
-import {route} from "../src/routes";
-import {buildServer} from "../src/server";
+import {buildRouter} from "../src/router";
+import {route, Routes} from "../src/routes";
 
 async function catchError(fn: () => any): Promise<any> {
   try {
@@ -22,7 +22,11 @@ async function catchError(fn: () => any): Promise<any> {
 
 describe('Client', () => {
   it('serialises request, sends to http handler, and then deserialises response', async () => {
-    const routes = {
+    type Api = {
+      example: () => Promise<any>;
+    }
+
+    const routes: Routes<Api> = {
       example: route(
         request('GET', "/some/path"),
         json()
@@ -33,14 +37,17 @@ describe('Client', () => {
       return "hello world"
     }
 
-    const server = buildServer(routes, {example});
+    const server = buildRouter(routes, {example});
     const client = buildClient(routes, server);
 
-    expect(await client.example({})).deep.eq("hello world");
+    expect(await client.example()).deep.eq("hello world");
   });
 
   it('supports root path', async () => {
-    const routes = {
+    type Api = {
+      example: () => Promise<any>;
+    }
+    const routes: Routes<Api> = {
       example: route(
         request('GET', "/"),
         json()
@@ -51,20 +58,14 @@ describe('Client', () => {
       return "hello world"
     }
 
-    const server = buildServer(routes, {example});
+    const server = buildRouter(routes, {example});
     const client = buildClient(routes, server);
 
-    expect(await client.example({})).deep.eq("hello world");
+    expect(await client.example()).deep.eq("hello world");
   });
 
   it('supports path variables', async () => {
-    type GetUserAccounts = {
-      readonly username: string
-    }
-    type CreateAccount = {
-      readonly username: string,
-      readonly account: Account
-    }
+
     type Account = {
       readonly name: string
     }
@@ -72,13 +73,16 @@ describe('Client', () => {
       readonly accounts: Account[]
     }
 
-    const paths: VariablePaths<GetUserAccounts> = {
-      username: v.segment
-    };
+    type Api = {
+      userAccounts: (request: { username: string }) => Promise<UserAccounts>;
+      createAccount: (request: { username: string, account: Account }) => Promise<Account>;
+    }
 
-    const routes = {
+    const routes: Routes<Api> = {
       userAccounts: route(
-        request('GET', path(paths, v => ["accounts/", v.username])),
+        request('GET', path({
+          username: v.segment
+        }, v => ["accounts/", v.username])),
         json<UserAccounts>()
       ),
       createAccount: route(
@@ -93,17 +97,17 @@ describe('Client', () => {
 
     const accounts: { [username: string]: Account[] } = {};
 
-    async function userAccounts(request: GetUserAccounts): Promise<UserAccounts> {
+    async function userAccounts(request: { username: string }): Promise<UserAccounts> {
       return {accounts: accounts[request.username] || []};
     }
 
-    async function createAccount(request: CreateAccount): Promise<Account> {
+    async function createAccount(request: { username: string, account: Account }): Promise<Account> {
       if (!accounts[request.username]) accounts[request.username] = [];
       accounts[request.username].push(request.account)
       return request.account;
     }
 
-    const server = buildServer(routes, {userAccounts, createAccount});
+    const server = buildRouter(routes, {userAccounts, createAccount});
     const client = buildClient(routes, server);
 
     expect(await client.userAccounts({username: "bob"})).deep.eq({accounts: []});
@@ -126,7 +130,11 @@ describe('Client', () => {
       path: v.restOfPath
     };
 
-    const routes = {
+    type Example = {
+      readonly example: (request: Vars) => Promise<Vars>;
+    }
+
+    const routes: Routes<Example> = {
       example: route(
         request('GET', path(paths, v => ["prefix", v.path])),
         json<Vars>()
@@ -137,7 +145,7 @@ describe('Client', () => {
       return vars;
     }
 
-    const server = buildServer(routes, {example});
+    const server = buildRouter(routes, {example});
     const client = buildClient(routes, server);
 
     expect(await client.example({path: ["some", "long", "path"]}))
@@ -163,7 +171,7 @@ describe('Client', () => {
       return "hello world";
     }
 
-    const httpHandler = buildServer(routes, {example});
+    const httpHandler = buildRouter(routes, {example});
     const c = buildClient(routes, httpHandler);
 
     const e = await catchError(() => c.example({}));

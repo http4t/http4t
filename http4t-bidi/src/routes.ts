@@ -19,40 +19,35 @@ export interface RequestLens<T> extends MessageLens<T, HttpRequest> {
 export interface ResponseLens<T> extends MessageLens<T, HttpResponse> {
 }
 
-export interface Route<TRequest, TResponse> {
+export type UnPromise<T> = T extends Promise<infer U> ? U : T;
+export type Route<TRequest, TResponse> = {
   readonly request: RequestLens<TRequest>;
   readonly response: ResponseLens<TResponse>;
 }
 
+
+export type HandlerFn0<Out = any> = () => Promise<Out>;
+export type HandlerFn1<In = any, Out = any> = (arg: In) => Promise<Out>;
+export type HandlerFn = HandlerFn0 | HandlerFn1
+
+export type ValidApi = {  [k: string]: HandlerFn };
+
+export type RouteFor<T extends HandlerFn> =
+  T extends (arg: infer In) => Promise<infer Out>
+    ? Route<In, Out>
+    : T extends () => Promise<infer Out>
+    ? Route<undefined, Out>
+    : never;
 /**
  * A collection of named http routes, which form an api.
  */
-export type Routes = { [routeKey: string]: Route<any, any> };
-
-export type HandlerFn<TReq, TRes> = (request: TReq) => Promise<TRes>;
-
-export type Handler<T> = T extends Route<infer TReq, infer TRes>
-  ? HandlerFn<TReq, TRes>
-  : never;
-
-/**
- * Named `HandlerFn`s of the correct types for each route.
- *
- * The client _creates_ an `Api`, where each key is a function which takes
- * a request, serialises it to an `HttpRequest`, sends it to an `HttpHandler`
- * and then deserialises the response.
- *
- * The server _uses_ a provided `Api` as the implementation of each `Route`,
- * automatically routing to the correct `HandlerFn`, deserialising the request,
- * and serialising the response.
- */
-export type Api<TRoute extends Routes> = { [K in keyof TRoute]: Handler<TRoute[K]> };
+export type Routes<T extends ValidApi> = { [K in keyof T]: RouteFor<T[K]> };
 
 export function route<TRequest, TResponse>(
   request: RequestLens<TRequest> | MessageLens<TRequest>,
-  response: ResponseLens<TResponse> | MessageLens<TResponse>): Route<TRequest, TResponse> {
+  response: ResponseLens<TResponse> | MessageLens<TResponse>): Route<TRequest, UnPromise<TResponse>> {
   return {
     request: request as RequestLens<TRequest>,
-    response: response as ResponseLens<TResponse>
+    response: response as ResponseLens<UnPromise<TResponse>>
   };
 }

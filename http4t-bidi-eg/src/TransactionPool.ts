@@ -36,5 +36,4 @@ export class PostgresTransactionPool implements TransactionPool {
   public async getTransaction(): Promise<Transaction> {
     return new PostgresTransaction(await this.pool.connect());
   }
-
 }

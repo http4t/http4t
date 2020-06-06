@@ -1,11 +1,11 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {response} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
-import {Api, Routes} from "./routes";
+import {Routes, ValidApi} from "./routes";
 
-export class Server<T extends Routes> implements HttpHandler {
-  constructor(private readonly routes: T,
-              private readonly handlers: Api<T>) {
+export class Router<T extends ValidApi> implements HttpHandler {
+  constructor(private readonly routes: Routes<T>,
+              private readonly handlers: T) {
 
   }
 
@@ -25,8 +25,8 @@ export class Server<T extends Routes> implements HttpHandler {
   }
 }
 
-export function buildServer<T extends Routes>(
-  routes: T,
-  handlers: Api<T>): HttpHandler {
-  return new Server(routes, handlers);
+export function buildRouter<T extends ValidApi>(
+  routes: Routes<T>,
+  handlers: T): HttpHandler {
+  return new Router(routes, handlers);
 }

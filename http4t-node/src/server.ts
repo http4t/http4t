@@ -1,8 +1,8 @@
+import {HttpHandler, HttpRequest, HttpResponse, ParsedUri} from "@http4t/core/contract";
+import {Server} from "@http4t/core/server";
+import {Uri} from "@http4t/core/uri";
 import * as node from 'http';
 import {requestNodeToHttp4t, responseHttp4tToNode} from "./conversions";
-import {Server} from "@http4t/core/server";
-import {HttpHandler, HttpRequest, HttpResponse, ParsedUri} from "@http4t/core/contract";
-import {Uri} from "@http4t/core/uri";
 
 export class ServerHandler implements Server {
   private readonly server: node.Server;
@@ -20,7 +20,7 @@ export class ServerHandler implements Server {
     })
   }
 
-  handle(request: HttpRequest): Promise<HttpResponse> {
+  handle = (request: HttpRequest): Promise<HttpResponse> => {
     return this.handler.handle(request);
   }
 

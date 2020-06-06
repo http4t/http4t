@@ -25,6 +25,6 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T,
   }
 }
 
-export function json<T, TMessage extends HttpMessage=HttpMessage>(): JsonLens<T, TMessage> {
+export function json<T = any, TMessage extends HttpMessage = HttpMessage>(): JsonLens<T, TMessage> {
   return new JsonLens<T, TMessage>();
 }

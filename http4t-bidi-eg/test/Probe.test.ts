@@ -2,25 +2,14 @@ import {buildClient} from "@http4t/bidi/client";
 import {HttpHandler} from "@http4t/core/contract";
 import {Closeable} from "@http4t/core/server";
 import {ServerHandler} from "@http4t/node/server";
-import {failure} from "@http4t/result";
 import {expect} from "chai";
 import {Pool} from "pg";
 import {Api, routes} from "../src/api";
 import {startApp} from "../src/App";
 import {PostgresTransactionPool} from "../src/TransactionPool";
 import {testDatabase} from "./db";
-import uuid = require("uuid");
 
-async function error(f: () => any): Promise<any> {
-  try {
-    await f();
-    return undefined
-  } catch (e) {
-    return e;
-  }
-}
-
-describe('store', function () {
+describe('probe', function () {
   this.timeout(2000);
 
   let router: HttpHandler & Closeable;
@@ -41,26 +30,11 @@ describe('store', function () {
     console.log("Transaction pool closed");
   });
 
-  it('stores some json', async () => {
-    const request = {
-      id: uuid(),
-      document: {name: 'Tom'}
-    };
-
-    expect(await client.post(request)).deep.eq({id: request.id});
-
-    expect(await client.get({id: request.id})).deep.eq(request)
+  it('ready', async () => {
+    expect(await client.ready()).eq(undefined);
   });
 
-  it('transactions roll back on error', async () => {
-    const request = {
-      id: uuid(),
-      document: {name: 'Should not be created'}
-    };
-
-    const e = await error(async () => await client.test(request));
-    expect(e).deep.include({failure: failure("Status was not 200", ["status"])});
-
-    expect(await client.get({id: request.id})).eq(undefined)
+  it('live', async () => {
+    expect(await client.live()).eq(undefined);
   });
 });

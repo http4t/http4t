@@ -7,18 +7,18 @@ import {RequestLens} from "../routes";
  *
  * Fails to extract if method is not correct.
  */
-export class MethodLens implements RequestLens<{}> {
+export class MethodLens implements RequestLens<void> {
   constructor(private readonly method: Method) {
   }
 
-  async extract(request: HttpRequest): Promise<Result<{}>> {
+  async extract(request: HttpRequest): Promise<Result<void>> {
     if (request.method.toUpperCase() === this.method.toUpperCase()) {
-      return success({});
+      return success(undefined);
     }
-    return failure(`Method must be ${this.method}`);
+    return failure(`Method must be ${this.method}`, ["method"]);
   }
 
-  async inject(value: {}, message: HttpRequest): Promise<HttpRequest> {
+  async inject(value: void, message: HttpRequest): Promise<HttpRequest> {
     return {...message, method: this.method};
   }
 }

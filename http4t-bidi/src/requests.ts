@@ -1,36 +1,37 @@
 import {Method} from "@http4t/core/contract";
+import {IntersectionLens} from "./lenses/IntersectionLens";
 import {MethodLens} from "./lenses/MethodLens";
 import {RequestUriLens} from "./lenses/RequestUriLens";
-import {IntersectionLens} from "./lenses/IntersectionLens";
 import {UriLens} from "./lenses/UriLens";
 import {literal} from "./paths/Literal";
 import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
-import {RequestLens} from "./routes";
+import {MessageLens, RequestLens} from "./routes";
 
-export function request<TPath>(method: Method, path: RequestLens<TPath> | PathMatcher<TPath>): RequestLens<TPath>;
+export type PathLike<TPath = undefined> = RequestLens<TPath> | PathMatcher<TPath> | string
+
+export function request<TPath = undefined>(method: Method, path: PathLike<TPath>): RequestLens<TPath>;
+export function request<TBody, TPath = undefined>(
+  method: Method,
+  path: PathLike<TPath>,
+  body: RequestLens<TBody> | MessageLens<TBody>): RequestLens<TPath & TBody>;
+
 export function request<TPath, TBody>(
   method: Method,
-  path: RequestLens<TPath> | PathMatcher<TPath>,
-  body: RequestLens<TBody>): RequestLens<TPath & TBody>;
-
-export function request(method: Method, path: string): RequestLens<{}>;
-export function request<TPath, TBody>(
-  method: Method,
-  pathOrString: RequestLens<TPath> | PathMatcher<TPath> | string,
-  body?: RequestLens<TBody>
+  pathLike: PathLike<TPath>,
+  body?: RequestLens<TBody> | MessageLens<TBody>
 ): RequestLens<TPath> {
 
   const path: RequestLens<TPath> =
-    typeof pathOrString === 'string'
-      ? new RequestUriLens(new UriLens(literal(pathOrString))) as any as RequestUriLens<TPath>
-      : isPathMatcher(pathOrString)
-      ? new RequestUriLens(new UriLens<TPath>(pathOrString))
-      : pathOrString;
+    typeof pathLike === 'string'
+      ? new RequestUriLens(new UriLens(literal(pathLike))) as any as RequestUriLens<TPath>
+      : isPathMatcher(pathLike)
+      ? new RequestUriLens(new UriLens<TPath>(pathLike))
+      : pathLike;
 
   const methodAndPath = new IntersectionLens(
     new MethodLens(method),
     path);
   return body
-    ? new IntersectionLens(methodAndPath, body)
+    ? new IntersectionLens(methodAndPath, body as RequestLens<TBody>)
     : methodAndPath;
 }

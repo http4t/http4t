@@ -17,7 +17,7 @@ export class IntersectionLens<A, B, TMessage extends HttpMessage> implements Mes
     if (isFailure(bResult)) {
       return bResult;
     }
-    return success({...aResult.value, ...bResult.value});
+    return success(aResult.value === undefined && bResult.value === undefined ? undefined as any : {...aResult.value, ...bResult.value});
 
   }
 

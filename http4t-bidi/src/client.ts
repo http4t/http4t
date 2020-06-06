@@ -2,7 +2,7 @@ import {HttpHandler, HttpMessage} from "@http4t/core/contract";
 import {get} from "@http4t/core/requests";
 import {isFailure} from "@http4t/result";
 import {ResultError, ResultErrorOpts} from "@http4t/result/ResultError";
-import {HandlerFn, Api, MessageLens, Route, Routes} from "./routes";
+import {HandlerFn, MessageLens, RouteFor, Routes, ValidApi} from "./routes";
 
 /**
  * Creates a function that returns `lens.extract(message)`,
@@ -20,25 +20,28 @@ function validator<T, TMessage extends HttpMessage>(
   }
 }
 
-export function routeClient<TReq, TRes>(
-  route: Route<TReq, TRes>,
+export function routeClient<T extends HandlerFn>(
+  route: RouteFor<T>,
   http: HttpHandler,
   opts: Partial<ResultErrorOpts> = {})
-  : HandlerFn<TReq, TRes> {
+  : T {
 
-  return (request: TReq): Promise<TRes> =>
-    route.request.inject(request, get("/"))
+  const f = async (request: any): Promise<any> => {
+    return await route.request.inject(request, get("/"))
       .then(http.handle)
-      .then(validator(route.response, opts))
+      .then(validator(route.response, opts));
+  };
+
+  return f as any;
 }
 
-export function buildClient<TRoutes extends Routes>(
-  routes: TRoutes,
-  http: HttpHandler): Api<TRoutes> {
+export function buildClient<T extends ValidApi>(
+  routes: Routes<T>,
+  http: HttpHandler): T {
   return Object.entries(routes)
     .reduce((acc, [key, route]) => {
-        acc[key as keyof TRoutes] = routeClient(route, http) as any;
+        acc[key as keyof T] = routeClient(route, http) as any;
         return acc;
       },
-      {} as Api<TRoutes>);
+      {} as T);
 }
