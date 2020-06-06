@@ -3,6 +3,7 @@ import {exactlyChars, exactlySegments, upToChars, upToSegments} from "./consume"
 import {ConsumeUntil} from "./ConsumeUntil";
 import {join} from "./Joined";
 import {literal} from "./Literal";
+import {BooleanPath} from "./parsers/BooleanPath";
 import {FloatPath} from "./parsers/FloatPath";
 import {IntPath} from "./parsers/IntParser";
 import {SplitStringPath} from "./parsers/SplitStringPath";
@@ -26,6 +27,8 @@ export const v = {
   restOfPath: new SplitStringPath(ConsumeUntil.endOfPath, '/'),
 
   restOfPathSegments: new SplitStringPath(ConsumeUntil.endOfPath, '/'),
+
+  boolean: new BooleanPath(ConsumeUntil.nextSlashOrEnd),
 
   float: new FloatPath(ConsumeUntil.nextSlashOrEnd),
 
