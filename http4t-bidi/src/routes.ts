@@ -2,6 +2,22 @@ import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {JsonPathResult} from "@http4t/result/JsonPathResult";
 
 
+/**
+ * A lens is something that, for example, knows how to both extract a named
+ * header from an http request, and how to set it. Or how to deserialize
+ * a request body into an object, and how to serialize the same body and
+ * put it into a request body.
+ *
+ * It's useful because the same lens can be used on the client side to
+ * inject the header or body into the request, and on the server side to
+ * read the values out.
+ */
+interface PolymorphicLens<Source, SourceAfterInjection, InjectedValue, ExtractedValue> {
+  get(from: Source): ExtractedValue;
+
+  set(into: Source, value: InjectedValue): SourceAfterInjection;
+}
+
 export interface BiDiLens<Source, InjectedValue> {
   set(into: Source, value: InjectedValue): Promise<Source>;
 
@@ -11,7 +27,12 @@ export interface BiDiLens<Source, InjectedValue> {
 /**
  * Serializes/deserializes a value into/out of a message
  */
-export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown> extends BiDiLens<TMessage, T> {
+export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown>
+  extends PolymorphicLens<
+    TMessage,
+    Promise<TMessage>,
+    T,
+    Promise<JsonPathResult<T>>> {
 }
 
 export interface RequestLens<T> extends MessageLens<HttpRequest, T> {
