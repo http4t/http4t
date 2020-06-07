@@ -12,14 +12,14 @@ export class MethodLens implements RequestLens<void> {
   constructor(private readonly method: Method) {
   }
 
-  async extract(request: HttpRequest): Promise<JsonPathResult<void>> {
+  async get(request: HttpRequest): Promise<JsonPathResult<void>> {
     if (request.method.toUpperCase() === this.method.toUpperCase()) {
       return success(undefined);
     }
     return failure(`Method must be ${this.method}`, ["method"]);
   }
 
-  async inject(value: void, message: HttpRequest): Promise<HttpRequest> {
+  async set(value: void, message: HttpRequest): Promise<HttpRequest> {
     return {...message, method: this.method};
   }
 }

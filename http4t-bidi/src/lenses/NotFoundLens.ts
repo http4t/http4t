@@ -7,16 +7,16 @@ export class NotFoundLens<T> implements ResponseLens<T | undefined> {
   constructor(private readonly lens: ResponseLens<T>) {
   }
 
-  async extract(message: HttpResponse): Promise<JsonPathResult<T | undefined>> {
+  async get(message: HttpResponse): Promise<JsonPathResult<T | undefined>> {
     if (message.status === 404)
       return success(undefined)
-    return await this.lens.extract(message)
+    return await this.lens.get(message)
   }
 
-  async inject(value: T | undefined, message: HttpResponse): Promise<HttpResponse> {
+  async set(value: T | undefined, message: HttpResponse): Promise<HttpResponse> {
     return typeof value === "undefined"
       ? {...message, status: 404}
-      : await this.lens.inject(value, message);
+      : await this.lens.set(value, message);
   }
 }
 

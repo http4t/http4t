@@ -9,13 +9,13 @@ export class NamedLenses<T, TMessage extends HttpMessage> implements MessageLens
   constructor(private readonly lenses: Lenses<T, TMessage>) {
   }
 
-  async extract(output: TMessage): Promise<JsonPathResult<T>> {
+  async get(output: TMessage): Promise<JsonPathResult<T>> {
     let problems: Problem[] = [];
     const value: T = {} as T;
 
     for (const [k, lens] of Object.entries(this.lenses)) {
 
-      const result: JsonPathResult<any> = await (lens as MessageLens<any, TMessage>).extract(output);
+      const result: JsonPathResult<any> = await (lens as MessageLens<any, TMessage>).get(output);
 
       if (isFailure(result)) {
         problems = [...problems, ...result.error];
@@ -26,9 +26,9 @@ export class NamedLenses<T, TMessage extends HttpMessage> implements MessageLens
     return problems.length > 0 ? failure(...problems) : success(value);
   }
 
-  inject(input: T, output: TMessage): Promise<TMessage> {
+  set(input: T, output: TMessage): Promise<TMessage> {
     const injectField = async (message: Promise<TMessage>, [k, lens]: [string, unknown]): Promise<TMessage> => {
-      return await (lens as MessageLens<any, TMessage>).inject(input[k as keyof T], await message);
+      return await (lens as MessageLens<any, TMessage>).set(input[k as keyof T], await message);
     };
     return Object.entries(this.lenses).reduce(injectField, Promise.resolve(output));
   }

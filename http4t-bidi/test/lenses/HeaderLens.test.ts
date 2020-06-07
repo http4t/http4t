@@ -11,7 +11,7 @@ describe("HeaderLens", () => {
 
     const message = request("GET", "/", undefined, ["Location", "Jamaica"]);
 
-    expect(await headerLens.extract(message)).deep.eq(success("Jamaica"))
+    expect(await headerLens.get(message)).deep.eq(success("Jamaica"))
   })
 
   it("fails if header aint there", async () => {
@@ -19,7 +19,7 @@ describe("HeaderLens", () => {
 
     const message = request("GET", "/", undefined, ["Loca", "Jamaica"]);
 
-    expect((await headerLens.extract(message))).deep.eq(failure("Expected header \"Location\""))
+    expect((await headerLens.get(message))).deep.eq(failure("Expected header \"Location\""))
   })
 
   it("should be able to put a header in a message", async () => {
@@ -27,6 +27,6 @@ describe("HeaderLens", () => {
 
     const message = request("GET", "/", undefined, ["Location", "Jamaica"]);
 
-    expect((await headerLens.inject("UK", message)).headers).deep.eq([["Location", "UK"]])
+    expect((await headerLens.set("UK", message)).headers).deep.eq([["Location", "UK"]])
   })
 })

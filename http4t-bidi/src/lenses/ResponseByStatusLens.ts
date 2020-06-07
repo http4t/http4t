@@ -11,21 +11,21 @@ export class ResponseByStatusLens<T extends ByStatus> implements ResponseLens<Ma
   constructor(private readonly statuses: ResponsesByStatus<T>) {
   }
 
-  async extract(message: HttpResponse): Promise<JsonPathResult<MatchedResponse<T>>> {
+  async get(message: HttpResponse): Promise<JsonPathResult<MatchedResponse<T>>> {
     if (!this.statuses.hasOwnProperty(message.status))
       return failure(`Status was not in ${Object.keys(this.statuses)}`, ["status"])
 
-    const result = await this.statuses[message.status].extract(message);
+    const result = await this.statuses[message.status].get(message);
     return isSuccess(result)
       ? success({status: message.status, value: result.value})
       : result;
   }
 
-  async inject(value: MatchedResponse<T>, message: HttpResponse): Promise<HttpResponse> {
+  async set(value: MatchedResponse<T>, message: HttpResponse): Promise<HttpResponse> {
     if (!this.statuses.hasOwnProperty(message.status))
       throw new Error(`No lens for status ${value.status}`);
 
-    return this.statuses[value.status].inject(value.value, {...message, status: value.status as number});
+    return this.statuses[value.status].set(value.value, {...message, status: value.status as number});
   }
 }
 

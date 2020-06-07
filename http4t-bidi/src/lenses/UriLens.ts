@@ -9,7 +9,7 @@ export class UriLens<T> implements BiDiLens<T, ParsedUri> {
   constructor(private readonly path: PathMatcher<T>) {
   }
 
-  async extract(uri: ParsedUri): Promise<JsonPathResult<T>> {
+  async get(uri: ParsedUri): Promise<JsonPathResult<T>> {
     const result = this.path.consume(uri.path);
 
     if (isFailure(result))
@@ -21,7 +21,7 @@ export class UriLens<T> implements BiDiLens<T, ParsedUri> {
     return success(result.value.value as T);
   }
 
-  async inject(value: T, uri: ParsedUri): Promise<ParsedUri> {
+  async set(value: T, uri: ParsedUri): Promise<ParsedUri> {
     return {...uri, path: joinPaths(uri.path, this.path.expand(value))};
   }
 }

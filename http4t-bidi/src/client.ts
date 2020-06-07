@@ -14,7 +14,7 @@ function validator<T, TMessage extends HttpMessage>(
   (message: TMessage) => Promise<T> {
 
   return async (message: TMessage): Promise<T> => {
-    const result = await lens.extract(message);
+    const result = await lens.get(message);
     if (isFailure(result)) throw new JsonPathError(message, result.error, opts);
     return result.value;
   }
@@ -27,7 +27,7 @@ export function routeClient<T extends HandlerFn>(
   : T {
 
   const f = async (request: any): Promise<any> => {
-    return await route.request.inject(request, get("/"))
+    return await route.request.set(request, get("/"))
       .then(http.handle)
       .then(validator(route.response, opts));
   };

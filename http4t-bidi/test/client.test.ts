@@ -157,10 +157,10 @@ describe('Client', () => {
       example: route(
         request('GET', "/some/path"),
         {
-          inject: async (input: string, output: HttpResponse): Promise<HttpResponse> => {
+          set: async (input: string, output: HttpResponse): Promise<HttpResponse> => {
             return setBody(output, input)
           },
-          extract: async (): Promise<JsonPathResult<string>> => {
+          get: async (): Promise<JsonPathResult<string>> => {
             return failure("response lens failed", ["body"])
           }
         }

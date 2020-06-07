@@ -9,12 +9,12 @@ export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<str
     constructor(private name: string) {
     }
 
-    async extract(output: TMessage): Promise<JsonPathResult<string>> {
+    async get(output: TMessage): Promise<JsonPathResult<string>> {
         const headerValue = getHeaderValue(output.headers, this.name);
         return headerValue ? success(headerValue) : failure(`Expected header "${this.name}"`)
     }
 
-    async inject(input: string, output: TMessage): Promise<TMessage> {
+    async set(input: string, output: TMessage): Promise<TMessage> {
         return setHeader(output, this.name, input);
     }
 }

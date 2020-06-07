@@ -6,15 +6,15 @@ export class ExpectStatusLens<T> implements ResponseLens<T> {
   constructor(private readonly status: number, private readonly lens: ResponseLens<T>) {
   }
 
-  async extract(message: HttpResponse): Promise<JsonPathResult<T>> {
+  async get(message: HttpResponse): Promise<JsonPathResult<T>> {
     if (message.status != this.status)
       return failure(`Status was not ${this.status}`, ["status"])
 
-    return await this.lens.extract(message);
+    return await this.lens.get(message);
   }
 
-  async inject(value: T, message: HttpResponse): Promise<HttpResponse> {
-    return this.lens.inject(value, {...message, status: this.status});
+  async set(value: T, message: HttpResponse): Promise<HttpResponse> {
+    return this.lens.set(value, {...message, status: this.status});
   }
 }
 

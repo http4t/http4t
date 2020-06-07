@@ -10,8 +10,8 @@ export class Router<T extends ValidApi> implements HttpHandler {
   }
 
   handle = async (request: HttpRequest): Promise<HttpResponse> => {
-    for (const [key, lens] of Object.entries(this.routes)) {
-      const requestObject = await lens.request.extract(request);
+    for (const [key, route] of Object.entries(this.routes)) {
+      const requestObject = await route.request.get(request);
 
       if (isFailure(requestObject)) {
         continue;
@@ -19,7 +19,7 @@ export class Router<T extends ValidApi> implements HttpHandler {
 
       const handler = this.handlers[key];
       const result = await handler(requestObject.value);
-      return lens.response.inject(result, response(200))
+      return route.response.set(result, response(200))
     }
     return response(404);
   }

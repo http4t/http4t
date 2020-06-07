@@ -8,13 +8,13 @@ export class RequestUriLens<T> implements RequestLens<T> {
   constructor(private readonly lens: UriLens<T>) {
   }
 
-  async extract(request: HttpRequest): Promise<JsonPathResult<T>> {
-    const extract = await this.lens.extract(uri(request));
+  async get(request: HttpRequest): Promise<JsonPathResult<T>> {
+    const extract = await this.lens.get(uri(request));
     return prefixFailure(extract, ["uri"]);
   }
 
-  async inject(value: T, message: HttpRequest): Promise<HttpRequest> {
-    const newUri = await this.lens.inject(value, uri(message));
+  async set(value: T, message: HttpRequest): Promise<HttpRequest> {
+    const newUri = await this.lens.set(value, uri(message));
     return {...message, uri: newUri};
   }
 

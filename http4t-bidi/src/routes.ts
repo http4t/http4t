@@ -2,9 +2,9 @@ import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {JsonPathResult} from "@http4t/result/JsonPathResult";
 
 export interface BiDiLens<TIn, TOut> {
-  inject(input: TIn, output: TOut): Promise<TOut>;
+  set(input: TIn, output: TOut): Promise<TOut>;
 
-  extract(output: TOut): Promise<JsonPathResult<TIn>>;
+  get(output: TOut): Promise<JsonPathResult<TIn>>;
 }
 
 /**

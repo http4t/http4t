@@ -12,12 +12,12 @@ import {MessageLens} from "../routes";
  * Uses {@link JsonBody} to avoid deserialising twice.
  */
 export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T, TMessage> {
-  async extract(message: TMessage): Promise<JsonPathResult<T>> {
+  async get(message: TMessage): Promise<JsonPathResult<T>> {
     const value = await bodyJson<T>(message.body);
     return success(value);
   }
 
-  async inject(value: T, message: TMessage): Promise<TMessage> {
+  async set(value: T, message: TMessage): Promise<TMessage> {
     return {
       ...message,
       headers: [...message.headers, header('Content-Type', 'application/json')],
