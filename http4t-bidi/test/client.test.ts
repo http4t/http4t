@@ -168,9 +168,8 @@ describe('Client', () => {
 
     const e = await catchError(() => c.example({}));
     expect(e).deep.eq({
-      "type": "route-failed",
-      "message": "Expected valid json- \"Unexpected token o in JSON at position 1\"",
-      "response": response(400)
+      message: "Expected valid json- \"Unexpected token o in JSON at position 1\"",
+      response: response(200, "not json}{")
     });
   });
 });

@@ -1,20 +1,20 @@
-import {HttpHandler, HttpMessage} from "@http4t/core/contract";
+import {HttpHandler, HttpResponse} from "@http4t/core/contract";
 import {get} from "@http4t/core/requests";
 import {isFailure} from "@http4t/result";
-import {HandlerFn, MessageLens, RouteFor, Routes, ValidApi} from "./routes";
+import {HandlerFn, ResponseLens, RouteFor, Routes, ValidApi} from "./routes";
 
 /**
  * Creates a function that returns `lens.extract(message)`,
  * or throws `ResultError` if the result is a failure.
  */
-function validator<TMessage extends HttpMessage, T>(
-  lens: MessageLens<TMessage, T>):
-  (message: TMessage) => Promise<T> {
+function validator<T>(
+  lens: ResponseLens<T>):
+  (message: HttpResponse) => Promise<T> {
 
-  return async (message: TMessage): Promise<T> => {
-    const result = await lens.get(message);
+  return async (response: HttpResponse): Promise<T> => {
+    const result = await lens.get(response);
     if (isFailure(result))
-      throw result.error;
+      throw {message: result.error.message, response};
     return result.value;
   }
 }

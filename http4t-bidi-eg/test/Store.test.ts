@@ -1,5 +1,6 @@
 import {buildClient} from "@http4t/bidi/client";
 import {HttpHandler} from "@http4t/core/contract";
+import {response} from "@http4t/core/responses";
 import {Closeable} from "@http4t/core/server";
 import {ServerHandler} from "@http4t/node/server";
 import {expect} from "chai";
@@ -59,8 +60,8 @@ describe('store', function () {
 
     const e = await error(async () => await client.test(request));
     expect(e).deep.eq({
-      "type": "wrong-route",
-      "message": "Status was not 200"
+      message: "Status was not 200",
+      response: response(500, "{\"message\":\"Deliberate error\"}")
     });
 
     expect(await client.get({id: request.id})).eq(undefined)
