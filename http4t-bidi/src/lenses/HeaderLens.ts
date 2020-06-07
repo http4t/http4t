@@ -5,7 +5,7 @@ import {success} from "@http4t/result";
 import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
 import {MessageLens} from "../routes";
 
-export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<string, TMessage> {
+export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<TMessage, string> {
     constructor(private name: string) {
     }
 

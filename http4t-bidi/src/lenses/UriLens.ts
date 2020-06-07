@@ -5,7 +5,7 @@ import {failure, JsonPathResult, prefix} from "@http4t/result/JsonPathResult";
 import {PathMatcher} from "../paths/PathMatcher";
 import {BiDiLens} from "../routes";
 
-export class UriLens<T> implements BiDiLens<T, ParsedUri> {
+export class UriLens<T> implements BiDiLens<ParsedUri, T> {
   constructor(private readonly path: PathMatcher<T>) {
   }
 

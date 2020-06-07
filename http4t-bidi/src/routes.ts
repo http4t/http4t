@@ -2,7 +2,7 @@ import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {JsonPathResult} from "@http4t/result/JsonPathResult";
 
 
-export interface BiDiLens<InjectedValue, Source>  {
+export interface BiDiLens<Source, InjectedValue> {
   set(into: Source, value: InjectedValue): Promise<Source>;
 
   get(from: Source): Promise<JsonPathResult<InjectedValue>>;
@@ -11,13 +11,13 @@ export interface BiDiLens<InjectedValue, Source>  {
 /**
  * Serializes/deserializes a value into/out of a message
  */
-export interface MessageLens<T, TMessage extends HttpMessage = HttpMessage> extends BiDiLens<T, TMessage> {
+export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown> extends BiDiLens<TMessage, T> {
 }
 
-export interface RequestLens<T> extends MessageLens<T, HttpRequest> {
+export interface RequestLens<T> extends MessageLens<HttpRequest, T> {
 }
 
-export interface ResponseLens<T> extends MessageLens<T, HttpResponse> {
+export interface ResponseLens<T> extends MessageLens<HttpResponse, T> {
 }
 
 export type UnPromise<T> = T extends Promise<infer U> ? U : T;
@@ -45,8 +45,8 @@ export type RouteFor<T extends HandlerFn> =
 export type Routes<T extends ValidApi> = { [K in keyof T]: RouteFor<T[K]> };
 
 export function route<TRequest, TResponse>(
-  request: RequestLens<TRequest> | MessageLens<TRequest>,
-  response: ResponseLens<TResponse> | MessageLens<TResponse>): Route<TRequest, UnPromise<TResponse>> {
+  request: RequestLens<TRequest> | MessageLens<HttpMessage, TRequest>,
+  response: ResponseLens<TResponse> | MessageLens<HttpMessage, TResponse>): Route<TRequest, UnPromise<TResponse>> {
   return {
     request: request as RequestLens<TRequest>,
     response: response as ResponseLens<UnPromise<TResponse>>

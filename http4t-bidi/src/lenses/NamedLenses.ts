@@ -3,10 +3,10 @@ import {isFailure, success} from "@http4t/result";
 import {failure, JsonPathResult, Problem} from "@http4t/result/JsonPathResult";
 import {MessageLens} from "../routes";
 
-type Lenses<T, TMessage extends HttpMessage> = { [K in keyof T]: MessageLens<T[K], TMessage> };
+type Lenses<TMessage extends HttpMessage, T> = { [K in keyof T]: MessageLens<TMessage, T[K]> };
 
-export class NamedLenses<T, TMessage extends HttpMessage> implements MessageLens<T, TMessage> {
-  constructor(private readonly lenses: Lenses<T, TMessage>) {
+export class NamedLenses<TMessage extends HttpMessage, T> implements MessageLens<TMessage, T> {
+  constructor(private readonly lenses: Lenses<TMessage, T>) {
   }
 
   async get(output: TMessage): Promise<JsonPathResult<T>> {
@@ -28,12 +28,12 @@ export class NamedLenses<T, TMessage extends HttpMessage> implements MessageLens
 
   set(into: TMessage, value: T): Promise<TMessage> {
     const injectField = async (message: Promise<TMessage>, [k, lens]: [string, unknown]): Promise<TMessage> => {
-      return await (lens as MessageLens<any, TMessage>).set(await message, value[k as keyof T]);
+      return await (lens as MessageLens<TMessage, any>).set(await message, value[k as keyof T]);
     };
     return Object.entries(this.lenses).reduce(injectField, Promise.resolve(into));
   }
 }
 
-export function named<T, TMessage extends HttpMessage>(lenses: Lenses<T, TMessage>): MessageLens<T, TMessage> {
+export function named<TMessage extends HttpMessage, T>(lenses: Lenses<TMessage, T>): MessageLens<TMessage, T> {
   return new NamedLenses(lenses);
 }

@@ -1,4 +1,4 @@
-import {Method} from "@http4t/core/contract";
+import {HttpMessage, Method} from "@http4t/core/contract";
 import {IntersectionLens} from "./lenses/IntersectionLens";
 import {MethodLens} from "./lenses/MethodLens";
 import {RequestUriLens} from "./lenses/RequestUriLens";
@@ -13,12 +13,12 @@ export function request<TPath = undefined>(method: Method, path: PathLike<TPath>
 export function request<TBody, TPath = undefined>(
   method: Method,
   path: PathLike<TPath>,
-  body: RequestLens<TBody> | MessageLens<TBody>): RequestLens<TPath & TBody>;
+  body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<TPath & TBody>;
 
 export function request<TPath, TBody>(
   method: Method,
   pathLike: PathLike<TPath>,
-  body?: RequestLens<TBody> | MessageLens<TBody>
+  body?: RequestLens<TBody> | MessageLens<HttpMessage, TBody>
 ): RequestLens<TPath> {
 
   const path: RequestLens<TPath> =

@@ -8,8 +8,8 @@ import {HandlerFn, MessageLens, RouteFor, Routes, ValidApi} from "./routes";
  * Creates a function that returns `lens.extract(message)`,
  * or throws `ResultError` if the result is a failure.
  */
-function validator<T, TMessage extends HttpMessage>(
-  lens: MessageLens<T, TMessage>,
+function validator<TMessage extends HttpMessage, T>(
+  lens: MessageLens<TMessage, T>,
   opts: Partial<ResultErrorOpts> = {}):
   (message: TMessage) => Promise<T> {
 

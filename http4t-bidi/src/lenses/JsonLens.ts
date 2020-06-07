@@ -11,7 +11,7 @@ import {MessageLens} from "../routes";
  *
  * Uses {@link JsonBody} to avoid deserialising twice.
  */
-export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T, TMessage> {
+export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TMessage, T> {
   async get(message: TMessage): Promise<JsonPathResult<T>> {
     const value = await bodyJson<T>(message.body);
     return success(value);

@@ -3,7 +3,7 @@ import {success} from "@http4t/result";
 import {JsonPathResult} from "@http4t/result/JsonPathResult";
 import {MessageLens} from "../routes";
 
-export class NothingLens<TMessage extends HttpMessage> implements MessageLens<undefined, TMessage> {
+export class NothingLens<TMessage extends HttpMessage> implements MessageLens<TMessage, undefined> {
   async get(message: TMessage): Promise<JsonPathResult<undefined>> {
     return success(undefined);
   }

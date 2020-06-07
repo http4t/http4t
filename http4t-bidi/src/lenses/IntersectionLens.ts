@@ -3,9 +3,9 @@ import {isFailure, success} from "@http4t/result";
 import {JsonPathResult, merge} from "@http4t/result/JsonPathResult";
 import {MessageLens} from "../routes";
 
-export class IntersectionLens<A, B, TMessage extends HttpMessage> implements MessageLens<A & B, TMessage> {
-  constructor(private readonly a: MessageLens<A, TMessage>,
-              private readonly b: MessageLens<B, TMessage>) {
+export class IntersectionLens<TMessage extends HttpMessage, A, B> implements MessageLens<TMessage, A & B> {
+  constructor(private readonly a: MessageLens<TMessage, A>,
+              private readonly b: MessageLens<TMessage, B>) {
   }
 
   async get(message: TMessage): Promise<JsonPathResult<A & B>> {
