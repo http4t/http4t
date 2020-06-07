@@ -12,16 +12,10 @@ import {JsonPathResult} from "@http4t/result/JsonPathResult";
  * inject the header or body into the request, and on the server side to
  * read the values out.
  */
-interface PolymorphicLens<Source, SourceAfterInjection, InjectedValue, ExtractedValue> {
+export interface PolymorphicLens<Source, SourceAfterInjection, InjectedValue, ExtractedValue> {
   get(from: Source): ExtractedValue;
 
   set(into: Source, value: InjectedValue): SourceAfterInjection;
-}
-
-export interface BiDiLens<Source, InjectedValue> {
-  set(into: Source, value: InjectedValue): Promise<Source>;
-
-  get(from: Source): Promise<JsonPathResult<InjectedValue>>;
 }
 
 /**

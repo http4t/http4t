@@ -3,9 +3,10 @@ import {joinPaths, stripSlashes} from "@http4t/core/uri";
 import {isFailure, success} from "@http4t/result";
 import {failure, JsonPathResult, prefix} from "@http4t/result/JsonPathResult";
 import {PathMatcher} from "../paths/PathMatcher";
-import {BiDiLens} from "../routes";
+import {PolymorphicLens} from "../routes";
 
-export class UriLens<T> implements BiDiLens<ParsedUri, T> {
+export class UriLens<T>
+  implements PolymorphicLens<ParsedUri, Promise<ParsedUri>, T, Promise<JsonPathResult<T>>> {
   constructor(private readonly path: PathMatcher<T>) {
   }
 
