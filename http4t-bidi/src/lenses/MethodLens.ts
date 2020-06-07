@@ -19,7 +19,7 @@ export class MethodLens implements RequestLens<void> {
     return failure(`Method must be ${this.method}`, ["method"]);
   }
 
-  async set(value: void, message: HttpRequest): Promise<HttpRequest> {
-    return {...message, method: this.method};
+  async set(into: HttpRequest, value: void): Promise<HttpRequest> {
+    return {...into, method: this.method};
   }
 }

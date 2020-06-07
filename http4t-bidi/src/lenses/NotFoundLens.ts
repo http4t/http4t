@@ -13,10 +13,10 @@ export class NotFoundLens<T> implements ResponseLens<T | undefined> {
     return await this.lens.get(message)
   }
 
-  async set(value: T | undefined, message: HttpResponse): Promise<HttpResponse> {
+  async set(into: HttpResponse, value: T): Promise<HttpResponse> {
     return typeof value === "undefined"
-      ? {...message, status: 404}
-      : await this.lens.set(value, message);
+      ? {...into, status: 404}
+      : await this.lens.set(into, value);
   }
 }
 

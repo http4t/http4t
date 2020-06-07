@@ -26,11 +26,11 @@ export class NamedLenses<T, TMessage extends HttpMessage> implements MessageLens
     return problems.length > 0 ? failure(...problems) : success(value);
   }
 
-  set(input: T, output: TMessage): Promise<TMessage> {
+  set(into: TMessage, value: T): Promise<TMessage> {
     const injectField = async (message: Promise<TMessage>, [k, lens]: [string, unknown]): Promise<TMessage> => {
-      return await (lens as MessageLens<any, TMessage>).set(input[k as keyof T], await message);
+      return await (lens as MessageLens<any, TMessage>).set(await message, value[k as keyof T]);
     };
-    return Object.entries(this.lenses).reduce(injectField, Promise.resolve(output));
+    return Object.entries(this.lenses).reduce(injectField, Promise.resolve(into));
   }
 }
 

@@ -14,7 +14,7 @@ export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<str
         return headerValue ? success(headerValue) : failure(`Expected header "${this.name}"`)
     }
 
-    async set(input: string, output: TMessage): Promise<TMessage> {
-        return setHeader(output, this.name, input);
+    async set(into: TMessage, value: string): Promise<TMessage> {
+        return setHeader(into, this.name, value);
     }
 }

@@ -8,8 +8,8 @@ export class NothingLens<TMessage extends HttpMessage> implements MessageLens<un
     return success(undefined);
   }
 
-  async set(value: undefined, message: TMessage): Promise<TMessage> {
-    return message;
+  async set(into: TMessage, value: undefined): Promise<TMessage> {
+    return into;
   }
 }
 

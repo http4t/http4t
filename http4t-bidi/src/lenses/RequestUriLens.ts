@@ -13,9 +13,9 @@ export class RequestUriLens<T> implements RequestLens<T> {
     return prefixFailure(extract, ["uri"]);
   }
 
-  async set(value: T, message: HttpRequest): Promise<HttpRequest> {
-    const newUri = await this.lens.set(value, uri(message));
-    return {...message, uri: newUri};
+  async set(into: HttpRequest, value: T): Promise<HttpRequest> {
+    const newUri = await this.lens.set(uri(into), value);
+    return {...into, uri: newUri};
   }
 
 }

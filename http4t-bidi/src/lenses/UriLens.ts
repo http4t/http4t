@@ -21,8 +21,8 @@ export class UriLens<T> implements BiDiLens<T, ParsedUri> {
     return success(result.value.value as T);
   }
 
-  async set(value: T, uri: ParsedUri): Promise<ParsedUri> {
-    return {...uri, path: joinPaths(uri.path, this.path.expand(value))};
+  async set(into: ParsedUri, value: T): Promise<ParsedUri> {
+    return {...into, path: joinPaths(into.path, this.path.expand(value))};
   }
 }
 

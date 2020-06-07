@@ -26,8 +26,8 @@ export function routeClient<T extends HandlerFn>(
   opts: Partial<ResultErrorOpts> = {})
   : T {
 
-  const f = async (request: any): Promise<any> => {
-    return await route.request.set(request, get("/"))
+  const f = async (value: any): Promise<any> => {
+    return await route.request.set(get("/"), value)
       .then(http.handle)
       .then(validator(route.response, opts));
   };

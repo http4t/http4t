@@ -27,6 +27,6 @@ describe("HeaderLens", () => {
 
     const message = request("GET", "/", undefined, ["Location", "Jamaica"]);
 
-    expect((await headerLens.set("UK", message)).headers).deep.eq([["Location", "UK"]])
+    expect((await headerLens.set(message, "UK")).headers).deep.eq([["Location", "UK"]])
   })
 })

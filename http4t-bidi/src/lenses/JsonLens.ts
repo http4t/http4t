@@ -17,10 +17,10 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T,
     return success(value);
   }
 
-  async set(value: T, message: TMessage): Promise<TMessage> {
+  async set(into: TMessage, value: T): Promise<TMessage> {
     return {
-      ...message,
-      headers: [...message.headers, header('Content-Type', 'application/json')],
+      ...into,
+      headers: [...into.headers, header('Content-Type', 'application/json')],
       body: jsonBody(value)
     };
   }

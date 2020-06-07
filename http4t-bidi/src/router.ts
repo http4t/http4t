@@ -18,8 +18,8 @@ export class Router<T extends ValidApi> implements HttpHandler {
       }
 
       const handler = this.handlers[key];
-      const result = await handler(requestObject.value);
-      return route.response.set(result, response(200))
+      const value = await handler(requestObject.value);
+      return route.response.set(response(200), value);
     }
     return response(404);
   }

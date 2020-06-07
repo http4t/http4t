@@ -22,9 +22,7 @@ export class IntersectionLens<A, B, TMessage extends HttpMessage> implements Mes
 
   }
 
-  async set(value: A & B, message: TMessage): Promise<TMessage> {
-    return this.b.set(
-      value,
-      await this.a.set(value, message));
+  async set(into: TMessage, value: A & B): Promise<TMessage> {
+    return this.b.set(await this.a.set(into, value), value);
   }
 }

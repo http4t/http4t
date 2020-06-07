@@ -21,11 +21,11 @@ export class ResponseByStatusLens<T extends ByStatus> implements ResponseLens<Ma
       : result;
   }
 
-  async set(value: MatchedResponse<T>, message: HttpResponse): Promise<HttpResponse> {
-    if (!this.statuses.hasOwnProperty(message.status))
+  async set(into: HttpResponse, value: MatchedResponse<T>): Promise<HttpResponse> {
+    if (!this.statuses.hasOwnProperty(into.status))
       throw new Error(`No lens for status ${value.status}`);
 
-    return this.statuses[value.status].set(value.value, {...message, status: value.status as number});
+    return this.statuses[value.status].set({...into, status: value.status as number}, value.value);
   }
 }
 

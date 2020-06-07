@@ -13,8 +13,8 @@ export class ExpectStatusLens<T> implements ResponseLens<T> {
     return await this.lens.get(message);
   }
 
-  async set(value: T, message: HttpResponse): Promise<HttpResponse> {
-    return this.lens.set(value, {...message, status: this.status});
+  async set(into: HttpResponse, value: T): Promise<HttpResponse> {
+    return this.lens.set({...into, status: this.status}, value);
   }
 }
 
