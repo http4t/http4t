@@ -2,7 +2,6 @@ import {buildClient} from "@http4t/bidi/client";
 import {HttpHandler} from "@http4t/core/contract";
 import {Closeable} from "@http4t/core/server";
 import {ServerHandler} from "@http4t/node/server";
-import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from "chai";
 import {Pool} from "pg";
 import {Api, routes} from "../src/api";
@@ -59,7 +58,10 @@ describe('store', function () {
     };
 
     const e = await error(async () => await client.test(request));
-    expect(e).deep.include({error: [problem("Status was not 200", ["status"])]});
+    expect(e).deep.eq({
+      "type": "wrong-route",
+      "message": "Status was not 200"
+    });
 
     expect(await client.get({id: request.id})).eq(undefined)
   });

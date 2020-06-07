@@ -1,9 +1,9 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
 import {bodyJson, jsonBody, JsonBody} from "@http4t/core/json";
+import {response} from "@http4t/core/responses";
 import {success} from "@http4t/result";
-import {JsonPathResult} from "@http4t/result/JsonPathResult";
-import {MessageLens} from "../routes";
+import {MessageLens, routeFailed, RoutingResult} from "../routes";
 
 /**
  * NB: does not _check_ `Content-Type` header when extracting, but does
@@ -12,9 +12,13 @@ import {MessageLens} from "../routes";
  * Uses {@link JsonBody} to avoid deserialising twice.
  */
 export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TMessage, T> {
-  async get(message: TMessage): Promise<JsonPathResult<T>> {
-    const value = await bodyJson<T>(message.body);
-    return success(value);
+  async get(message: TMessage): Promise<RoutingResult<T>> {
+    try {
+      const value = await bodyJson<T>(message.body);
+      return success(value);
+    } catch (e) {
+      return routeFailed(`Expected valid json${e.message ? `- "${e.message}"` : ""}`, response(400))
+    }
   }
 
   async set(into: TMessage, value: T): Promise<TMessage> {

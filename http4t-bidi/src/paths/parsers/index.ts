@@ -1,9 +1,10 @@
-import {isFailure, map} from "@http4t/result";
-import {JsonPathResult} from "@http4t/result/JsonPathResult";
-import {PathMatch, PathMatcher} from "../PathMatcher";
+import {isFailure, map, Result} from "@http4t/result";
+import {PathMatcher, PathResult} from "../PathMatcher";
+
+export type ParserResult<T> = Result<string, T>;
 
 export interface Parser<T> {
-  parse(value: string): JsonPathResult<T>;
+  parse(value: string): ParserResult<T>;
 
   unparse(value: T): string;
 }
@@ -13,7 +14,7 @@ export abstract class ParserPath<T> implements PathMatcher<T> {
                         private readonly parser: Parser<T>) {
   }
 
-  consume(path: string): PathMatch<T> {
+  consume(path: string): PathResult<T> {
     const result = this.base.consume(path);
     if (isFailure(result)) return result;
 
@@ -24,8 +25,8 @@ export abstract class ParserPath<T> implements PathMatcher<T> {
       value => ({
         ...result.value,
         value: value
-      })
-    );
+      }),
+      error => ({message: error, remaining: path}))
   }
 
   expand(value: T): string {

@@ -31,12 +31,25 @@ export function failure<E>(error: E): Failure<E> {
 }
 
 /**
- * Map a function over the _value_ of a successful Result.
+ * Map a function over the value of a successful Result.
  */
 export function map<E = unknown, T = unknown, T1 = T>(
   result: Result<E, T>,
-  f: (success: T) => T1): Result<E, T1> {
-  return isSuccess(result) ? success(f(result.value)) : result;
+  f: (success: T) => T1): Result<E, T1>;
+/**
+ * Map functions over value or error
+ */
+export function map<E = unknown, E1 = unknown, T = unknown, T1 = T>(
+  result: Result<E, T>,
+  onSuccess: (success: T) => T1,
+  onFailure: (error: E) => E1): Result<E1, T1>;
+export function map<E = unknown, E1 = E, T = unknown, T1 = T>(
+  result: Result<E, T>,
+  onSuccess: (success: T) => T1,
+  onFailure: (error: E) => E1 = error => error as any): Result<E1, T1> {
+  return isSuccess(result)
+    ? success(onSuccess(result.value))
+    : failure(onFailure(result.error));
 }
 
 /**
@@ -53,7 +66,7 @@ export function flatMap<E = unknown, T = unknown, T1 = T>(
  */
 export function mapFailure<E = unknown, E1 = E, T = unknown>(
   result: Result<E, T>,
-  f: (failure: E) => E1): Result<E1, T> {
+  f: (error: E) => E1): Result<E1, T> {
   return isSuccess(result) ? result : failure(f(result.error));
 }
 

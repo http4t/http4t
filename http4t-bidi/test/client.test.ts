@@ -1,6 +1,6 @@
-import {HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {setBody} from "@http4t/core/messages";
-import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
+import {HttpHandler, HttpRequest} from "@http4t/core/contract";
+import {handler} from "@http4t/core/handlers";
+import {response} from "@http4t/core/responses";
 import {expect} from 'chai';
 import {buildClient} from "../src/client";
 import {json} from "../src/lenses/JsonLens";
@@ -14,7 +14,6 @@ import {route, Routes} from "../src/routes";
 async function catchError(fn: () => any): Promise<any> {
   try {
     await fn();
-    return;
   } catch (e) {
     return e;
   }
@@ -156,34 +155,22 @@ describe('Client', () => {
     const routes = {
       example: route(
         request('GET', "/some/path"),
-        {
-          set: async (source: HttpResponse, value: string): Promise<HttpResponse> => {
-            return setBody(source, value)
-          },
-          get: async (): Promise<JsonPathResult<string>> => {
-            return failure("response lens failed", ["body"])
-          }
-        }
+        json<any>()
       )
     };
 
-    async function example(): Promise<string> {
-      return "hello world";
-    }
+    const brokenServer: HttpHandler = handler(async () => {
+        return response(200, "not json}{")
+      }
+    );
 
-    const httpHandler = buildRouter(routes, {example});
-    const c = buildClient(routes, httpHandler);
+    const c = buildClient(routes, brokenServer);
 
     const e = await catchError(() => c.example({}));
-    expect(e.actual).deep.eq({
-      "status": 200,
-      "headers": [],
-      "body": "hello world",
-    });
-    expect(e.expected).deep.eq({
-      "status": 200,
-      "headers": [],
-      "body": "response lens failed",
+    expect(e).deep.eq({
+      "type": "route-failed",
+      "message": "Expected valid json- \"Unexpected token o in JSON at position 1\"",
+      "response": response(400)
     });
   });
 });

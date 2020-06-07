@@ -1,10 +1,9 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {success} from "@http4t/result";
-import {JsonPathResult} from "@http4t/result/JsonPathResult";
-import {MessageLens} from "../routes";
+import {MessageLens, RoutingResult} from "../routes";
 
 export class NothingLens<TMessage extends HttpMessage> implements MessageLens<TMessage, undefined> {
-  async get(message: TMessage): Promise<JsonPathResult<undefined>> {
+  async get(message: TMessage): Promise<RoutingResult<undefined>> {
     return success(undefined);
   }
 

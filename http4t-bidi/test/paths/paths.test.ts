@@ -1,5 +1,4 @@
-import {success} from "@http4t/result";
-import {failure} from "@http4t/result/JsonPathResult";
+import {failure, success} from "@http4t/result";
 import {expect} from 'chai';
 import {path} from "../../src/paths";
 import {v, VariablePath} from "../../src/paths/variables";
@@ -30,7 +29,7 @@ describe('path()', () => {
   });
   it('fails if path does not match', async () => {
     expect(componentPath.consume("/widgets/123/components"))
-      .deep.eq(failure("path did not match"))
+      .deep.eq(failure({message: "path did not match", remaining: ""}))
   });
   it('leaves non-matching remainder of path', async () => {
     expect(componentPath.consume("/widgets/123/components/456/doesnotmatch"))

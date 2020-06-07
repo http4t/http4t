@@ -1,7 +1,6 @@
 import {HttpHandler, HttpMessage} from "@http4t/core/contract";
 import {get} from "@http4t/core/requests";
 import {isFailure} from "@http4t/result";
-import {JsonPathError, ResultErrorOpts} from "@http4t/result/JsonPathError";
 import {HandlerFn, MessageLens, RouteFor, Routes, ValidApi} from "./routes";
 
 /**
@@ -9,27 +8,26 @@ import {HandlerFn, MessageLens, RouteFor, Routes, ValidApi} from "./routes";
  * or throws `ResultError` if the result is a failure.
  */
 function validator<TMessage extends HttpMessage, T>(
-  lens: MessageLens<TMessage, T>,
-  opts: Partial<ResultErrorOpts> = {}):
+  lens: MessageLens<TMessage, T>):
   (message: TMessage) => Promise<T> {
 
   return async (message: TMessage): Promise<T> => {
     const result = await lens.get(message);
-    if (isFailure(result)) throw new JsonPathError(message, result.error, opts);
+    if (isFailure(result))
+      throw result.error;
     return result.value;
   }
 }
 
 export function routeClient<T extends HandlerFn>(
   route: RouteFor<T>,
-  http: HttpHandler,
-  opts: Partial<ResultErrorOpts> = {})
+  http: HttpHandler)
   : T {
 
   const f = async (value: any): Promise<any> => {
     return await route.request.set(get("/"), value)
       .then(http.handle)
-      .then(validator(route.response, opts));
+      .then(validator(route.response));
   };
 
   return f as any;

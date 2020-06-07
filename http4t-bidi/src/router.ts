@@ -1,7 +1,7 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {response} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
-import {Routes, ValidApi} from "./routes";
+import {RequestLens, Routes, ValidApi} from "./routes";
 
 export class Router<T extends ValidApi> implements HttpHandler {
   constructor(private readonly routes: Routes<T>,
@@ -11,14 +11,19 @@ export class Router<T extends ValidApi> implements HttpHandler {
 
   handle = async (request: HttpRequest): Promise<HttpResponse> => {
     for (const [key, route] of Object.entries(this.routes)) {
-      const requestObject = await route.request.get(request);
+      const result = await (route.request as RequestLens<any>).get(request);
 
-      if (isFailure(requestObject)) {
-        continue;
+      if (isFailure(result)) {
+        switch (result.error.type) {
+          case "wrong-route":
+            continue;
+          case "route-failed":
+            return result.error.response;
+        }
       }
 
       const handler = this.handlers[key];
-      const value = await handler(requestObject.value);
+      const value = await handler(result.value);
       return route.response.set(response(200), value);
     }
     return response(404);

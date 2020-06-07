@@ -1,14 +1,14 @@
 import {isFailure, success} from "@http4t/result";
 import {join as joinPath} from "path";
 import {NoopPath} from "./NoopPath";
-import {PathMatch, PathMatcher} from "./PathMatcher";
+import {PathResult, PathMatcher} from "./PathMatcher";
 
 export class Joined<A, B> implements PathMatcher<A & B> {
   constructor(private readonly a: PathMatcher<A>,
               private readonly b: PathMatcher<B>) {
   }
 
-  consume(path: string): PathMatch<A & B> {
+  consume(path: string): PathResult<A & B> {
     const a = this.a.consume(path);
     if (isFailure(a)) return a;
 

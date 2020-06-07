@@ -1,16 +1,15 @@
 import {HttpResponse} from "@http4t/core/contract";
 import {success} from "@http4t/result";
-import {JsonPathResult} from "@http4t/result/JsonPathResult";
-import {ResponseLens} from "../routes";
+import {ResponseLens, RoutingResult} from "../routes";
 
 export class NotFoundLens<T> implements ResponseLens<T | undefined> {
   constructor(private readonly lens: ResponseLens<T>) {
   }
 
-  async get(message: HttpResponse): Promise<JsonPathResult<T | undefined>> {
+  async get(message: HttpResponse): Promise<RoutingResult<T | undefined>> {
     if (message.status === 404)
       return success(undefined)
-    return await this.lens.get(message)
+    return await this.lens.get(message);
   }
 
   async set(into: HttpResponse, value: T): Promise<HttpResponse> {

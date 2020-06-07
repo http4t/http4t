@@ -1,7 +1,6 @@
-import {success} from "@http4t/result";
-import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
+import {failure, success} from "@http4t/result";
 import {PathMatcher} from "../PathMatcher";
-import {Parser, ParserPath} from "./index";
+import {Parser, ParserPath, ParserResult} from "./index";
 
 const validInt = /^[0-9]+$/;
 
@@ -9,7 +8,7 @@ export class IntParser implements Parser<number> {
   constructor(private readonly radix?: number) {
   }
 
-  parse(pathSegment: string): JsonPathResult<number> {
+  parse(pathSegment: string): ParserResult<number> {
     const parsed = Number.parseInt(pathSegment, this.radix);
 
     if (Number.isNaN(parsed) || !pathSegment.match(validInt)) return failure("expected an integer");

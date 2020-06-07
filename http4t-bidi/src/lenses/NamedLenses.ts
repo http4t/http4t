@@ -1,7 +1,6 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {isFailure, success} from "@http4t/result";
-import {failure, JsonPathResult, Problem} from "@http4t/result/JsonPathResult";
-import {MessageLens} from "../routes";
+import {MessageLens, RoutingResult} from "../routes";
 
 type Lenses<TMessage extends HttpMessage, T> = { [K in keyof T]: MessageLens<TMessage, T[K]> };
 
@@ -9,21 +8,19 @@ export class NamedLenses<TMessage extends HttpMessage, T> implements MessageLens
   constructor(private readonly lenses: Lenses<TMessage, T>) {
   }
 
-  async get(output: TMessage): Promise<JsonPathResult<T>> {
-    let problems: Problem[] = [];
+  async get(output: TMessage): Promise<RoutingResult<T>> {
     const value: T = {} as T;
 
     for (const [k, lens] of Object.entries(this.lenses)) {
 
-      const result: JsonPathResult<any> = await (lens as MessageLens<any, TMessage>).get(output);
+      const result: RoutingResult<any> = await (lens as MessageLens<any, TMessage>).get(output);
 
       if (isFailure(result)) {
-        problems = [...problems, ...result.error];
-        continue;
+        return result;
       }
       value[k as keyof T] = result.value;
     }
-    return problems.length > 0 ? failure(...problems) : success(value);
+    return success(value);
   }
 
   set(into: TMessage, value: T): Promise<TMessage> {

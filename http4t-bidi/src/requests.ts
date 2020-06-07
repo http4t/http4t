@@ -2,7 +2,6 @@ import {HttpMessage, Method} from "@http4t/core/contract";
 import {IntersectionLens} from "./lenses/IntersectionLens";
 import {MethodLens} from "./lenses/MethodLens";
 import {RequestUriLens} from "./lenses/RequestUriLens";
-import {UriLens} from "./lenses/UriLens";
 import {literal} from "./paths/Literal";
 import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
 import {MessageLens, RequestLens} from "./routes";
@@ -23,9 +22,9 @@ export function request<TPath, TBody>(
 
   const path: RequestLens<TPath> =
     typeof pathLike === 'string'
-      ? new RequestUriLens(new UriLens(literal(pathLike))) as any as RequestUriLens<TPath>
+      ? new RequestUriLens(literal(pathLike)) as any as RequestUriLens<TPath>
       : isPathMatcher(pathLike)
-      ? new RequestUriLens(new UriLens<TPath>(pathLike))
+      ? new RequestUriLens(pathLike)
       : pathLike;
 
   const methodAndPath = new IntersectionLens(

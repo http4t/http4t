@@ -1,10 +1,9 @@
-import {success} from "@http4t/result";
-import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
+import {failure, success} from "@http4t/result";
 import {PathMatcher} from "../PathMatcher";
-import {Parser, ParserPath} from "./index";
+import {Parser, ParserPath, ParserResult} from "./index";
 
 class FloatParser implements Parser<number> {
-  parse(pathSegment: string): JsonPathResult<number> {
+  parse(pathSegment: string): ParserResult<number> {
     const parsed = +pathSegment;
 
     if (Number.isNaN(parsed)) return failure("expected a number");

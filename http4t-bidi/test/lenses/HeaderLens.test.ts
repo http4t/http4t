@@ -1,8 +1,9 @@
 import {request} from "@http4t/core/requests";
+import {response} from "@http4t/core/responses";
 import {success} from "@http4t/result";
-import {failure} from "@http4t/result/JsonPathResult";
 import {expect} from 'chai';
 import {HeaderLens} from "../../src/lenses/HeaderLens";
+import {routeFailed} from "../../src/routes";
 
 describe("HeaderLens", () => {
 
@@ -19,7 +20,7 @@ describe("HeaderLens", () => {
 
     const message = request("GET", "/", undefined, ["Loca", "Jamaica"]);
 
-    expect((await headerLens.get(message))).deep.eq(failure("Expected header \"Location\""))
+    expect((await headerLens.get(message))).deep.eq(routeFailed("Expected header \"Location\"", response(400)))
   })
 
   it("should be able to put a header in a message", async () => {

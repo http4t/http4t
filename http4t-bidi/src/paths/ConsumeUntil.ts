@@ -1,5 +1,4 @@
-import {success} from "@http4t/result";
-import {failure} from "@http4t/result/JsonPathResult";
+import {failure, success} from "@http4t/result";
 import {
   consume,
   endOfPath,
@@ -10,7 +9,7 @@ import {
   upToChars,
   upToSegments
 } from "./consume";
-import {PathMatch, PathMatcher} from "./PathMatcher";
+import {PathMatcher, PathResult} from "./PathMatcher";
 
 export class ConsumeUntil implements PathMatcher<string> {
   static nextSlashOrEnd = new ConsumeUntil(nextSlashOrEnd);
@@ -35,9 +34,9 @@ export class ConsumeUntil implements PathMatcher<string> {
     return new ConsumeUntil(upToSegments(count));
   }
 
-  consume(path: string): PathMatch<string> {
+  consume(path: string): PathResult<string> {
     const consumed = consume(path, this.consumer);
-    if (!consumed) return failure("path did not match");
+    if (!consumed) return failure({message: "path did not match", remaining: path});
 
     return success({
       value: consumed.captured,

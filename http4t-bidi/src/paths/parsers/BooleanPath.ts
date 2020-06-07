@@ -1,10 +1,9 @@
-import {success} from "@http4t/result";
-import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
+import {failure, success} from "@http4t/result";
 import {PathMatcher} from "../PathMatcher";
-import {Parser, ParserPath} from "./index";
+import {Parser, ParserPath, ParserResult} from "./index";
 
 class BooleanParser implements Parser<boolean> {
-  parse(pathSegment: string): JsonPathResult<boolean> {
+  parse(pathSegment: string): ParserResult<boolean> {
     if (pathSegment.toLowerCase() === "true") return success(true);
     if (pathSegment.toLowerCase() === "false") return success(false);
     return failure("Expected 'true' or 'false'");

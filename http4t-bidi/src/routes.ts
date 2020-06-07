@@ -1,5 +1,5 @@
 import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {JsonPathResult} from "@http4t/result/JsonPathResult";
+import {Failure, failure, Result} from "@http4t/result";
 
 
 /**
@@ -18,15 +18,25 @@ export interface PolymorphicLens<Source, SourceAfterInjection, InjectedValue, Ex
   set(into: Source, value: InjectedValue): SourceAfterInjection;
 }
 
+export type WrongRoute = { type: "wrong-route", message: string };
+export type RouteFailed = { type: "route-failed", message: string, response: HttpResponse };
+export type RoutingError = WrongRoute | RouteFailed;
+
+export type RoutingResult<T> = Result<RoutingError, T>;
+
+export function wrongRoute(message: string): Failure<RoutingError> {
+  return failure({type: "wrong-route", message});
+}
+
+export function routeFailed(message: string, response: HttpResponse): Failure<RoutingError> {
+  return failure({type: "route-failed", message, response});
+}
+
 /**
  * Serializes/deserializes a value into/out of a message
  */
 export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown>
-  extends PolymorphicLens<
-    TMessage,
-    Promise<TMessage>,
-    T,
-    Promise<JsonPathResult<T>>> {
+  extends PolymorphicLens<TMessage, Promise<TMessage>, T, Promise<RoutingResult<T>>> {
 }
 
 export interface RequestLens<T> extends MessageLens<HttpRequest, T> {

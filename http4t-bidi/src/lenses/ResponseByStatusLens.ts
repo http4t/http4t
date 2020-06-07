@@ -1,7 +1,6 @@
 import {HttpResponse} from "@http4t/core/contract";
 import {isSuccess, success} from "@http4t/result";
-import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
-import {ResponseLens} from "../routes";
+import {ResponseLens, RoutingResult, wrongRoute} from "../routes";
 
 export type ByStatus = { [k: number]: any };
 export type ResponsesByStatus<T extends ByStatus> = { [K in keyof T]: ResponseLens<T[K]> }
@@ -11,9 +10,9 @@ export class ResponseByStatusLens<T extends ByStatus> implements ResponseLens<Ma
   constructor(private readonly statuses: ResponsesByStatus<T>) {
   }
 
-  async get(message: HttpResponse): Promise<JsonPathResult<MatchedResponse<T>>> {
+  async get(message: HttpResponse): Promise<RoutingResult<MatchedResponse<T>>> {
     if (!this.statuses.hasOwnProperty(message.status))
-      return failure(`Status was not in ${Object.keys(this.statuses)}`, ["status"])
+      return wrongRoute(`Status was not in ${Object.keys(this.statuses)}`);
 
     const result = await this.statuses[message.status].get(message);
     return isSuccess(result)

@@ -1,5 +1,4 @@
-import {success} from "@http4t/result";
-import {failure} from "@http4t/result/JsonPathResult";
+import {failure, success} from "@http4t/result";
 import {expect} from 'chai';
 import {v, variablesPath} from "../../src/paths/variables";
 
@@ -52,7 +51,7 @@ describe('variablesPath()', () => {
     it('does not match non-integers, including values Number.parseInt would successfully parse', async () => {
       const path = variablesPath({int: v.int}, v => ["one", v.int, "three"]);
       const consume = path.consume("one/2notanumber2/three");
-      expect(consume).deep.eq(failure("expected an integer"));
+      expect(consume).deep.eq(failure({message: "expected an integer", remaining: "/2notanumber2/three"}));
     });
     it('supports floats', async () => {
       const path = variablesPath({float: v.float}, v => ["one", v.float, "three"]);
@@ -67,7 +66,7 @@ describe('variablesPath()', () => {
     it('does not match non-floats, including values Number.parseFloat would successfully parse', async () => {
       const path = variablesPath({float: v.float}, v => ["one", v.float, "three"]);
       expect(path.consume("one/2.2notanumber2.2/three"))
-        .deep.eq(failure("expected a number"));
+        .deep.eq(failure({message: "expected a number", remaining: "/2.2notanumber2.2/three"}));
     });
     it('can split segments', async () => {
       const path = variablesPath({segments: v.upToSegments(2)}, v => [v.segments]);

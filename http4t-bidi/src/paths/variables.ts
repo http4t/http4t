@@ -7,7 +7,7 @@ import {BooleanPath} from "./parsers/BooleanPath";
 import {FloatPath} from "./parsers/FloatPath";
 import {IntPath} from "./parsers/IntParser";
 import {SplitStringPath} from "./parsers/SplitStringPath";
-import {PathMatch, PathMatcher} from "./PathMatcher";
+import {PathResult, PathMatcher} from "./PathMatcher";
 
 export const v = {
   segment: ConsumeUntil.nextSlashOrEnd,
@@ -50,7 +50,7 @@ export class VariablePath<T, K extends keyof T> implements PathMatcher<{ K: T[K]
     private readonly value: PathMatcher<T[K]>) {
   }
 
-  consume(path: string): PathMatch<{ K: T[K] }> {
+  consume(path: string): PathResult<{ K: T[K] }> {
     return map(
       this.value.consume(path),
       value => ({...value, value: {[this.key]: value.value} as { K: T[K] }}));
