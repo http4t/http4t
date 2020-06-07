@@ -1,5 +1,6 @@
 import {expect} from 'chai';
-import {failure, isFailure, isSuccess, merge, prefix, problem, success} from "../src";
+import {isFailure, isSuccess, success} from "../src";
+import {failure, merge, prefix, problem} from "../src/JsonPathResult";
 
 describe('Problem', () => {
   it('has a nice toString()', async () => {

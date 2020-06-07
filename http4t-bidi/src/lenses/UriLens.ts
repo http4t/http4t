@@ -1,6 +1,7 @@
 import {ParsedUri} from "@http4t/core/contract";
 import {joinPaths, stripSlashes} from "@http4t/core/uri";
-import {failure, isFailure, prefix, Result, success} from "@http4t/result";
+import {isFailure, success} from "@http4t/result";
+import {failure, JsonPathResult, prefix} from "@http4t/result/JsonPathResult";
 import {PathMatcher} from "../paths/PathMatcher";
 import {BiDiLens} from "../routes";
 
@@ -8,7 +9,7 @@ export class UriLens<T> implements BiDiLens<T, ParsedUri> {
   constructor(private readonly path: PathMatcher<T>) {
   }
 
-  async extract(uri: ParsedUri): Promise<Result<T>> {
+  async extract(uri: ParsedUri): Promise<JsonPathResult<T>> {
     const result = this.path.consume(uri.path);
 
     if (isFailure(result))

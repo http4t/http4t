@@ -1,12 +1,12 @@
 import {HttpResponse} from "@http4t/core/contract";
-import {failure, Result} from "@http4t/result";
+import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
 import {ResponseLens} from "../routes";
 
 export class ExpectStatusLens<T> implements ResponseLens<T> {
   constructor(private readonly status: number, private readonly lens: ResponseLens<T>) {
   }
 
-  async extract(message: HttpResponse): Promise<Result<T>> {
+  async extract(message: HttpResponse): Promise<JsonPathResult<T>> {
     if (message.status != this.status)
       return failure(`Status was not ${this.status}`, ["status"])
 

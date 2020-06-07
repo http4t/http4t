@@ -1,5 +1,6 @@
 import {HttpMessage} from "@http4t/core/contract";
-import {isFailure, merge, Result, success} from "@http4t/result";
+import {isFailure, success} from "@http4t/result";
+import {JsonPathResult, merge} from "@http4t/result/JsonPathResult";
 import {MessageLens} from "../routes";
 
 export class IntersectionLens<A, B, TMessage extends HttpMessage> implements MessageLens<A & B, TMessage> {
@@ -7,7 +8,7 @@ export class IntersectionLens<A, B, TMessage extends HttpMessage> implements Mes
               private readonly b: MessageLens<B, TMessage>) {
   }
 
-  async extract(message: TMessage): Promise<Result<A & B>> {
+  async extract(message: TMessage): Promise<JsonPathResult<A & B>> {
     const aResult = await this.a.extract(message);
     const bResult = await this.b.extract(message);
 

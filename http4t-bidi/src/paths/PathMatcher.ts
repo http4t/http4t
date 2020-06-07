@@ -1,10 +1,10 @@
-import {Result} from "@http4t/result";
+import {JsonPathResult} from "@http4t/result/JsonPathResult";
 
 export type Matched<T> = {
   value: T,
   remaining: string
 };
-export type PathMatch<T> = Result<Matched<T>>;
+export type PathMatch<T> = JsonPathResult<Matched<T>>;
 
 export interface PathMatcher<T> {
   consume(path: string): PathMatch<T>;

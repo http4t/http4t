@@ -1,6 +1,6 @@
 import {expect} from 'chai';
-import {failure, problem} from "../src";
-import {ResultError} from "../src/ResultError";
+import {problem} from "../src/JsonPathResult";
+import {JsonPathError} from "../src/JsonPathError";
 
 describe('ResultError', () => {
   it('fails with an AssertionError with expected, actual and showDiff=true', () => {
@@ -10,7 +10,7 @@ describe('ResultError', () => {
       problem("value was incorrect", []),
     ];
 
-    const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+    const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
     expect(e.message).contains('value was incorrect');
 
@@ -28,7 +28,7 @@ describe('ResultError', () => {
         problem("value was incorrect", []),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq('value was incorrect');
@@ -41,7 +41,7 @@ describe('ResultError', () => {
         problem("value was incorrect", [1]),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq([undefined, 'value was incorrect']);
@@ -57,7 +57,7 @@ describe('ResultError', () => {
         problem("value was incorrect", [2]),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq(
@@ -79,7 +79,7 @@ describe('ResultError', () => {
         problem("value was incorrect", [2, 'wrong']),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq(
@@ -98,7 +98,7 @@ describe('ResultError', () => {
         problem("value was incorrect", ['nested', 'wrong']),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq({nested: {wrong: 'value was incorrect'}});
@@ -111,7 +111,7 @@ describe('ResultError', () => {
         problem("value was incorrect", ['nested', 1]),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq({nested: ['right', 'value was incorrect', 'right']});
@@ -127,7 +127,7 @@ describe('ResultError', () => {
         problem("value was incorrect", [2]),
       ];
 
-      const e = new ResultError(actual, failure(...problems), {leakActualValuesInError: true});
+      const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
       expect(e.actual).deep.eq(actual);
       expect(e.expected).deep.eq(

@@ -1,5 +1,6 @@
 import {HttpRequest, Method} from "@http4t/core/contract";
-import {failure, Result, success} from "@http4t/result";
+import {success} from "@http4t/result";
+import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
 import {RequestLens} from "../routes";
 
 /**
@@ -11,7 +12,7 @@ export class MethodLens implements RequestLens<void> {
   constructor(private readonly method: Method) {
   }
 
-  async extract(request: HttpRequest): Promise<Result<void>> {
+  async extract(request: HttpRequest): Promise<JsonPathResult<void>> {
     if (request.method.toUpperCase() === this.method.toUpperCase()) {
       return success(undefined);
     }

@@ -1,14 +1,15 @@
 import {HttpMessage} from "@http4t/core/contract";
-import {MessageLens} from "../routes";
-import {failure, Result, success} from "@http4t/result";
 import {getHeaderValue} from "@http4t/core/headers";
 import {setHeader} from "@http4t/core/messages";
+import {success} from "@http4t/result";
+import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
+import {MessageLens} from "../routes";
 
 export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<string, TMessage> {
     constructor(private name: string) {
     }
 
-    async extract(output: TMessage): Promise<Result<string>> {
+    async extract(output: TMessage): Promise<JsonPathResult<string>> {
         const headerValue = getHeaderValue(output.headers, this.name);
         return headerValue ? success(headerValue) : failure(`Expected header "${this.name}"`)
     }

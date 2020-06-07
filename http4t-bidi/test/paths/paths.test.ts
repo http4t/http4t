@@ -1,6 +1,7 @@
-import {failure, success} from "@http4t/result";
+import {success} from "@http4t/result";
+import {failure} from "@http4t/result/JsonPathResult";
 import {expect} from 'chai';
-import {path} from "../../src/paths/index";
+import {path} from "../../src/paths";
 import {v, VariablePath} from "../../src/paths/variables";
 
 const componentVars = {

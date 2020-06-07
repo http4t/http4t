@@ -1,4 +1,4 @@
-import {Failure, JsonPath, pathsEq, pathStartsWith, Problem} from "./index";
+import {JsonPath, Problems, pathsEq, pathStartsWith, Problem} from "./JsonPathResult";
 
 export function isPrimitive(value: any): boolean {
   return (typeof value !== 'object' && typeof value !== 'function') || value === null
@@ -81,25 +81,25 @@ export type ResultErrorOpts = {
  * compatible with mocha's diff functionality on errors, and which work nicely with
  * IntelliJ/Webstorm's diff viewer in the test runner.
  */
-export class ResultError extends Error {
+export class JsonPathError extends Error {
   public readonly actual?: any;
   public readonly expected?: any;
   public readonly showDiff: boolean;
 
   constructor(actual: any,
-              public readonly failure: Failure,
+              public readonly error: Problems,
               {
                 message = 'Validation failed',
                 leakActualValuesInError = false,
               }: Partial<ResultErrorOpts> = {}
   ) {
-    super(`${message}:\n${failure}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
+    super(`${message}:\n${error}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
     if (!leakActualValuesInError) {
       this.showDiff = false;
     }
     // tells mocha to show diff
     this.showDiff = true;
     this.actual = actual;
-    this.expected = intertwingle(actual, failure.problems, []);
+    this.expected = intertwingle(actual, error, []);
   }
 }

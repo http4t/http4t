@@ -1,6 +1,6 @@
 import {HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {setBody} from "@http4t/core/messages";
-import {failure, Result} from "@http4t/result";
+import {failure, JsonPathResult} from "@http4t/result/JsonPathResult";
 import {expect} from 'chai';
 import {buildClient} from "../src/client";
 import {json} from "../src/lenses/JsonLens";
@@ -160,7 +160,7 @@ describe('Client', () => {
           inject: async (input: string, output: HttpResponse): Promise<HttpResponse> => {
             return setBody(output, input)
           },
-          extract: async (): Promise<Result<string>> => {
+          extract: async (): Promise<JsonPathResult<string>> => {
             return failure("response lens failed", ["body"])
           }
         }

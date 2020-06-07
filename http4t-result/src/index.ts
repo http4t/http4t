@@ -1,96 +1,105 @@
 // Types
 // ------------------------------------------------------------------------------------------
-
 /**
- * Just enough of jsonpath to identify a single element- object keys and array indexes
+ * A rough port of https://github.com/npryce/result4k/blob/master/src/main/kotlin/com/natpryce/result.kt,
+ * but with the order of the type params reversed to the more idiomatic <E,T>
  */
-export type JsonPath = (string | number)[];
-
-export class Problem {
-  constructor(readonly message: string,
-              readonly path: JsonPath
-  ) {
-  }
-
-  toString(): string {
-    return `${unparse(this.path)}: ${this.message}`
-  }
-}
-
-export class Failure {
-  constructor(readonly problems: Readonly<Problem[]>) {
-  }
-
-  toString(): string {
-    return this.problems.map(problem => problem.toString()).join('\r\n');
-  }
+export type Failure<E> = {
+  readonly error: E;
 }
 
 export type Success<T> = {
   readonly value: T;
 }
 
-export type Result<T> = Success<T> | Failure;
+export type Result<E, T> = Success<T> | Failure<E>;
 
-// Convenience functions
-// ------------------------------------------------------------------------------------------
-
-export function isSuccess<T>(result: Result<T>): result is Success<T> {
+export function isSuccess<E = unknown, T = unknown>(result: Result<E, T>): result is Success<T> {
   return result.hasOwnProperty('value');
 }
 
-export function isFailure<T>(result: Result<T>): result is Failure {
-  return result.hasOwnProperty('problems');
+export function isFailure<E = unknown, T = unknown>(result: Result<E, T>): result is Failure<E> {
+  return result.hasOwnProperty('error');
 }
-
-export function merge(a: Failure, b: Failure): Failure {
-  return failure(...[...a.problems, ...b.problems])
-}
-
-export function prefix(value: Failure, path: JsonPath): Failure {
-  return failure(...value.problems.map(p => problem(p.message, [...path, ...p.path])))
-}
-
-export function pathsEq(a: JsonPath, b: JsonPath) {
-  return a.length === b.length
-    && a.every((v, i) => v === b[i]);
-}
-
-export function pathStartsWith(path: JsonPath, startsWith: JsonPath) {
-  return path.length >= startsWith.length
-    && startsWith.every((v, i) => v === path[i]);
-}
-
-export function unparse(path: JsonPath): string {
-  return ['$', ...path].map(x => typeof x === 'string' ? x : `[${x}]`).join('.')
-}
-
-// Constructors
-// ------------------------------------------------------------------------------------------
 
 export function success<T>(value: T): Success<T> {
   return {value};
 }
 
-export function problem(message: string, path: JsonPath = []): Problem {
-  return new Problem(message, path);
+export function failure<E>(error: E): Failure<E> {
+  return {error};
 }
 
-export function failure(message: string, path?: JsonPath): Failure;
-export function failure(...problems: Problem[]): Failure;
-export function failure(first: string | Problem, second: Problem | JsonPath | undefined, ...rest: Problem[]): Failure {
-  if (typeof first === 'string') return failure(problem(first, second as JsonPath | undefined));
-  const problems = [first as Problem, ...(second ? [second as Problem] : []), ...rest];
-  return new Failure(problems)
+/**
+ * Map a function over the _value_ of a successful Result.
+ */
+export function map<E = unknown, T = unknown, T1 = T>(
+  result: Result<E, T>,
+  f: (success: T) => T1): Result<E, T1> {
+  return isSuccess(result) ? success(f(result.value)) : result;
 }
 
-export function map<T, U>(result: Result<T>,
-                          onSuccess: (t: T) => U,
-                          onFailure: (f: Failure) => Result<U> = f => f): Result<U> {
-  return isFailure(result) ? onFailure(result) : success(onSuccess(result.value));
+/**
+ * Flat-map a function over the _value_ of a successful Result.
+ */
+export function flatMap<E = unknown, T = unknown, T1 = T>(
+  result: Result<E, T>,
+  f: (success: T) => Result<E, T1>): Result<E, T1> {
+  return isSuccess(result) ? f(result.value) : result;
 }
 
-export function prefixFailure<T>(result: Result<T>,
-                                    path: JsonPath): Result<T> {
-  return map(result, s => s, f => prefix(f, path));
+/**
+ * Map a function over the _reason_ of an unsuccessful Result.
+ */
+export function mapFailure<E = unknown, E1 = E, T = unknown>(
+  result: Result<E, T>,
+  f: (failure: E) => E1): Result<E1, T> {
+  return isSuccess(result) ? result : failure(f(result.error));
+}
+
+/**
+ * Flat-map a function over the _reason_ of a unsuccessful Result.
+ */
+export function flatMapFailure<E = unknown, E1 = E, T = unknown>(
+  result: Result<E, T>,
+  f: (failure: E) => Result<E1, T>): Result<E1, T> {
+  return isSuccess(result) ? result : f(result.error);
+}
+
+/**
+ * Unwrap a Result in which both the success and failure values have the same type, returning a plain value.
+ */
+export function get<T>(result: Result<T, T>): T {
+  return isSuccess(result) ? result.value : result.error;
+}
+
+/**
+ * Unwrap a Result, by returning the success value or throwing the result of block on failure to abort
+ * from the current function.
+ */
+export function onFailure<E, T>(result: Result<E, T>, block: (error: E) => any = error => error): T {
+  if (isSuccess(result)) return result.value;
+  throw block(result.error);
+}
+
+
+/**
+ * Unwrap a Result by returning the success value or calling errorToValue to mapping the failure reason to a plain value.
+ */
+export function recover<S, T extends S, U extends S, E>(result: Result<E, T>, errorToValue: (error: E) => U): S {
+  return get(mapFailure(result, errorToValue) as Result<S, S>);
+}
+
+/**
+ * Perform a side effect with the success value.
+ */
+export function peek<E, T, R = void>(result: Result<E, T>, f: (value: T) => R): R | undefined {
+  return isSuccess(result) ? f(result.value) : undefined;
+}
+
+/**
+ * Perform a side effect with the failure value.
+ */
+export function peekFailure<E, T, R = void>(result: Result<E, T>, f: (error: E) => R): R | undefined {
+  return isSuccess(result) ? undefined : f(result.error);
 }

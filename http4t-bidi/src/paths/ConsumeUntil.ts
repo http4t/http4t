@@ -1,4 +1,5 @@
-import {failure, success} from "@http4t/result";
+import {success} from "@http4t/result";
+import {failure} from "@http4t/result/JsonPathResult";
 import {
   consume,
   endOfPath,

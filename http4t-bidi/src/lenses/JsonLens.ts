@@ -1,7 +1,8 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
 import {bodyJson, jsonBody, JsonBody} from "@http4t/core/json";
-import {Result, success} from "@http4t/result";
+import {success} from "@http4t/result";
+import {JsonPathResult} from "@http4t/result/JsonPathResult";
 import {MessageLens} from "../routes";
 
 /**
@@ -11,7 +12,7 @@ import {MessageLens} from "../routes";
  * Uses {@link JsonBody} to avoid deserialising twice.
  */
 export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<T, TMessage> {
-  async extract(message: TMessage): Promise<Result<T>> {
+  async extract(message: TMessage): Promise<JsonPathResult<T>> {
     const value = await bodyJson<T>(message.body);
     return success(value);
   }

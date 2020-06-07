@@ -2,7 +2,7 @@ import {buildClient} from "@http4t/bidi/client";
 import {HttpHandler} from "@http4t/core/contract";
 import {Closeable} from "@http4t/core/server";
 import {ServerHandler} from "@http4t/node/server";
-import {failure} from "@http4t/result";
+import {failure} from "@http4t/result/JsonPathResult";
 import {expect} from "chai";
 import {Pool} from "pg";
 import {Api, routes} from "../src/api";

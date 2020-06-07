@@ -1,10 +1,10 @@
 import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {Result} from "@http4t/result";
+import {JsonPathResult} from "@http4t/result/JsonPathResult";
 
 export interface BiDiLens<TIn, TOut> {
   inject(input: TIn, output: TOut): Promise<TOut>;
 
-  extract(output: TOut): Promise<Result<TIn>>;
+  extract(output: TOut): Promise<JsonPathResult<TIn>>;
 }
 
 /**
@@ -30,7 +30,7 @@ export type HandlerFn0<Out = any> = () => Promise<Out>;
 export type HandlerFn1<In = any, Out = any> = (arg: In) => Promise<Out>;
 export type HandlerFn = HandlerFn0 | HandlerFn1
 
-export type ValidApi = {  [k: string]: HandlerFn };
+export type ValidApi = { [k: string]: HandlerFn };
 
 export type RouteFor<T extends HandlerFn> =
   T extends (arg: infer In) => Promise<infer Out>

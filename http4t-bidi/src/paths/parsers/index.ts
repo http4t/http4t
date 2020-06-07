@@ -1,8 +1,9 @@
-import {isFailure, map, Result} from "@http4t/result";
+import {isFailure, map} from "@http4t/result";
+import {JsonPathResult} from "@http4t/result/JsonPathResult";
 import {PathMatch, PathMatcher} from "../PathMatcher";
 
 export interface Parser<T> {
-  parse(value: string): Result<T>;
+  parse(value: string): JsonPathResult<T>;
 
   unparse(value: T): string;
 }
