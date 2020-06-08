@@ -2,11 +2,12 @@ import {HttpMessage} from "@http4t/core/contract";
 import {MessageLens, RoutingResult} from "../lenses";
 
 export class AlwaysFailLens<TMessage extends HttpMessage, T = never> implements MessageLens<TMessage, T> {
-    constructor(private readonly error: RoutingResult<T>) {
+    constructor(private readonly error: (message: TMessage) => RoutingResult<T>) {
+
     }
 
     async get(message: TMessage): Promise<RoutingResult<T>> {
-        return this.error;
+        return this.error(message);
     }
 
     async set(into: TMessage, value: T): Promise<TMessage> {
@@ -14,6 +15,8 @@ export class AlwaysFailLens<TMessage extends HttpMessage, T = never> implements 
     }
 }
 
-export function alwaysFail<TMessage extends HttpMessage = HttpMessage, T = never>(error: RoutingResult<T>): MessageLens<TMessage, T> {
-    return new AlwaysFailLens<TMessage, T>(error);
+export function alwaysFail<TMessage extends HttpMessage = HttpMessage, T = never>(error: RoutingResult<T>): MessageLens<TMessage, T>;
+export function alwaysFail<TMessage extends HttpMessage = HttpMessage, T = never>(error: (message: TMessage) => RoutingResult<T>): MessageLens<TMessage, T>;
+export function alwaysFail<TMessage extends HttpMessage = HttpMessage, T = never>(error: RoutingResult<T> | ((message: TMessage) => RoutingResult<T>)): MessageLens<TMessage, T> {
+    return new AlwaysFailLens<TMessage, T>(typeof error === "function" ? error : () => error);
 }
