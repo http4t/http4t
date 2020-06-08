@@ -1,8 +1,8 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {success} from "@http4t/result";
-import {MessageLens, RoutingResult} from "../routes";
+import {MessageLens, RoutingResult} from "../lenses";
 
-export class NothingLens<TMessage extends HttpMessage> implements MessageLens<TMessage, undefined> {
+export class EmptyLens<TMessage extends HttpMessage> implements MessageLens<TMessage, undefined> {
   async get(message: TMessage): Promise<RoutingResult<undefined>> {
     return success(undefined);
   }
@@ -12,6 +12,6 @@ export class NothingLens<TMessage extends HttpMessage> implements MessageLens<TM
   }
 }
 
-export function nothing<TMessage extends HttpMessage = HttpMessage>(): NothingLens<TMessage> {
-  return new NothingLens<TMessage>();
+export function empty<TMessage extends HttpMessage = HttpMessage>(): EmptyLens<TMessage> {
+  return new EmptyLens<TMessage>();
 }

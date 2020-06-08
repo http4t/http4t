@@ -1,6 +1,6 @@
 import {HttpRequest, Method} from "@http4t/core/contract";
 import {success} from "@http4t/result";
-import {RequestLens, RoutingResult, wrongRoute} from "../routes";
+import {RequestLens, RoutingResult, wrongRoute} from "../lenses";
 
 /**
  * Injects method into request.

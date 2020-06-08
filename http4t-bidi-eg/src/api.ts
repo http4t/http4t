@@ -1,7 +1,7 @@
-import {response} from "@http4t/bidi/lenses/ExpectStatusLens";
+import {empty} from "@http4t/bidi/lenses/EmptyLens";
 import {json} from "@http4t/bidi/lenses/JsonLens";
 import {maybe} from "@http4t/bidi/lenses/NotFoundLens";
-import {nothing} from "@http4t/bidi/lenses/NothingLens";
+import {response} from "@http4t/bidi/lenses/StatusLens";
 import {path} from "@http4t/bidi/paths";
 import {v} from "@http4t/bidi/paths/variables";
 import {request} from "@http4t/bidi/requests";
@@ -20,11 +20,11 @@ export type Api = {
 export const routes: Routes<Api> = {
   ready: route(
     request('GET', '/probe/ready'),
-    response(200, nothing())
+    response(200, empty())
   ),
   live: route(
     request('GET', '/probe/live'),
-    response(200, nothing())
+    response(200, empty())
   ),
   post: route(
     request('POST', '/store', json()),
@@ -36,6 +36,6 @@ export const routes: Routes<Api> = {
   ),
   test: route(
     request("POST", '/test/store-then-throw', json()),
-    response(200, nothing())
+    response(200, empty())
   )
 }

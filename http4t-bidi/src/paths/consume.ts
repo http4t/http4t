@@ -16,7 +16,6 @@ export type Consumed = {
 /**
  * 1. consume leading slashes from path
  * 2. use consumer to capture some substring of what's left, e.g. everything until the index of the first '/'
- * 3. consume leading slashes from the remaining path
  */
 export function consume(path: string, consumer: PathConsumer): Consumed | undefined {
   const prefix = path.match(leading)?.[0] || "";

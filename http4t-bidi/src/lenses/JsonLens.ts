@@ -1,9 +1,8 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
 import {bodyJson, jsonBody, JsonBody} from "@http4t/core/json";
-import {response} from "@http4t/core/responses";
 import {success} from "@http4t/result";
-import {MessageLens, routeFailed, RoutingResult} from "../routes";
+import {MessageLens, routeFailed, RoutingResult} from "../lenses";
 
 /**
  * NB: does not _check_ `Content-Type` header when extracting, but does
@@ -17,7 +16,7 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TM
       const value = await bodyJson<T>(message.body);
       return success(value);
     } catch (e) {
-      return routeFailed(`Expected valid json${e.message ? `- "${e.message}"` : ""}`, response(400))
+      return routeFailed(`Expected valid json${e.message ? `- "${e.message}"` : ""}`)
     }
   }
 

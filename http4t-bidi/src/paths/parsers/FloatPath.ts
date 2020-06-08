@@ -5,10 +5,9 @@ import {Parser, ParserPath, ParserResult} from "./index";
 class FloatParser implements Parser<number> {
   parse(pathSegment: string): ParserResult<number> {
     const parsed = +pathSegment;
-
-    if (Number.isNaN(parsed)) return failure("expected a number");
-
-    return success(parsed);
+    return Number.isNaN(parsed)
+      ? failure("expected a number")
+      : success(parsed);
   }
 
   unparse(value: number): string {

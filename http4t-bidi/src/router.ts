@@ -1,7 +1,8 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {response} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
-import {RequestLens, Routes, ValidApi} from "./routes";
+import {RequestLens} from "./lenses";
+import {Routes, ValidApi} from "./routes";
 
 export class Router<T extends ValidApi> implements HttpHandler {
   constructor(private readonly routes: Routes<T>,

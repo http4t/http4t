@@ -11,9 +11,9 @@ export class IntParser implements Parser<number> {
   parse(pathSegment: string): ParserResult<number> {
     const parsed = Number.parseInt(pathSegment, this.radix);
 
-    if (Number.isNaN(parsed) || !pathSegment.match(validInt)) return failure("expected an integer");
-
-    return success(parsed);
+    return Number.isNaN(parsed) || !pathSegment.match(validInt)
+      ? failure("expected an integer")
+      : success(parsed);
   }
 
   unparse(value: number): string {

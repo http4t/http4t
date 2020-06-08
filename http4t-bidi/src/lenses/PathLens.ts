@@ -2,10 +2,10 @@ import {HttpRequest} from "@http4t/core/contract";
 import {uri} from "@http4t/core/requests";
 import {stripSlashes} from "@http4t/core/uri";
 import {isSuccess, success} from "@http4t/result";
+import {RequestLens, RoutingResult, wrongRoute} from "../lenses";
 import {PathMatcher} from "../paths/PathMatcher";
-import {RequestLens, RoutingResult, wrongRoute} from "../routes";
 
-export class RequestUriLens<T> implements RequestLens<T> {
+export class PathLens<T> implements RequestLens<T> {
   constructor(private readonly path: PathMatcher<T>) {
   }
 

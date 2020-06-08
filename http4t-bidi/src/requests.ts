@@ -1,30 +1,30 @@
 import {HttpMessage, Method} from "@http4t/core/contract";
+import {MessageLens, RequestLens} from "./lenses";
 import {IntersectionLens} from "./lenses/IntersectionLens";
 import {MethodLens} from "./lenses/MethodLens";
-import {RequestUriLens} from "./lenses/RequestUriLens";
+import {PathLens} from "./lenses/PathLens";
 import {literal} from "./paths/Literal";
 import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
-import {MessageLens, RequestLens} from "./routes";
 
 export type PathLike<TPath = undefined> = RequestLens<TPath> | PathMatcher<TPath> | string
 
 export function request<TPath = undefined>(method: Method, path: PathLike<TPath>): RequestLens<TPath>;
-export function request<TBody, TPath = undefined>(
+export function request<TPath = undefined, TBody = unknown>(
   method: Method,
   path: PathLike<TPath>,
   body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<TPath & TBody>;
 
-export function request<TPath, TBody>(
+export function request<TPath, TBody = undefined>(
   method: Method,
   pathLike: PathLike<TPath>,
   body?: RequestLens<TBody> | MessageLens<HttpMessage, TBody>
-): RequestLens<TPath> {
+): RequestLens<TPath> | RequestLens<TPath & TBody> {
 
   const path: RequestLens<TPath> =
     typeof pathLike === 'string'
-      ? new RequestUriLens(literal(pathLike)) as any as RequestUriLens<TPath>
+      ? new PathLens(literal(pathLike)) as any as PathLens<TPath>
       : isPathMatcher(pathLike)
-      ? new RequestUriLens(pathLike)
+      ? new PathLens(pathLike)
       : pathLike;
 
   const methodAndPath = new IntersectionLens(

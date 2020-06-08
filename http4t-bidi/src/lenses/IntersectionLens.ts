@@ -1,7 +1,6 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {isFailure, success} from "@http4t/result";
-import {JsonPathResult, merge} from "@http4t/result/JsonPathResult";
-import {MessageLens, RoutingResult} from "../routes";
+import {MessageLens, RoutingResult} from "../lenses";
 
 export class IntersectionLens<TMessage extends HttpMessage, A, B> implements MessageLens<TMessage, A & B> {
   constructor(private readonly a: MessageLens<TMessage, A>,

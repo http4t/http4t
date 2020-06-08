@@ -2,8 +2,8 @@ import {request} from "@http4t/core/requests";
 import {response} from "@http4t/core/responses";
 import {success} from "@http4t/result";
 import {expect} from 'chai';
+import {routeFailed} from "../../src/lenses";
 import {HeaderLens} from "../../src/lenses/HeaderLens";
-import {routeFailed} from "../../src/routes";
 
 describe("HeaderLens", () => {
 

@@ -1,31 +1,13 @@
-import {HttpMessage, HttpResponse} from "@http4t/core/contract";
+import {bufferText} from "@http4t/core/bodies";
 import {get} from "@http4t/core/requests";
-import {response} from "@http4t/core/responses";
-import {failure} from "@http4t/result";
 import {expect} from 'chai';
+import {routeFailed, wrongRoute} from "../src/lenses";
+import {alwaysFail} from "../src/lenses/AlwaysFailLens";
+import {empty} from "../src/lenses/EmptyLens";
 import {json} from "../src/lenses/JsonLens";
-import {nothing} from "../src/lenses/NothingLens";
 import {request} from "../src/requests";
 import {buildRouter} from "../src/router";
-import {MessageLens, route, routeFailed, RoutingResult} from "../src/routes";
-
-export class AlwaysFaillLens<TMessage extends HttpMessage> implements MessageLens<TMessage, undefined> {
-  constructor(private readonly message: string, private readonly response: HttpResponse) {
-
-  }
-
-  async get(message: TMessage): Promise<RoutingResult<undefined>> {
-    return routeFailed(this.message, this.response);
-  }
-
-  async set(into: TMessage, value: undefined): Promise<TMessage> {
-    return into;
-  }
-}
-
-function alwaysFail<TMessage extends HttpMessage>(expectedFailure: string): MessageLens<TMessage, undefined> {
-  return new AlwaysFaillLens(expectedFailure, response(400));
-}
+import {route} from "../src/routes";
 
 describe('Server', () => {
   it('matches route and calls handler', async () => {
@@ -85,13 +67,13 @@ describe('Server', () => {
     expect(response.status).eq(404);
   });
 
-  it('short circuits as soon as a route fails (as opposed to just not matching the request)', async () => {
+  it('short circuits if route fails with routeFailed("reason")', async () => {
     const routes = {
       fails: route(
-        alwaysFail("expected failure"),
-        nothing()
+        alwaysFail(routeFailed("expected failure")),
+        empty()
       ),
-      doesNotGetHit: route(nothing(), nothing())
+      doesNotGetHit: route(empty(), empty())
     };
 
     const behaviourIsNeverUsed = {} as any;
@@ -100,6 +82,26 @@ describe('Server', () => {
     const response = await s.handle(get('/'));
 
     expect(response.status).eq(400);
+  });
+
+  it('does not short circuit if a route fails with wrongRoute("reason")', async () => {
+    const routes = {
+      fails: route(
+        alwaysFail(wrongRoute("expected failure")),
+        empty()
+      ),
+      getsHit: route(empty(), json<string>())
+    };
+
+    const onlyGetsHitIsUsed = {
+      getsHit: () => "ok"
+    } as any;
+    const s = buildRouter(routes, onlyGetsHitIsUsed);
+
+    const response = await s.handle(get('/'));
+
+    expect(response.status).eq(200);
+    expect(await bufferText(response.body)).eq("\"ok\"");
   });
 });
 

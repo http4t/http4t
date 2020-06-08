@@ -1,6 +1,6 @@
 import {HttpResponse} from "@http4t/core/contract";
 import {success} from "@http4t/result";
-import {ResponseLens, RoutingResult} from "../routes";
+import {ResponseLens, RoutingResult} from "../lenses";
 
 export class NotFoundLens<T> implements ResponseLens<T | undefined> {
   constructor(private readonly lens: ResponseLens<T>) {

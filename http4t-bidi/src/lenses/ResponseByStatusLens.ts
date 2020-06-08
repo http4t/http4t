@@ -1,6 +1,6 @@
 import {HttpResponse} from "@http4t/core/contract";
 import {isSuccess, success} from "@http4t/result";
-import {ResponseLens, RoutingResult, wrongRoute} from "../routes";
+import {ResponseLens, RoutingResult, wrongRoute} from "../lenses";
 
 export type ByStatus = { [k: number]: any };
 export type ResponsesByStatus<T extends ByStatus> = { [K in keyof T]: ResponseLens<T[K]> }

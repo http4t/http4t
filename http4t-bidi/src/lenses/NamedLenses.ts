@@ -1,6 +1,6 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {isFailure, success} from "@http4t/result";
-import {MessageLens, RoutingResult} from "../routes";
+import {MessageLens, RoutingResult} from "../lenses";
 
 type Lenses<TMessage extends HttpMessage, T> = { [K in keyof T]: MessageLens<TMessage, T[K]> };
 

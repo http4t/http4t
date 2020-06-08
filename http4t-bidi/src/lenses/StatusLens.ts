@@ -1,7 +1,7 @@
 import {HttpResponse} from "@http4t/core/contract";
-import {ResponseLens, RoutingResult, wrongRoute} from "../routes";
+import {ResponseLens, RoutingResult, wrongRoute} from "../lenses";
 
-export class ExpectStatusLens<T> implements ResponseLens<T> {
+export class StatusLens<T> implements ResponseLens<T> {
   constructor(private readonly status: number, private readonly lens: ResponseLens<T>) {
   }
 
@@ -17,6 +17,6 @@ export class ExpectStatusLens<T> implements ResponseLens<T> {
   }
 }
 
-export function response<T>(status: number, lens: ResponseLens<T>): ExpectStatusLens<T> {
-  return new ExpectStatusLens(status, lens);
+export function response<T>(status: number, lens: ResponseLens<T>): StatusLens<T> {
+  return new StatusLens(status, lens);
 }

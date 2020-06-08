@@ -1,7 +1,8 @@
 import {HttpHandler, HttpResponse} from "@http4t/core/contract";
 import {get} from "@http4t/core/requests";
 import {isFailure} from "@http4t/result";
-import {HandlerFn, ResponseLens, RouteFor, Routes, ValidApi} from "./routes";
+import {ResponseLens} from "./lenses";
+import {HandlerFn, RouteFor, Routes, ValidApi} from "./routes";
 
 /**
  * Creates a function that returns `lens.extract(message)`,
