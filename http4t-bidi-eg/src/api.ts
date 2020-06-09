@@ -27,7 +27,7 @@ export const routes: Routes<Api> = {
     response(200, empty())
   ),
   post: route(
-    request('POST', '/store', json()),
+    request('POST', '/store', json<Doc>()),
     response(201, json<{ id: string }, HttpResponse>())
   ),
   get: route(
@@ -35,7 +35,7 @@ export const routes: Routes<Api> = {
     maybe(json<Doc, HttpResponse>())
   ),
   test: route(
-    request("POST", '/test/store-then-throw', json()),
+    request("POST", '/test/store-then-throw', json<Doc>()),
     response(200, empty())
   )
 }

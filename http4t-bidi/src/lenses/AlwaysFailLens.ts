@@ -3,7 +3,6 @@ import {MessageLens, RoutingResult} from "../lenses";
 
 export class AlwaysFailLens<TMessage extends HttpMessage, T = never> implements MessageLens<TMessage, T> {
   constructor(private readonly error: RoutingResult<T>) {
-
   }
 
   async get(message: TMessage): Promise<RoutingResult<T>> {
@@ -15,6 +14,6 @@ export class AlwaysFailLens<TMessage extends HttpMessage, T = never> implements 
   }
 }
 
-export function alwaysFail<TMessage extends HttpMessage = HttpMessage, T = undefined>(error: RoutingResult<T>): MessageLens<TMessage, T> {
+export function alwaysFail<TMessage extends HttpMessage = HttpMessage, T = never>(error: RoutingResult<T>): MessageLens<TMessage, T> {
   return new AlwaysFailLens<TMessage, T>(error);
 }

@@ -14,7 +14,7 @@ describe('Server', () => {
     const routes = {
       example: route(
         request('GET', "/some/path"),
-        json()
+        json<string>()
       )
     };
 
@@ -33,7 +33,7 @@ describe('Server', () => {
     const routes = {
       example: route(
         request('GET', "/some/path"),
-        json()
+        json<string>()
       )
     };
 
@@ -52,7 +52,7 @@ describe('Server', () => {
     const routes = {
       example: route(
         request('GET', "/some/path"),
-        json()
+        json<string>()
       )
     };
 
