@@ -2,7 +2,7 @@ import {HttpMessage} from "@http4t/core/contract";
 import {isFailure, success} from "@http4t/result";
 import {MessageLens, RoutingResult} from "../lenses";
 
-export class IntersectionLens<TMessage extends HttpMessage, A, B> implements MessageLens<TMessage, A & B> {
+export class IntersectionLens<TMessage extends HttpMessage, A extends object | undefined, B extends object | undefined> implements MessageLens<TMessage, A & B> {
   constructor(private readonly a: MessageLens<TMessage, A>,
               private readonly b: MessageLens<TMessage, B>) {
   }
@@ -18,8 +18,8 @@ export class IntersectionLens<TMessage extends HttpMessage, A, B> implements Mes
     if (isFailure(bResult)) {
       return bResult;
     }
-    return success(aResult.value === undefined && bResult.value === undefined ? undefined as any : {...aResult.value, ...bResult.value});
 
+    return success(aResult.value === undefined && bResult.value === undefined ? undefined as any : {...aResult.value, ...bResult.value});
   }
 
   async set(into: TMessage, value: A & B): Promise<TMessage> {

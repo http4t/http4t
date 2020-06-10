@@ -2,7 +2,7 @@ import {HttpMessage} from "@http4t/core/contract";
 import {isFailure, success} from "@http4t/result";
 import {MessageLens, RoutingResult} from "../lenses";
 
-type Lenses<TMessage extends HttpMessage, T> = { [K in keyof T]: MessageLens<TMessage, T[K]> };
+export type Lenses<TMessage extends HttpMessage, T extends object> = { [K in keyof T]: MessageLens<TMessage, T[K]> };
 
 export class NamedLenses<TMessage extends HttpMessage, T> implements MessageLens<TMessage, T> {
   constructor(private readonly lenses: Lenses<TMessage, T>) {

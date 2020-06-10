@@ -12,6 +12,7 @@ export class PathLens<T> implements RequestLens<T> {
   async get(request: HttpRequest): Promise<RoutingResult<T>> {
     const result = await this.path.consume(uri(request).path);
 
+    console.log(result);
     return isSuccess(result)
       ? stripSlashes(result.value.remaining).length === 0
         ? success(result.value.value)

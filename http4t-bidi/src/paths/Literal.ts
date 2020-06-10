@@ -1,7 +1,7 @@
 import {stripSlashes} from "@http4t/core/uri";
 import {map} from "@http4t/result";
 import {ConsumeUntil} from "./ConsumeUntil";
-import {PathResult, PathMatcher} from "./PathMatcher";
+import {PathMatcher, PathResult} from "./PathMatcher";
 
 /**
  * PathMatcher that consumes {text} from a uri path
@@ -34,11 +34,7 @@ export class Literal implements PathMatcher<undefined> {
 
   consume(path: string): PathResult<undefined> {
     const result = this.base.consume(path);
-    return map(result,
-      value => ({
-        ...value,
-        value: undefined
-      }))
+    return map(result, value => ({...value, value: undefined }))
   }
 
   expand(value: undefined): string {
