@@ -4,7 +4,7 @@ import {MessageLens, RoutingResult} from "../lenses";
 
 export type Lenses<TMessage extends HttpMessage, T extends object> = { [K in keyof T]: MessageLens<TMessage, T[K]> };
 
-export class NamedLenses<TMessage extends HttpMessage, T> implements MessageLens<TMessage, T> {
+export class NamedLenses<TMessage extends HttpMessage, T extends object> implements MessageLens<TMessage, T> {
   constructor(private readonly lenses: Lenses<TMessage, T>) {
   }
 
@@ -31,6 +31,6 @@ export class NamedLenses<TMessage extends HttpMessage, T> implements MessageLens
   }
 }
 
-export function named<TMessage extends HttpMessage, T>(lenses: Lenses<TMessage, T>): MessageLens<TMessage, T> {
+export function named<TMessage extends HttpMessage, T extends object>(lenses: Lenses<TMessage, T>): MessageLens<TMessage, T> {
   return new NamedLenses(lenses);
 }

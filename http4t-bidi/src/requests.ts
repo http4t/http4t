@@ -8,13 +8,13 @@ import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
 
 export type PathLike<TPath = undefined> = RequestLens<TPath> | PathMatcher<TPath> | string
 
-export function request<TPath = undefined>(method: Method, path: PathLike<TPath>): RequestLens<TPath>;
-export function request<TPath = undefined, TBody = unknown>(
+export function request<TPath extends object>(method: Method, path: PathLike<TPath>): RequestLens<TPath>;
+export function request<TPath extends object, TBody = unknown>(
   method: Method,
   path: PathLike<TPath>,
   body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<TPath & TBody>;
 
-export function request<TPath, TBody = undefined>(
+export function request<TPath extends object, TBody extends object>(
   method: Method,
   pathLike: PathLike<TPath>,
   body?: RequestLens<TBody> | MessageLens<HttpMessage, TBody>
@@ -30,6 +30,7 @@ export function request<TPath, TBody = undefined>(
   const methodAndPath = new IntersectionLens(
     new MethodLens(method),
     path);
+
   return body
     ? new IntersectionLens(methodAndPath, body as RequestLens<TBody>)
     : methodAndPath;
