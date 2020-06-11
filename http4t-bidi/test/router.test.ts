@@ -5,7 +5,7 @@ import {routeFailed, wrongRoute} from "../src/lenses";
 import {alwaysFail} from "../src/lenses/AlwaysFailLens";
 import {empty} from "../src/lenses/EmptyLens";
 import {json} from "../src/lenses/JsonLens";
-import {request} from "../src/requests";
+import {$request} from "../src/requests";
 import {buildRouter} from "../src/router";
 import {route} from "../src/routes";
 
@@ -13,7 +13,7 @@ describe('Server', () => {
   it('matches route and calls handler', async () => {
     const routes = {
       example: route(
-        request('GET', "/some/path"),
+        $request('GET', "/some/path"),
         json<string>()
       )
     };
@@ -32,7 +32,7 @@ describe('Server', () => {
   it('ignores trailing slashes in url', async () => {
     const routes = {
       example: route(
-        request('GET', "/some/path"),
+        $request('GET', "/some/path"),
         json<string>()
       )
     };
@@ -51,7 +51,7 @@ describe('Server', () => {
   it('404 on match failure', async () => {
     const routes = {
       example: route(
-        request('GET', "/some/path"),
+        $request('GET', "/some/path"),
         json<string>()
       )
     };

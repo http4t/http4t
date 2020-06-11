@@ -15,6 +15,8 @@ export class NamedLenses<TMessage extends HttpMessage, T extends object> impleme
 
       const result: RoutingResult<any> = await (lens as MessageLens<any, TMessage>).get(output);
 
+      // you only get one lens failure (the first lens failure)
+      // and it's hard to debug which lens failed
       if (isFailure(result)) {
         return result;
       }

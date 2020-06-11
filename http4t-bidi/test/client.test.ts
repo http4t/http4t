@@ -7,7 +7,7 @@ import {json} from "../src/lenses/JsonLens";
 import {named} from "../src/lenses/NamedLenses";
 import {path} from "../src/paths";
 import {v, VariablePaths} from "../src/paths/variables";
-import {request} from "../src/requests";
+import {$request} from "../src/requests";
 import {buildRouter} from "../src/router";
 import {route, Routes} from "../src/routes";
 
@@ -27,7 +27,7 @@ describe('Client', () => {
 
     const routes: Routes<Api> = {
       example: route(
-        request('GET', "/some/path"),
+        $request('GET', "/some/path"),
         json()
       )
     };
@@ -48,7 +48,7 @@ describe('Client', () => {
     }
     const routes: Routes<Api> = {
       example: route(
-        request('GET', "/"),
+        $request('GET', "/"),
         json()
       )
     };
@@ -79,13 +79,13 @@ describe('Client', () => {
 
     const routes: Routes<Api> = {
       userAccounts: route(
-        request('GET', path({
+        $request('GET', path({
           username: v.segment
         }, v => ["accounts/", v.username])),
         json<UserAccounts>()
       ),
       createAccount: route(
-        request(
+        $request(
           'POST',
           path({username: v.segment}, v => ["accounts/", v.username]),
           named({account: json<Account, HttpRequest>()})),
@@ -135,7 +135,7 @@ describe('Client', () => {
 
     const routes: Routes<Example> = {
       example: route(
-        request('GET', path(paths, v => ["prefix", v.path])),
+        $request('GET', path(paths, v => ["prefix", v.path])),
         json<Vars>()
       )
     };
@@ -154,7 +154,7 @@ describe('Client', () => {
   it('throws ResultError on response lens failure', async () => {
     const routes = {
       example: route(
-        request('GET', "/some/path"),
+        $request('GET', "/some/path"),
         json<any>()
       )
     };

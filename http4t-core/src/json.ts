@@ -1,22 +1,26 @@
 import {bufferText} from "./bodies";
-import {HttpBody, Data, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./contract";
+import {Data, HttpBody, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./contract";
 import {modify} from "./util/objects";
 
 async function* yieldStringify(data: object): AsyncIterable<Data> {
-  yield typeof data ==='undefined' ? "" : JSON.stringify(data)
+    yield typeof data === 'undefined' ? "" : JSON.stringify(data)
 }
 
 export class JsonBody<T = any> implements AsyncIterable<Data> {
-  constructor(public readonly data: Readonly<T>) {
-  }
 
-  [Symbol.asyncIterator](): AsyncIterator<Data> {
-    return yieldStringify(this.data)[Symbol.asyncIterator]();
-  }
+    public readonly ifYouAreSeeingThisInATestAssertion =
+        "You probably forgot to call toJSON(message) on your HttpMessage, which would have called Symbol.asyncIterator on this body";
 
-  toJSON() {
-    return this.data;
-  }
+    constructor(public readonly data: Readonly<T>) {
+    }
+
+    [Symbol.asyncIterator](): AsyncIterator<Data> {
+        return yieldStringify(this.data)[Symbol.asyncIterator]();
+    }
+
+    toJSON() {
+        return this.data;
+    }
 }
 
 /**
@@ -28,7 +32,7 @@ export class JsonBody<T = any> implements AsyncIterable<Data> {
  * parse body, make changes, then stringify the result between each step.
  */
 export function jsonBody<T>(data: T): JsonBody<T> {
-  return new JsonBody(data);
+    return new JsonBody(data);
 }
 
 export async function bodyJson<T>(body: HttpBody): Promise<T>;
@@ -42,12 +46,12 @@ export async function bodyJson<T>(message: HttpMessage): Promise<T>;
  * Use the parseJson function
  */
 export async function bodyJson<T>(value: HttpBody | HttpMessage): Promise<T | undefined> {
-  const body = isMessage(value) ? value.body : value;
-  if (body instanceof JsonBody)
-    return body.data;
-  const text = await bufferText(body);
-  if(text === "") return undefined;
-  return JSON.parse(text);
+    const body = isMessage(value) ? value.body : value;
+    if (body instanceof JsonBody)
+        return body.data;
+    const text = await bufferText(body);
+    if (text === "") return undefined;
+    return JSON.parse(text);
 }
 
 /**
@@ -57,9 +61,9 @@ export async function bodyJson<T>(value: HttpBody | HttpMessage): Promise<T | un
  * No-op if message.body is already JsonBody.
  */
 export async function parseJson<T extends HttpRequest | HttpResponse>(message: T): Promise<T> {
-  if (message.body instanceof JsonBody)
-    return message;
+    if (message.body instanceof JsonBody)
+        return message;
 
-  const parsed = bodyJson(message.body);
-  return modify(message, {body: jsonBody(parsed)} as any);
+    const parsed = bodyJson(message.body);
+    return modify(message, {body: jsonBody(parsed)} as any);
 }
