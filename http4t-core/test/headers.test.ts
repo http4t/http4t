@@ -1,6 +1,6 @@
 import {expect} from 'chai';
-import {header, setHeader} from "../src/headers";
-import {appendHeader, removeHeaders, updateHeaders} from "../src/messages";
+import {header} from "../src/headers";
+import {appendHeader, removeHeaders, setHeader, updateHeaders} from "../src/messages";
 import {request} from "../src/requests";
 
 describe("header()", () => {
@@ -12,20 +12,20 @@ describe("header()", () => {
 
 describe('setHeader()', () => {
     it('works with empty array', async () => {
-        expect(setHeader([], header('header-name', 'value')))
+        expect(setHeader(request("GET", "/"), 'header-name', 'value').headers)
             .deep.eq([['header-name', 'value']])
     });
 
     it('deletes old header value', async () => {
-        expect(setHeader([
+        expect(setHeader(request("GET", "/", "",
             header('unchanged', 'first'),
             header('header-name', 'old value'),
-            header('unchanged', 'second')], header('header-name', 'new value')))
+            header('unchanged', 'second')), 'header-name', 'new value').headers)
             .deep.eq([['unchanged', 'first'], ['unchanged', 'second'], ['header-name', 'new value']])
     });
 
     it('is case insensitive', async () => {
-        expect(setHeader([header('header-name', 'old value')], header('Header-Name', 'value')))
+        expect(setHeader(request("GET", "/", "", header('header-name', 'old value')), 'Header-Name', 'value').headers)
             .deep.eq([['Header-Name', 'value']])
     });
 });
