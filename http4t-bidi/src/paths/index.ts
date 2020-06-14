@@ -18,14 +18,14 @@ export function path<A, B, C, D, E>(a: PathMatcher<A>, b: PathMatcher<B>, c: Pat
 export function path<T extends object>(...segments: PathMatcher<T>[]): PathMatcher<T>;
 
 export function path<T extends object>(
-  first: string | VariablePaths<T> | PathMatcher<T>,
-  second?: SegmentsFn<T> | PathMatcher<T>,
-  ...rest: PathMatcher<T>[])
-  : PathMatcher<T> | PathMatcher<undefined> {
+    first: string | VariablePaths<T> | PathMatcher<T>,
+    second?: SegmentsFn<T> | PathMatcher<T>,
+    ...rest: PathMatcher<T>[])
+    : PathMatcher<T> | PathMatcher<undefined> {
 
-  if (typeof first === "string") return literal(first);
-  if (typeof second === "function") return variablesPath(first as VariablePaths<T>, second);
-  return join<T>(first as PathMatcher<T>, second as PathMatcher<T>, ...rest as PathMatcher<T>[]);
+    if (typeof first === "string") return literal(first);
+    if (typeof second === "function") return variablesPath(first as VariablePaths<T>, second);
+    return join<T>(first as PathMatcher<T>, second as PathMatcher<T>, ...rest as PathMatcher<T>[]);
 }
 
 

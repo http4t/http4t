@@ -19,29 +19,29 @@ import {PathMatcher, PathResult} from "./PathMatcher";
  * ```
  */
 export class Literal implements PathMatcher<undefined> {
-  private readonly strippedText: string;
-  private readonly base: ConsumeUntil;
+    private readonly strippedText: string;
+    private readonly base: ConsumeUntil;
 
-  constructor(private readonly text: string) {
-    this.strippedText = stripSlashes(text);
+    constructor(private readonly text: string) {
+        this.strippedText = stripSlashes(text);
 
-    const consumer = (path: string) => path.startsWith(this.strippedText)
-      ? this.strippedText.length
-      : -1;
+        const consumer = (path: string) => path.startsWith(this.strippedText)
+            ? this.strippedText.length
+            : -1;
 
-    this.base = new ConsumeUntil(consumer);
-  }
+        this.base = new ConsumeUntil(consumer);
+    }
 
-  consume(path: string): PathResult<undefined> {
-    const result = this.base.consume(path);
-    return map(result, value => ({...value, value: undefined }))
-  }
+    consume(path: string): PathResult<undefined> {
+        const result = this.base.consume(path);
+        return map(result, value => ({...value, value: undefined}))
+    }
 
-  expand(value: undefined): string {
-    return this.text;
-  }
+    expand(value: undefined): string {
+        return this.text;
+    }
 }
 
 export function literal(text: string): PathMatcher<undefined> {
-  return new Literal(text);
+    return new Literal(text);
 }

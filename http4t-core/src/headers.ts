@@ -22,7 +22,7 @@ export function getHeaderValues(headers: readonly Header[], name: HeaderName): H
 
     const lowerCaseName = name.toLowerCase();
     return headers.filter(([name, value]) => name.toLowerCase() === lowerCaseName)
-            .map(([name, value]) => value)
+        .map(([name, value]) => value)
 }
 
 /**
@@ -35,9 +35,9 @@ export function setHeader(headers: readonly Header[], header: Header): readonly 
     return [...headers.filter(([name]) => name.toLowerCase() !== lowerCaseName), header];
 }
 
-export function updateHeaders(headers: readonly Header[], name: HeaderName, f: (value: HeaderValue)=> HeaderValue): readonly Header[] {
+export function updateHeaders(headers: readonly Header[], name: HeaderName, f: (value: HeaderValue) => HeaderValue): readonly Header[] {
     const lowerCaseName = name.toLowerCase();
-    return headers.map(([name, value]) =>  (name.toLowerCase() === lowerCaseName) ? [name, f(value)] : [name, value] );
+    return headers.map(([name, value]) => (name.toLowerCase() === lowerCaseName) ? [name, f(value)] : [name, value]);
 }
 
 export function removeHeader(headers: readonly Header[], name: HeaderName): readonly Header[] {

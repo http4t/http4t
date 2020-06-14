@@ -10,31 +10,31 @@ import {PostgresTransactionPool} from "../src/TransactionPool";
 import {testDatabase} from "./db";
 
 describe('probe', function () {
-  this.timeout(2000);
+    this.timeout(2000);
 
-  let router: HttpHandler & Closeable;
-  let server: ServerHandler;
-  let client: Api;
+    let router: HttpHandler & Closeable;
+    let server: ServerHandler;
+    let client: Api;
 
-  before(async () => {
-    router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
-    server = new ServerHandler(router);
-    client = buildClient(routes, server)
-  });
+    before(async () => {
+        router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
+        server = new ServerHandler(router);
+        client = buildClient(routes, server)
+    });
 
-  after(async () => {
-    console.log("Closing...");
-    await server.close();
-    console.log("Server closed");
-    await router.close();
-    console.log("Transaction pool closed");
-  });
+    after(async () => {
+        console.log("Closing...");
+        await server.close();
+        console.log("Server closed");
+        await router.close();
+        console.log("Transaction pool closed");
+    });
 
-  it('ready', async () => {
-    expect(await client.ready()).eq(undefined);
-  });
+    it('ready', async () => {
+        expect(await client.ready()).eq(undefined);
+    });
 
-  it('live', async () => {
-    expect(await client.live()).eq(undefined);
-  });
+    it('live', async () => {
+        expect(await client.live()).eq(undefined);
+    });
 });

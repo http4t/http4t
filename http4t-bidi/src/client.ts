@@ -9,38 +9,38 @@ import {HandlerFn, RouteFor, Routes, ValidApi} from "./routes";
  * or throws `ResultError` if the result is a failure.
  */
 function validator<T>(
-  lens: ResponseLens<T>):
-  (message: HttpResponse) => Promise<T> {
+    lens: ResponseLens<T>):
+    (message: HttpResponse) => Promise<T> {
 
-  return async (response: HttpResponse): Promise<T> => {
-    const result = await lens.get(response);
-    if (isFailure(result))
-      throw {message: result.error.message, response};
-    return result.value;
-  }
+    return async (response: HttpResponse): Promise<T> => {
+        const result = await lens.get(response);
+        if (isFailure(result))
+            throw {message: result.error.message, response};
+        return result.value;
+    }
 }
 
 export function routeClient<T extends HandlerFn>(
-  route: RouteFor<T>,
-  http: HttpHandler)
-  : T {
+    route: RouteFor<T>,
+    http: HttpHandler)
+    : T {
 
-  const f = async (value: any): Promise<any> => {
-    return await route.request.set(get("/"), value)
-      .then(http.handle)
-      .then(validator(route.response));
-  };
+    const f = async (value: any): Promise<any> => {
+        return await route.request.set(get("/"), value)
+            .then(http.handle)
+            .then(validator(route.response));
+    };
 
-  return f as any;
+    return f as any;
 }
 
 export function buildClient<T extends ValidApi>(
-  routes: Routes<T>,
-  http: HttpHandler): T {
-  return Object.entries(routes)
-    .reduce((acc, [key, route]) => {
-        acc[key as keyof T] = routeClient(route, http) as any;
-        return acc;
-      },
-      {} as T);
+    routes: Routes<T>,
+    http: HttpHandler): T {
+    return Object.entries(routes)
+        .reduce((acc, [key, route]) => {
+                acc[key as keyof T] = routeClient(route, http) as any;
+                return acc;
+            },
+            {} as T);
 }

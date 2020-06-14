@@ -10,28 +10,28 @@ export type PathLike<TPath = undefined> = RequestLens<TPath> | PathMatcher<TPath
 
 export function $request<TPath extends object>(method: Method, path: PathLike<TPath>): RequestLens<TPath>;
 export function $request<TPath extends object, TBody = unknown>(
-  method: Method,
-  path: PathLike<TPath>,
-  body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<TPath & TBody>;
+    method: Method,
+    path: PathLike<TPath>,
+    body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<TPath & TBody>;
 
 export function $request<TPath extends object, TBody extends object>(
-  method: Method,
-  pathLike: PathLike<TPath>,
-  body?: RequestLens<TBody> | MessageLens<HttpMessage, TBody>
+    method: Method,
+    pathLike: PathLike<TPath>,
+    body?: RequestLens<TBody> | MessageLens<HttpMessage, TBody>
 ): RequestLens<TPath> | RequestLens<TPath & TBody> {
 
-  const path: RequestLens<TPath> =
-    typeof pathLike === 'string'
-      ? new PathLens(literal(pathLike)) as any as PathLens<TPath>
-      : isPathMatcher(pathLike)
-      ? new PathLens(pathLike)
-      : pathLike;
+    const path: RequestLens<TPath> =
+        typeof pathLike === 'string'
+            ? new PathLens(literal(pathLike)) as any as PathLens<TPath>
+            : isPathMatcher(pathLike)
+            ? new PathLens(pathLike)
+            : pathLike;
 
-  const methodAndPath = new IntersectionLens(
-    new MethodLens(method),
-    path);
+    const methodAndPath = new IntersectionLens(
+        new MethodLens(method),
+        path);
 
-  return body
-    ? new IntersectionLens(methodAndPath, body as RequestLens<TBody>)
-    : methodAndPath;
+    return body
+        ? new IntersectionLens(methodAndPath, body as RequestLens<TBody>)
+        : methodAndPath;
 }

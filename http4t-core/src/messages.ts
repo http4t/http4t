@@ -9,23 +9,23 @@ import {bufferText} from "./bodies";
 * while headers themselves can have any casing they like and we preserve it.
 * */
 export function setHeader<T extends HttpMessage>(message: T, name: HeaderName, value: HeaderValue): T {
-  return modify(message, {headers: h.setHeader(message.headers, header(name, value))} as Partial<T>);
+    return modify(message, {headers: h.setHeader(message.headers, header(name, value))} as Partial<T>);
 }
 
 export function appendHeader<T extends HttpMessage>(message: T, name: HeaderName, value: HeaderValue): T {
-  return modify(message, {headers: [...message.headers, [name, value]]} as Partial<T>);
+    return modify(message, {headers: [...message.headers, [name, value]]} as Partial<T>);
 }
 
 export function removeHeaders<T extends HttpMessage>(message: T, name: HeaderName): T {
-  return modify(message, {headers: h.removeHeader(message.headers, name)} as Partial<T>);
+    return modify(message, {headers: h.removeHeader(message.headers, name)} as Partial<T>);
 }
 
-export function updateHeaders<T extends HttpMessage>(message: T, name: HeaderName, f: (value: HeaderValue)=> HeaderValue): T {
-  return modify(message, {headers: h.updateHeaders(message.headers, name, f)} as Partial<T>);
+export function updateHeaders<T extends HttpMessage>(message: T, name: HeaderName, f: (value: HeaderValue) => HeaderValue): T {
+    return modify(message, {headers: h.updateHeaders(message.headers, name, f)} as Partial<T>);
 }
 
 export function setBody<T extends HttpMessage>(message: T, body: HttpBody): T {
-  return modify(message, {body} as Partial<T>);
+    return modify(message, {body} as Partial<T>);
 }
 
 export function isResponse(message: HttpMessage): message is HttpResponse {

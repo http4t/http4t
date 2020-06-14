@@ -5,7 +5,7 @@ import {AlwaysFailLens} from "../../src/lenses/AlwaysFailLens";
 import {WrongRoute} from "../../src/lenses";
 
 describe("AlwaysFailLens", () => {
-    const error: Result<WrongRoute, never> = { error: {type: 'wrong-route', message: "wrong route"} };
+    const error: Result<WrongRoute, never> = {error: {type: 'wrong-route', message: "wrong route"}};
 
     it("always fails", async () => {
 

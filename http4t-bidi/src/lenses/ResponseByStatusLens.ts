@@ -7,27 +7,27 @@ export type ResponsesByStatus<T extends ByStatus> = { [K in keyof T]: ResponseLe
 export type MatchedResponse<T extends ByStatus, K extends keyof T = keyof T> = { status: K, value: T[K] };
 
 export class ResponseByStatusLens<T extends ByStatus> implements ResponseLens<MatchedResponse<T>> {
-  constructor(private readonly statuses: ResponsesByStatus<T>) {
-  }
+    constructor(private readonly statuses: ResponsesByStatus<T>) {
+    }
 
-  async get(message: HttpResponse): Promise<RoutingResult<MatchedResponse<T>>> {
-    if (!this.statuses.hasOwnProperty(message.status))
-      return wrongRoute(`Status was not in ${Object.keys(this.statuses)}`);
+    async get(message: HttpResponse): Promise<RoutingResult<MatchedResponse<T>>> {
+        if (!this.statuses.hasOwnProperty(message.status))
+            return wrongRoute(`Status was not in ${Object.keys(this.statuses)}`);
 
-    const result = await this.statuses[message.status].get(message);
-    return isSuccess(result)
-      ? success({status: message.status, value: result.value})
-      : result;
-  }
+        const result = await this.statuses[message.status].get(message);
+        return isSuccess(result)
+            ? success({status: message.status, value: result.value})
+            : result;
+    }
 
-  async set(into: HttpResponse, value: MatchedResponse<T>): Promise<HttpResponse> {
-    if (!this.statuses.hasOwnProperty(into.status))
-      throw new Error(`No lens for status ${value.status}`);
+    async set(into: HttpResponse, value: MatchedResponse<T>): Promise<HttpResponse> {
+        if (!this.statuses.hasOwnProperty(into.status))
+            throw new Error(`No lens for status ${value.status}`);
 
-    return this.statuses[value.status].set({...into, status: value.status as number}, value.value);
-  }
+        return this.statuses[value.status].set({...into, status: value.status as number}, value.value);
+    }
 }
 
 export function responses<T extends ByStatus>(byStatus: ResponsesByStatus<T>): ResponseByStatusLens<T> {
-  return new ResponseByStatusLens(byStatus);
+    return new ResponseByStatusLens(byStatus);
 }

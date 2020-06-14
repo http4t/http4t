@@ -5,7 +5,7 @@ import {startApp} from "./App";
 import {PostgresTransactionPool} from "./TransactionPool";
 
 (async function main() {
-  const router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
-  const server = new ServerHandler(router);
-  console.log('Running on port', (await server.url()).authority);
+    const router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
+    const server = new ServerHandler(router);
+    console.log('Running on port', (await server.url()).authority);
 })();

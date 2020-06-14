@@ -12,58 +12,58 @@ import {testDatabase} from "./db";
 import uuid = require("uuid");
 
 async function error(f: () => any): Promise<any> {
-  try {
-    await f();
-    return undefined
-  } catch (e) {
-    return e;
-  }
+    try {
+        await f();
+        return undefined
+    } catch (e) {
+        return e;
+    }
 }
 
 describe('store', function () {
-  this.timeout(2000);
+    this.timeout(2000);
 
-  let router: HttpHandler & Closeable;
-  let server: ServerHandler;
-  let client: Api;
+    let router: HttpHandler & Closeable;
+    let server: ServerHandler;
+    let client: Api;
 
-  before(async () => {
-    router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
-    server = new ServerHandler(router);
-    client = buildClient(routes, server)
-  });
-
-  after(async () => {
-    console.log("Closing...");
-    await server.close();
-    console.log("Server closed");
-    await router.close();
-    console.log("Transaction pool closed");
-  });
-
-  it('stores some json', async () => {
-    const request = {
-      id: uuid(),
-      document: {name: 'Tom'}
-    };
-
-    expect(await client.post(request)).deep.eq({id: request.id});
-
-    expect(await client.get({id: request.id})).deep.eq(request)
-  });
-
-  it('transactions roll back on error', async () => {
-    const request = {
-      id: uuid(),
-      document: {name: 'Should not be created'}
-    };
-
-    const e = await error(async () => await client.test(request));
-    expect(e).deep.eq({
-      message: "Status was not 200",
-      response: response(500, "{\"message\":\"Deliberate error\"}")
+    before(async () => {
+        router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
+        server = new ServerHandler(router);
+        client = buildClient(routes, server)
     });
 
-    expect(await client.get({id: request.id})).eq(undefined)
-  });
+    after(async () => {
+        console.log("Closing...");
+        await server.close();
+        console.log("Server closed");
+        await router.close();
+        console.log("Transaction pool closed");
+    });
+
+    it('stores some json', async () => {
+        const request = {
+            id: uuid(),
+            document: {name: 'Tom'}
+        };
+
+        expect(await client.post(request)).deep.eq({id: request.id});
+
+        expect(await client.get({id: request.id})).deep.eq(request)
+    });
+
+    it('transactions roll back on error', async () => {
+        const request = {
+            id: uuid(),
+            document: {name: 'Should not be created'}
+        };
+
+        const e = await error(async () => await client.test(request));
+        expect(e).deep.eq({
+            message: "Status was not 200",
+            response: response(500, "{\"message\":\"Deliberate error\"}")
+        });
+
+        expect(await client.get({id: request.id})).eq(undefined)
+    });
 });

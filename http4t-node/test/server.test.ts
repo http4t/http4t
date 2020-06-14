@@ -1,5 +1,4 @@
 import {Authority} from "@http4t/core/uri";
-import {assert} from 'chai';
 import {runningInNode} from "./client.test";
 import {Server} from "@http4t/core/server";
 import {BinHandler} from "@http4t/core/bin";
@@ -31,12 +30,12 @@ describe("ServerHandler", function () {
     }
 
     handlerContract(async () => {
-        if (!runningInNode()) throw new Error("Unsupported");
+            if (!runningInNode()) throw new Error("Unsupported");
 
-        const {ClientHandler} = await import('../src/client');
-        return new ClientHandler();
-    },
-      runningInNode() ? host() : null as any);
+            const {ClientHandler} = await import('../src/client');
+            return new ClientHandler();
+        },
+        runningInNode() ? host() : null as any);
 
     after(async function () {
         try {

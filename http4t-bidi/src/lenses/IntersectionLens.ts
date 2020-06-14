@@ -3,26 +3,26 @@ import {isFailure, success} from "@http4t/result";
 import {MessageLens, RoutingResult} from "../lenses";
 
 export class IntersectionLens<TMessage extends HttpMessage, A extends object | undefined, B extends object | undefined> implements MessageLens<TMessage, A & B> {
-  constructor(private readonly a: MessageLens<TMessage, A>,
-              private readonly b: MessageLens<TMessage, B>) {
-  }
-
-  async get(message: TMessage): Promise<RoutingResult<A & B>> {
-    const aResult = await this.a.get(message);
-
-    if (isFailure(aResult)) {
-      return aResult;
+    constructor(private readonly a: MessageLens<TMessage, A>,
+                private readonly b: MessageLens<TMessage, B>) {
     }
 
-    const bResult = await this.b.get(message);
-    if (isFailure(bResult)) {
-      return bResult;
+    async get(message: TMessage): Promise<RoutingResult<A & B>> {
+        const aResult = await this.a.get(message);
+
+        if (isFailure(aResult)) {
+            return aResult;
+        }
+
+        const bResult = await this.b.get(message);
+        if (isFailure(bResult)) {
+            return bResult;
+        }
+
+        return success(aResult.value === undefined && bResult.value === undefined ? undefined as any : {...aResult.value, ...bResult.value});
     }
 
-    return success(aResult.value === undefined && bResult.value === undefined ? undefined as any : {...aResult.value, ...bResult.value});
-  }
-
-  async set(into: TMessage, value: A & B): Promise<TMessage> {
-    return this.b.set(await this.a.set(into, value), value);
-  }
+    async set(into: TMessage, value: A & B): Promise<TMessage> {
+        return this.b.set(await this.a.set(into, value), value);
+    }
 }

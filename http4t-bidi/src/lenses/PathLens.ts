@@ -6,22 +6,22 @@ import {RequestLens, RoutingResult, wrongRoute} from "../lenses";
 import {PathMatcher} from "../paths/PathMatcher";
 
 export class PathLens<T> implements RequestLens<T> {
-  constructor(private readonly path: PathMatcher<T>) {
-  }
+    constructor(private readonly path: PathMatcher<T>) {
+    }
 
-  async get(request: HttpRequest): Promise<RoutingResult<T>> {
-    const result = await this.path.consume(uri(request).path);
+    async get(request: HttpRequest): Promise<RoutingResult<T>> {
+        const result = await this.path.consume(uri(request).path);
 
-    return isSuccess(result)
-      ? stripSlashes(result.value.remaining).length === 0
-        ? success(result.value.value)
-        : wrongRoute(`Did not match full path. Remaining path: "${result.value.remaining}"`)
-      : wrongRoute(`${result.error.message}. Remaining path: "${result.error.remaining}"`);
-  }
+        return isSuccess(result)
+            ? stripSlashes(result.value.remaining).length === 0
+                ? success(result.value.value)
+                : wrongRoute(`Did not match full path. Remaining path: "${result.value.remaining}"`)
+            : wrongRoute(`${result.error.message}. Remaining path: "${result.error.remaining}"`);
+    }
 
-  async set(into: HttpRequest, value: T): Promise<HttpRequest> {
-    const path = await this.path.expand(value);
-    return {...into, uri: {...uri(into), path}};
-  }
+    async set(into: HttpRequest, value: T): Promise<HttpRequest> {
+        const path = await this.path.expand(value);
+        return {...into, uri: {...uri(into), path}};
+    }
 
 }

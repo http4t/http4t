@@ -13,9 +13,9 @@ import {failure, Failure, Result} from "@http4t/result";
  * read the values out.
  */
 export interface PolymorphicLens<Source, SourceAfterInjection, InjectedValue, ExtractedValue> {
-  get(from: Source): ExtractedValue;
+    get(from: Source): ExtractedValue;
 
-  set(into: Source, value: InjectedValue): SourceAfterInjection;
+    set(into: Source, value: InjectedValue): SourceAfterInjection;
 }
 
 export type WrongRoute = { type: "wrong-route", message: string };
@@ -24,18 +24,18 @@ export type RoutingError = WrongRoute | RouteFailed;
 export type RoutingResult<T> = Result<RoutingError, T>;
 
 export function wrongRoute(message: string): Failure<RoutingError> {
-  return failure({type: "wrong-route", message});
+    return failure({type: "wrong-route", message});
 }
 
 export function routeFailed(message: string, response: HttpResponse = responses.response(400)): Failure<RoutingError> {
-  return failure({type: "route-failed", message, response});
+    return failure({type: "route-failed", message, response});
 }
 
 /**
  * Serializes/deserializes a value into/out of a message
  */
 export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown>
-  extends PolymorphicLens<TMessage, Promise<TMessage>, T, Promise<RoutingResult<T>>> {
+    extends PolymorphicLens<TMessage, Promise<TMessage>, T, Promise<RoutingResult<T>>> {
 }
 
 export interface RequestLens<T> extends MessageLens<HttpRequest, T> {
