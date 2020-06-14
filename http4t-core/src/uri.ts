@@ -57,6 +57,13 @@ export class Uri implements ParsedUri {
   }
 }
 
+export type QueryLike = string | undefined;
+export function appendQuery(query: string | undefined, name: string, value: QueryLike): string {
+  const pair = typeof value === 'undefined' ? encodeURIComponent(name) : [name, value].map(it => encodeURIComponent(it.toString())).join("=");
+  if (typeof query === 'undefined' || query.length === 0) return pair;
+  return `${query}&${pair}`
+}
+
 export class Authority implements ParsedAuthority {
   readonly user?: string;
   readonly host: string;
