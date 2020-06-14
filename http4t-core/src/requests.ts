@@ -1,6 +1,13 @@
 import {Header, HttpBody, HttpRequest, Method, ParsedAuthority} from "./contract";
 import {getHeaderValue} from "./headers";
-import {appendQuery as uriSetQuery, Authority, Uri, UriLike} from "./uri";
+import {
+  appendQueries as uriAppendQueries,
+  appendQuery as uriAppendQuery,
+  Authority,
+  QueryValue,
+  Uri,
+  UriLike
+} from "./uri";
 import {modify} from "./util/objects";
 
 export function request(method: Method, uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
@@ -32,9 +39,14 @@ export function delete_(uri: UriLike | string, ...headers: Header[]): HttpReques
   return request("DELETE", uri, undefined, ...headers);
 }
 
+export function appendQueries(message: HttpRequest, queries: { [key: string]: QueryValue }): HttpRequest {
+    const query = message.uri.query;
+    return modify(message, {uri: modify(message.uri, {query: uriAppendQueries(query, queries)})})
+}
+
 export function appendQuery(message: HttpRequest, name: string, value: string|undefined): HttpRequest {
   const query = message.uri.query;
-  return modify(message, {uri: modify(message.uri, {query: uriSetQuery(query, name, value)})})
+  return modify(message, {uri: modify(message.uri, {query: uriAppendQuery(query, name, value)})})
 }
 
 export function authority(request: HttpRequest): ParsedAuthority {

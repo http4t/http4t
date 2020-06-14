@@ -57,11 +57,21 @@ export class Uri implements ParsedUri {
   }
 }
 
-export type QueryLike = string | undefined;
-export function appendQuery(query: string | undefined, name: string, value: QueryLike): string {
-  const pair = typeof value === 'undefined' ? encodeURIComponent(name) : [name, value].map(it => encodeURIComponent(it.toString())).join("=");
-  if (typeof query === 'undefined' || query.length === 0) return pair;
-  return `${query}&${pair}`
+export type QueryValue = (string|undefined)[] | string | undefined;
+export function queryPair(name:string,value:string|undefined):string {
+  return typeof value ==='undefined'?encodeURIComponent(name):[name, value].map(it => encodeURIComponent(it.toString())).join("=");
+}
+export function appendQuery(query: string | undefined, name: string, value: QueryValue): string {
+  const nameValues = Array.isArray(value)
+      ? value.map(value=>queryPair(name,value)).join("&")
+      : queryPair(name,value);
+  if (typeof query === 'undefined' || query.length === 0) return nameValues;
+  return `${query}&${nameValues}`
+}
+export function appendQueries(query: string | undefined, queries: { [key: string]: QueryValue }): string | undefined {
+  return Object.entries(queries).reduce((acc, [name, value]) => {
+    return appendQuery(acc, name, value)
+  }, query)
 }
 
 export class Authority implements ParsedAuthority {
