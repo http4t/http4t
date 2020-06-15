@@ -1,4 +1,4 @@
-export type DecodedPair = [string, string | null];
+export type DecodedPair = [string, string | undefined];
 
 export function decode(value: string): string {
     return decodeURIComponent(value.replace('+', ' '));
@@ -8,28 +8,29 @@ export function encode(value: string): string {
     return encodeURIComponent(value).replace('%20', '+');
 }
 
-export function parsePair(pair: string): DecodedPair {
+export function decodePair(pair: string): DecodedPair {
     const [name, value] = pair.split('=');
-    const decoded = pair.indexOf('=') < 0 ? null : decode(value);
+    const decoded = pair.indexOf('=') < 0 ? undefined : decode(value);
     return [decode(name), decoded]
 }
 
-export function parse(value: string): DecodedPair[] {
+export function decodePairs(value: string | undefined): DecodedPair[] {
+    if(typeof value === "undefined") return [];
     return value
         .split('&')
-        .map(p => parsePair(p));
+        .map(p => decodePair(p));
 }
 
-export function unparsePair([name, value]: DecodedPair): string {
-    const encodedValue = value === null
+export function encodePair([name, value]: DecodedPair): string {
+    const encodedValue = value === undefined
         ? ""
         : `=${encode(value)}`;
 
     return `${encode(name)}${encodedValue}`
 }
 
-export function unparse(values: DecodedPair[]): string {
+export function encodePairs(values: DecodedPair[]): string {
     return values
-        .map(unparsePair)
+        .map(encodePair)
         .join('&');
 }

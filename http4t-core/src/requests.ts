@@ -1,10 +1,13 @@
 import {Header, HttpBody, HttpRequest, Method, ParsedAuthority} from "./contract";
 import {getHeaderValue} from "./headers";
 import {
-  appendQueries as uriAppendQueries,
-  appendQuery as uriAppendQuery,
+    appendQueries as uriAppendQueries,
+    appendQuery as uriAppendQuery, QueryValue,
+    setQueries as uriSetQueries,
+    setQuery as uriSetQuery
+} from "./queries";
+import {
   Authority,
-  QueryValue,
   Uri,
   UriLike
 } from "./uri";
@@ -44,9 +47,19 @@ export function appendQueries(message: HttpRequest, queries: { [key: string]: Qu
     return modify(message, {uri: modify(message.uri, {query: uriAppendQueries(query, queries)})})
 }
 
-export function appendQuery(message: HttpRequest, name: string, value: string | undefined): HttpRequest {
+export function appendQuery(message: HttpRequest, name: string, value: QueryValue): HttpRequest {
     const query = message.uri.query;
     return modify(message, {uri: modify(message.uri, {query: uriAppendQuery(query, name, value)})})
+}
+
+export function setQueries(message: HttpRequest, queries: { [key: string]: QueryValue }): HttpRequest {
+    const query = message.uri.query;
+    return modify(message, {uri: modify(message.uri, {query: uriSetQueries(query, queries)})})
+}
+
+export function setQuery(message: HttpRequest, name: string, value: string | undefined): HttpRequest {
+    const query = message.uri.query;
+    return modify(message, {uri: modify(message.uri, {query: uriSetQuery(query, name, value)})})
 }
 
 export function authority(request: HttpRequest): ParsedAuthority {

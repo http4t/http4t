@@ -1,9 +1,9 @@
 import {expect} from 'chai';
-import {DecodedPair, parse, unparse} from "../src/urlEncoding";
+import {DecodedPair, decodePairs, encodePairs} from "../src/urlEncoding";
 
 function checkParsing(value: string, expected: DecodedPair[]) {
-    expect(parse(value)).deep.eq(expected);
-    expect(unparse(expected)).eq(value);
+    expect(decodePairs(value)).deep.eq(expected);
+    expect(encodePairs(expected)).eq(value);
 }
 
 describe('parse() and unparse()', () => {
@@ -14,13 +14,18 @@ describe('parse() and unparse()', () => {
     });
     it('Supports multiple pairs', async () => {
         checkParsing(
-            'name=value&name=value&other-name=other-value&empty=&null',
-            [['name', 'value'], ['name', 'value'], ['other-name', 'other-value'], ['empty', ''], ['null', null]]);
+            'name=value&name=value&other-name=other-value&empty=&undefined',
+            [['name', 'value'], ['name', 'value'], ['other-name', 'other-value'], ['empty', ''], ['undefined', undefined]]);
     });
     it('Supports percent encoding', async () => {
         checkParsing(
             'name%C3%BC%40=value%C3%BC%40',
             [['nameü@', 'valueü@']]);
+    });
+    it('Supports percent encoding "+"', async () => {
+        checkParsing(
+            'name%2B=value%2B',
+            [['name+', 'value+']]);
     });
     it('Supports spaces', async () => {
         checkParsing(
@@ -34,6 +39,6 @@ describe('parse() and unparse()', () => {
     });
     it('Supports no value', async () => {
         checkParsing('name',
-            [['name', null]])
+            [['name', undefined]])
     });
 });
