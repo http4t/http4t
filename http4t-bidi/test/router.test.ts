@@ -2,7 +2,7 @@ import {bufferText} from "@http4t/core/bodies";
 import {get} from "@http4t/core/requests";
 import {expect} from 'chai';
 import {routeFailed, wrongRoute} from "../src/lenses";
-import {alwaysFail} from "../src/lenses/AlwaysFailLens";
+import {fail} from "../src/lenses/AlwaysFailLens";
 import {empty} from "../src/lenses/EmptyLens";
 import {json} from "../src/lenses/JsonLens";
 import {$request} from "../src/requests";
@@ -70,7 +70,7 @@ describe('Server', () => {
     it('short circuits if route fails with routeFailed("reason")', async () => {
         const routes = {
             fails: route(
-                alwaysFail(routeFailed("expected failure")),
+                fail(routeFailed("expected failure")),
                 empty()
             ),
             doesNotGetHit: route(empty(), empty())
@@ -87,7 +87,7 @@ describe('Server', () => {
     it('does not short circuit if a route fails with wrongRoute("reason")', async () => {
         const routes = {
             fails: route(
-                alwaysFail(wrongRoute("expected failure")),
+                fail(wrongRoute("expected failure")),
                 empty()
             ),
             getsHit: route(empty(), json<string>())
