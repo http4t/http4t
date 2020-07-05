@@ -1,4 +1,13 @@
-import {appendQueries, appendQuery, removeQuery, request, setQueries, setQuery, uriString} from "../src/requests";
+import {
+    appendQueries,
+    appendQuery,
+    removeQueries,
+    removeQuery,
+    request,
+    setQueries,
+    setQuery,
+    uriString
+} from "../src/requests";
 import {expect} from 'chai';
 
 describe("appendQuery()", () => {
@@ -75,6 +84,28 @@ describe('removeQuery()', () => {
     });
     it("removes a load of queries at once and retains others", () => {
         const query = removeQuery(request("GET", "/?shouldBeRemoved=first&shouldBeRemoved=second&shouldNotBeRemoved"), "shouldBeRemoved");
+        expect(uriString(query)).to.eq("/?shouldNotBeRemoved");
+    });
+});
+
+describe('removeQueries()', () => {
+    it("removes a single query", () => {
+        const query = removeQueries(request("GET", "/?shouldBeRemoved1=value&shouldBeRemoved2=value"),
+            "shouldBeRemoved1",
+            "shouldBeRemoved2",
+            "shouldAlsoBeRemovedButIsntInQuery");
+        expect(uriString(query)).to.eq("/");
+    });
+    it("removes a load of queries at once", () => {
+        const query = removeQueries(request("GET", "/?shouldBeRemoved1=first&shouldBeRemoved1=second&shouldBeRemoved2"),
+            "shouldBeRemoved1",
+            "shouldBeRemoved2");
+        expect(uriString(query)).to.eq("/");
+    });
+    it("removes a load of queries at once and retains others", () => {
+        const query = removeQueries(request("GET", "/?shouldBeRemoved1=first&shouldBeRemoved2=second&shouldNotBeRemoved"),
+            "shouldBeRemoved1",
+            "shouldBeRemoved2");
         expect(uriString(query)).to.eq("/?shouldNotBeRemoved");
     });
 });

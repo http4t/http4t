@@ -38,6 +38,10 @@ export function removeQuery(query: string | undefined, name: string): string | u
     return encodePairs(filtered)
 }
 
+export function removeQueries(query: string | undefined, ...names: string[]): string | undefined {
+    return names.reduce((result, name) => removeQuery(result, name), query)
+}
+
 export function setQuery(query: string | undefined, name: string, value: QueryValue): string {
     return appendQuery(removeQuery(query, name), name, value);
 }
