@@ -52,3 +52,11 @@ export function setQueries(query: string | undefined, queries: { [key: string]: 
         .filter(([name]) => !existingKeys.has(name));
     return appendQueries(encodePairs(filtered), queries);
 }
+
+export function query(query: string | undefined, name: string): string | undefined {
+    return decodePairs(query).find(([n]) => n === name)?.[1];
+}
+
+export function queries(query: string | undefined, name: string): (string | undefined)[] {
+    return decodePairs(query).filter(([n]) => n === name).map(([n, v]) => v);
+}

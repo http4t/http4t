@@ -1,6 +1,9 @@
+import {expect} from 'chai';
 import {
     appendQueries,
     appendQuery,
+    queries,
+    query,
     removeQueries,
     removeQuery,
     request,
@@ -8,7 +11,33 @@ import {
     setQuery,
     uriString
 } from "../src/requests";
-import {expect} from 'chai';
+
+describe('query()', () => {
+    it("gets a single value", () => {
+        expect(query(request("GET", "/?foo=bar"), "foo")).to.eq("bar");
+    });
+    it("gets the first value where many exist", () => {
+        expect(query(request("GET", "/?foo=first&foo=second"), "foo")).to.eq("first");
+    });
+    it("returns undefined if param does not exist", () => {
+        expect(query(request("GET", "/"), "foo")).to.eq(undefined);
+    });
+})
+
+describe('queries()', () => {
+    it("gets a single value", () => {
+        expect(queries(request("GET", "/?foo=bar"), "foo")).deep.eq(["bar"]);
+    });
+    it("gets multiple values", () => {
+        expect(queries(request("GET", "/?foo=first&foo=second"), "foo")).deep.eq(["first", "second"]);
+    });
+    it("gets multiple values including undefined", () => {
+        expect(queries(request("GET", "/?foo=first&foo"), "foo")).deep.eq(["first", undefined]);
+    });
+    it("returns empty array if param does not exist", () => {
+        expect(queries(request("GET", "/"), "foo")).to.deep.eq([]);
+    });
+})
 
 describe("appendQuery()", () => {
 

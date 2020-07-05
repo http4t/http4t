@@ -6,7 +6,9 @@ import {
     setQueries as uriSetQueries,
     setQuery as uriSetQuery,
     removeQuery as uriRemoveQuery,
-    removeQueries as uriRemoveQueries
+    removeQueries as uriRemoveQueries,
+    query as uriQuery,
+    queries as uriQueries,
 } from "./queries";
 import {
   Authority,
@@ -42,6 +44,16 @@ export function patch(uri: UriLike, body?: HttpBody, ...headers: Header[]): Http
 
 export function delete_(uri: UriLike | string, ...headers: Header[]): HttpRequest {
     return request("DELETE", uri, undefined, ...headers);
+}
+
+export function query(message: HttpRequest, name: string): string | undefined {
+    const query = message.uri.query;
+    return uriQuery(query, name)
+}
+
+export function queries(message: HttpRequest, name:string): (string | undefined)[] {
+    const query = message.uri.query;
+    return uriQueries(query, name);
 }
 
 export function appendQueries(message: HttpRequest, queries: { [key: string]: QueryValue }): HttpRequest {
