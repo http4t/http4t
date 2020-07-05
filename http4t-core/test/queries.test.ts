@@ -1,4 +1,4 @@
-import {appendQueries, appendQuery, request, setQueries, setQuery, uriString} from "../src/requests";
+import {appendQueries, appendQuery, removeQuery, request, setQueries, setQuery, uriString} from "../src/requests";
 import {expect} from 'chai';
 
 describe("appendQuery()", () => {
@@ -61,5 +61,20 @@ describe('setQueries()', () => {
             "meh": "",
         });
         expect(uriString(query)).to.eq("/?na+me=tom&na+me=ma+tt&na+me&na+me=&existing=new_value&meh=");
+    });
+});
+
+describe('removeQuery()', () => {
+    it("removes a single query", () => {
+        const query = removeQuery(request("GET", "/?shouldBeRemoved=value"), "shouldBeRemoved");
+        expect(uriString(query)).to.eq("/");
+    });
+    it("removes a load of queries at once", () => {
+        const query = removeQuery(request("GET", "/?shouldBeRemoved=first&shouldBeRemoved=second"), "shouldBeRemoved");
+        expect(uriString(query)).to.eq("/");
+    });
+    it("removes a load of queries at once and retains others", () => {
+        const query = removeQuery(request("GET", "/?shouldBeRemoved=first&shouldBeRemoved=second&shouldNotBeRemoved"), "shouldBeRemoved");
+        expect(uriString(query)).to.eq("/?shouldNotBeRemoved");
     });
 });

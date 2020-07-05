@@ -9,7 +9,7 @@ async function* yieldStringify(data: object): AsyncIterable<Data> {
 export class JsonBody<T = any> implements AsyncIterable<Data> {
 
     public readonly ifYouAreSeeingThisInATestAssertion =
-        "You probably forgot to call toJSON(message) on your HttpMessage, which would have called Symbol.asyncIterator on this body";
+        "You probably forgot to call toJSON(message) on your HttpMessage, which would have called Symbol.asyncIterator on this body.";
 
     constructor(public readonly data: Readonly<T>) {
     }
@@ -25,7 +25,9 @@ export class JsonBody<T = any> implements AsyncIterable<Data> {
 
 /**
  * A JsonBody is an AsyncIterable<Data> (and is therefore a Body), which will lazily yield
- * JSON.stringify(data) when asked to stream, but also contains the original data without
+ * JSON.stringify(data) when asked to stream.
+ *
+ * But also contains the original data without
  * needing to be deserialised.
  *
  * This is useful when composing middlewares that would otherwise need to repeatedly

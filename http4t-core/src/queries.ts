@@ -20,7 +20,7 @@ export function expand([name, value]: QueryPair): DecodedPair[] {
 
 export function appendQuery(query: string | undefined, name: string, value: QueryValue): string {
     const newQuery = encodePairs(expand([name, value]));
-    if (typeof query === 'undefined' || query.length === 0) return newQuery;
+    if (typeof query === 'undefined' || query.length === 0) return newQuery as string;
     return `${query}&${newQuery}`
 }
 

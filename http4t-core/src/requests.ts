@@ -4,7 +4,8 @@ import {
     appendQueries as uriAppendQueries,
     appendQuery as uriAppendQuery, QueryValue,
     setQueries as uriSetQueries,
-    setQuery as uriSetQuery
+    setQuery as uriSetQuery,
+    removeQuery as uriRemoveQuery
 } from "./queries";
 import {
   Authority,
@@ -60,6 +61,11 @@ export function setQueries(message: HttpRequest, queries: { [key: string]: Query
 export function setQuery(message: HttpRequest, name: string, value: string | undefined): HttpRequest {
     const query = message.uri.query;
     return modify(message, {uri: modify(message.uri, {query: uriSetQuery(query, name, value)})})
+}
+
+export function removeQuery(message: HttpRequest, name: string): HttpRequest {
+    const query = message.uri.query;
+    return modify(message, {uri: modify(message.uri, {query: uriRemoveQuery(query, name)})})
 }
 
 export function authority(request: HttpRequest): ParsedAuthority {

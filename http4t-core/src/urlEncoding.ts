@@ -15,7 +15,7 @@ export function decodePair(pair: string): DecodedPair {
 }
 
 export function decodePairs(value: string | undefined): DecodedPair[] {
-    if(typeof value === "undefined") return [];
+    if (typeof value === "undefined") return [];
     return value
         .split('&')
         .map(p => decodePair(p));
@@ -29,7 +29,8 @@ export function encodePair([name, value]: DecodedPair): string {
     return `${encode(name)}${encodedValue}`
 }
 
-export function encodePairs(values: DecodedPair[]): string {
+export function encodePairs(values: DecodedPair[]): string | undefined {
+    if (values.length == 0) return undefined;
     return values
         .map(encodePair)
         .join('&');
