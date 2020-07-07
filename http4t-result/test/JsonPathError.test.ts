@@ -1,23 +1,31 @@
 import {expect} from 'chai';
-import {problem} from "../src/JsonPathResult";
 import {JsonPathError} from "../src/JsonPathError";
+import {problem} from "../src/JsonPathResult";
 
-describe('ResultError', () => {
+describe('JsonPathError', () => {
     it('fails with an AssertionError with expected, actual and showDiff=true', () => {
-        const actual = 'incorrect';
+        const actual = {a: "wrong value", b: ["ok", "not ok"]};
 
         const problems = [
-            problem("value was incorrect", []),
+            problem("first problem", ["a"]),
+            problem("second problem", ["b", 1]),
         ];
 
         const e = new JsonPathError(actual, problems, {leakActualValuesInError: true});
 
-        expect(e.message).contains('value was incorrect');
+        expect(e.message).contains('\n$.a: first problem');
+        expect(e.message).contains('\n$.b.[1]: second problem');
 
         expect(e.showDiff).eq(true);
 
-        expect(e.actual).deep.eq('incorrect');
-        expect(e.expected).deep.eq('value was incorrect');
+        expect(e.actual).deep.eq(actual);
+        expect(e.expected).deep.eq({
+            a: "first problem",
+            b: [
+                "ok",
+                "second problem"
+            ]
+        });
     });
 
     describe('intertwingling', () => {

@@ -105,7 +105,7 @@ export class JsonPathError extends Error {
                     leakActualValuesInError = false,
                 }: Partial<ResultErrorOpts> = {}
     ) {
-        super(`${message}:\n${problems}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
+        super(`${message}:\n${problems.join("\n")}${leakActualValuesInError ? `\n\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
         if (!leakActualValuesInError) {
             this.showDiff = false;
         }
