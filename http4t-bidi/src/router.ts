@@ -1,5 +1,5 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {response} from "@http4t/core/responses";
+import {responseOf} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
 import {RequestLens} from "./lenses";
 import {Routes, ValidApi} from "./routes";
@@ -25,9 +25,9 @@ export class Router<T extends ValidApi> implements HttpHandler {
 
             const handler = this.handlers[key];
             const value = await handler(result.value);
-            return route.response.set(response(200), value);
+            return route.response.set(responseOf(200), value);
         }
-        return response(404);
+        return responseOf(404);
     }
 }
 

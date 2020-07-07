@@ -12,7 +12,7 @@ export class ResponseByStatusLens<T extends ByStatus> implements ResponseLens<Ma
 
     async get(message: HttpResponse): Promise<RoutingResult<MatchedResponse<T>>> {
         if (!this.statuses.hasOwnProperty(message.status))
-            return wrongRoute(`Status was not in ${Object.keys(this.statuses)}`);
+            return wrongRoute(`Status was not in ${Object.keys(this.statuses)}`, ["status"]);
 
         const result = await this.statuses[message.status].get(message);
         return isSuccess(result)

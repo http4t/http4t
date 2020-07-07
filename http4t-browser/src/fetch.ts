@@ -1,7 +1,7 @@
 import {bufferText, streamBinary} from "@http4t/core/bodies";
 import {Header, HeaderName, HttpBody, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
-import {response} from "@http4t/core/responses";
+import {responseOf} from "@http4t/core/responses";
 import {Uri} from "@http4t/core/uri";
 
 /**
@@ -104,7 +104,7 @@ async function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Promis
 function toResponse(fetchResponse: Response): HttpResponse {
     const headers: Header[] = [];
     fetchResponse.headers.forEach((n, v) => headers.push(header(n, v)));
-    return response(
+    return responseOf(
         fetchResponse.status,
         fromReadableStream(fetchResponse.body),
         ...headers);

@@ -4,7 +4,13 @@ export function isPrimitive(value: any): boolean {
     return (typeof value !== 'object' && typeof value !== 'function') || value === null
 }
 
-function intertwingledValue<T>(actual: any, problems: Readonly<Problem[]>, path: JsonPath): any {
+/**
+ * @param actual the actual value, which may be the root object (if pathToActual is []), or some field value or array item
+ *               within the root
+ * @param rootObjectProblems all problems for the root object that actual is part of
+ * @param pathToActual the path to actual, relative to the root object (or [] if actual is the root object)
+ */
+function intertwingledValue<T>(actual: any, rootObjectProblems: Readonly<Problem[]>, pathToActual: JsonPath): any {
     if (isPrimitive(actual))
         return actual;
 
@@ -13,11 +19,11 @@ function intertwingledValue<T>(actual: any, problems: Readonly<Problem[]>, path:
         : new Set(Object.keys(actual));
 
     // Keys that appear in a problems path, but aren't in actual.
-    const missingKeys = problems
+    const missingKeys = rootObjectProblems
         .filter(problem =>
             // problems for direct children of path (but not ancestors)
-            problem.path.length === path.length + 1
-            && pathStartsWith(problem.path, path)
+            problem.path.length === pathToActual.length + 1
+            && pathStartsWith(problem.path, pathToActual)
 
             // ...that are not in actual
             && !actualKeys.has(problem.path[problem.path.length - 1]))
@@ -25,7 +31,7 @@ function intertwingledValue<T>(actual: any, problems: Readonly<Problem[]>, path:
 
     return [...actualKeys, ...missingKeys]
         .reduce((result: any, k) => {
-            result[k] = intertwingle(actual[k], problems, [...path, k]);
+            result[k] = intertwingle(actual[k], rootObjectProblems, [...pathToActual, k]);
             return result;
         }, Array.isArray(actual) ? [] : {});
 }
@@ -49,15 +55,21 @@ function intertwingledValue<T>(actual: any, problems: Readonly<Problem[]>, path:
  * is used as "expected" in a thrown ResultError, IntelliJ/WebStorm will
  * display a nice diff in test failures, based on `error.expected` and
  * `error.actual`.
+ *
+ * @param actual the actual value, which may be the root object (if pathToActual is []), or some field value or array item
+ *               within the root
+ * @param rootObjectProblems all problems for the root object that actual is part of
+ * @param pathToActual the path to actual, relative to the root object (or [] if actual is the root object)
  */
-export function intertwingle(actual: any, problems: Readonly<Problem[]>, path: JsonPath = []): any {
+export function intertwingle(actual: any, rootObjectProblems: Readonly<Problem[]>, pathToActual: JsonPath = []): any {
 
-    const myProblems = problems
-        .filter(p => pathsEq(path, p.path))
+    // TODO: optimise this by indexing problems
+    const myProblems = rootObjectProblems
+        .filter(p => pathsEq(pathToActual, p.path))
         .map(p => p.message);
 
     return myProblems.length === 0
-        ? intertwingledValue(actual, problems, path)
+        ? intertwingledValue(actual, rootObjectProblems, pathToActual)
         : myProblems.length === 1
             ? myProblems[0]
             : myProblems;
@@ -87,19 +99,20 @@ export class JsonPathError extends Error {
     public readonly showDiff: boolean;
 
     constructor(actual: any,
-                public readonly error: Problems,
+                public readonly problems: Problems,
                 {
                     message = 'Validation failed',
                     leakActualValuesInError = false,
                 }: Partial<ResultErrorOpts> = {}
     ) {
-        super(`${message}:\n${error}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
+        super(`${message}:\n${problems}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
         if (!leakActualValuesInError) {
             this.showDiff = false;
         }
         // tells mocha to show diff
         this.showDiff = true;
         this.actual = actual;
-        this.expected = intertwingle(actual, error, []);
+        this.problems = problems;
+        this.expected = intertwingle(actual, problems, []);
     }
 }

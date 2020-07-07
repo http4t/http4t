@@ -1,7 +1,8 @@
 import {bufferText} from "@http4t/core/bodies";
 import {get} from "@http4t/core/requests";
+import {responseOf as responseOf} from "@http4t/core/responses";
 import {expect} from 'chai';
-import {routeFailed, wrongRoute} from "../src/lenses";
+import {routeFailedError, wrongRouteError} from "../src/lenses";
 import {fail} from "../src/lenses/AlwaysFailLens";
 import {empty} from "../src/lenses/EmptyLens";
 import {json} from "../src/lenses/JsonLens";
@@ -70,24 +71,30 @@ describe('Server', () => {
     it('short circuits if route fails with routeFailed("reason")', async () => {
         const routes = {
             fails: route(
-                fail(routeFailed("expected failure")),
+                fail(routeFailedError("expected failure", [], responseOf(400))),
                 empty()
             ),
             doesNotGetHit: route(empty(), empty())
         };
 
-        const behaviourIsNeverUsed = {} as any;
-        const s = buildRouter(routes, behaviourIsNeverUsed);
+        let wasHit = false;
+        const behaviourDoesNotGetHit = {
+            doesNotGetHit: () => {
+                wasHit = true;
+            }
+        } as any;
+        const s = buildRouter(routes, behaviourDoesNotGetHit);
 
         const response = await s.handle(get('/'));
 
         expect(response.status).eq(400);
+        expect(wasHit).eq(false);
     });
 
     it('does not short circuit if a route fails with wrongRoute("reason")', async () => {
         const routes = {
             fails: route(
-                fail(wrongRoute("expected failure")),
+                fail(wrongRouteError("expected failure", [])),
                 empty()
             ),
             getsHit: route(empty(), json<string>())

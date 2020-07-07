@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {header} from "../src/headers";
 import {appendHeader, removeHeaders, setHeader, updateHeaders} from "../src/messages";
-import {request} from "../src/requests";
+import {requestOf} from "../src/requests";
 
 describe("header()", () => {
     it("formats HeaderValueLike values for you", () => {
@@ -12,12 +12,12 @@ describe("header()", () => {
 
 describe('setHeader()', () => {
     it('works with empty array', async () => {
-        expect(setHeader(request("GET", "/"), 'header-name', 'value').headers)
+        expect(setHeader(requestOf("GET", "/"), 'header-name', 'value').headers)
             .deep.eq([['header-name', 'value']])
     });
 
     it('deletes old header value', async () => {
-        expect(setHeader(request("GET", "/", "",
+        expect(setHeader(requestOf("GET", "/", "",
             header('unchanged', 'first'),
             header('header-name', 'old value'),
             header('unchanged', 'second')), 'header-name', 'new value').headers)
@@ -25,19 +25,19 @@ describe('setHeader()', () => {
     });
 
     it('is case insensitive', async () => {
-        expect(setHeader(request("GET", "/", "", header('header-name', 'old value')), 'Header-Name', 'value').headers)
+        expect(setHeader(requestOf("GET", "/", "", header('header-name', 'old value')), 'Header-Name', 'value').headers)
             .deep.eq([['Header-Name', 'value']])
     });
 });
 
 describe('appendHeader()', () => {
     it('adds on another header', () => {
-        const message = request("GET", "/");
+        const message = requestOf("GET", "/");
         expect(appendHeader(message, "X-Matt", "Savage").headers).deep.eq([["X-Matt", "Savage"]])
     });
 
     it('adds on another header', () => {
-        const message = request("GET", "/");
+        const message = requestOf("GET", "/");
         const appendedOnce = appendHeader(message, "X-Matt", "Savage");
         expect(appendHeader(appendedOnce, "X-Matt", "S").headers).deep.eq([["X-Matt", "Savage"], ["X-Matt", "S"]])
     });
@@ -45,14 +45,14 @@ describe('appendHeader()', () => {
 
 describe("removeHeaders()", () => {
     it("removes all headers case-insensitively", () => {
-        const message = request("GET", "/", undefined, ["X-Matt", "S"], ["X-matt", "S"], ["X-Tom", "S"]);
+        const message = requestOf("GET", "/", undefined, ["X-Matt", "S"], ["X-matt", "S"], ["X-Tom", "S"]);
         expect(removeHeaders(message, "X-Matt").headers).deep.eq([["X-Tom", "S"]])
     });
 });
 
 describe("updateHeaders()", () => {
     it("updates header values", () => {
-        const req = request("GET", "/", undefined, ["name", "value"], ["name", "value"], ["name2", "value2"])
+        const req = requestOf("GET", "/", undefined, ["name", "value"], ["name", "value"], ["name2", "value2"])
         expect(updateHeaders(req, "name", (n: string) => n + "updated").headers).deep.eq([["name", "valueupdated"], ["name", "valueupdated"], ["name2", "value2"]])
     });
 });

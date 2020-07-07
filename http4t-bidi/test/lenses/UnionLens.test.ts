@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {json} from "../../src/lenses/JsonLens";
 import {StatusLens} from "../../src/lenses/StatusLens";
 import {HttpMessage, HttpResponse} from "@http4t/core/contract";
-import {ok, response} from "@http4t/core/responses";
+import {ok, responseOf} from "@http4t/core/responses";
 import {UnionLens} from "../../src/lenses/UnionLens";
 import {toJSON} from "@http4t/core/messages";
 
@@ -23,7 +23,7 @@ describe("Union lens", () => {
 
         const result: HttpMessage = await union.set(ok(), {ok: false})
 
-        expect(await toJSON(result)).to.deep.eq(response(404, JSON.stringify({ok: false}), ["Content-Type", "application/json"]))
+        expect(await toJSON(result)).to.deep.eq(responseOf(404, JSON.stringify({ok: false}), ["Content-Type", "application/json"]))
     });
 
 })

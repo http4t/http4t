@@ -1,19 +1,19 @@
-import {request} from "@http4t/core/requests";
-import {Result} from "@http4t/result";
+import {requestOf} from "@http4t/core/requests";
+import {failure} from "@http4t/result";
+import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from 'chai';
-import {WrongRoute} from "../../src/lenses";
+import {RoutingError} from "../../src/lenses";
 import {fail} from "../../src/lenses/AlwaysFailLens";
 
 describe("AlwaysFailLens", () => {
-    const error: Result<WrongRoute, never> = {error: {type: 'wrong-route', message: "wrong route"}};
+    const error: RoutingError = {type: "wrong-route", problems: [problem("deliberate error", [])]};
 
     it("always fails", async () => {
-
-        expect(await fail(error).get(request("GET", "/"))).to.deep.eq(error)
+        expect(await fail(error).get(requestOf("GET", "/"))).to.deep.eq(failure(error))
     });
 
     it("sets nothing", async () => {
-        const req = request("GET", "/");
+        const req = requestOf("GET", "/");
         expect(await fail(error).set(req, {} as never)).to.deep.eq(req)
     });
 

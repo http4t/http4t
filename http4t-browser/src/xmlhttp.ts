@@ -1,7 +1,7 @@
 import {bufferText, typeDescription} from "@http4t/core/bodies";
 import {Header, HeaderName, HttpBody, HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {authority} from "@http4t/core/requests";
-import {response} from "@http4t/core/responses";
+import {responseOf} from "@http4t/core/responses";
 import {Uri} from "@http4t/core/uri";
 
 export class XmlHttpHandler implements HttpHandler {
@@ -22,7 +22,7 @@ export class XmlHttpHandler implements HttpHandler {
                     if (!(this.handler.response instanceof ArrayBuffer))
                         throw new Error(`Not an ArrayBuffer ${typeDescription(this.handler.response)}`);
 
-                    resolve(response(
+                    resolve(responseOf(
                         this.handler.status,
                         [new Uint8Array(this.handler.response)],
                         ...this.getHeaders()));

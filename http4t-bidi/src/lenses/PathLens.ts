@@ -15,8 +15,8 @@ export class PathLens<T> implements RequestLens<T> {
         return isSuccess(result)
             ? stripSlashes(result.value.remaining).length === 0
                 ? success(result.value.value)
-                : wrongRoute(`Did not match full path. Remaining path: "${result.value.remaining}"`)
-            : wrongRoute(`${result.error.message}. Remaining path: "${result.error.remaining}"`);
+                : wrongRoute(`Did not match full path. Remaining path: "${result.value.remaining}"`, ["uri", "path"])
+            : wrongRoute(`${result.error.message}. Remaining path: "${result.error.remaining}"`, ["uri", "path"]);
     }
 
     async set(into: HttpRequest, value: T): Promise<HttpRequest> {

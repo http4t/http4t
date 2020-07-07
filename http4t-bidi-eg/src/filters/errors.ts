@@ -1,5 +1,5 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {response} from "@http4t/core/responses";
+import {responseOf} from "@http4t/core/responses";
 import {toHttpHandler} from "../utils/http";
 import {Logger} from "../Logger";
 import {Filter} from "../utils/Filter";
@@ -11,7 +11,7 @@ export function handleError(log: Logger): Filter {
                 return await decorated.handle(request);
             } catch (e) {
                 log.info(`${e}`);
-                return response(500, JSON.stringify({message: e.message}));
+                return responseOf(500, JSON.stringify({message: e.message}));
             }
         })
     }

@@ -15,7 +15,7 @@ export class MethodLens implements RequestLens<undefined> {
         if (request.method.toUpperCase() === this.method.toUpperCase()) {
             return success(undefined);
         }
-        return wrongRoute(`Method must be ${this.method}`);
+        return wrongRoute(`Method must be ${this.method}`, ["method"]);
     }
 
     async set(into: HttpRequest, value: undefined): Promise<HttpRequest> {

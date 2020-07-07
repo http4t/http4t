@@ -1,6 +1,7 @@
 import {HttpHandler, HttpRequest} from "@http4t/core/contract";
 import {handler} from "@http4t/core/handlers";
-import {response} from "@http4t/core/responses";
+import {responseOf} from "@http4t/core/responses";
+import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from 'chai';
 import {buildClient} from "../src/client";
 import {json} from "../src/lenses/JsonLens";
@@ -19,7 +20,7 @@ async function catchError(fn: () => any): Promise<any> {
     }
 }
 
-describe('Client', () => {
+describe('buildClient()', () => {
     it('serialises request, sends to http handler, and then deserialises response', async () => {
         type Api = {
             example: () => Promise<any>;
@@ -160,16 +161,16 @@ describe('Client', () => {
         };
 
         const brokenServer: HttpHandler = handler(async () => {
-                return response(200, "not json}{")
+                return responseOf(200, "not json}{")
             }
         );
 
         const c = buildClient(routes, brokenServer);
 
         const e = await catchError(() => c.example({}));
-        expect(e).deep.eq({
-            message: "Expected valid json- \"Unexpected token o in JSON at position 1\"",
-            response: response(200, "not json}{")
+        expect(e).deep.contains({
+            problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"])],
+            actual: responseOf(200, "not json}{")
         });
     });
 });

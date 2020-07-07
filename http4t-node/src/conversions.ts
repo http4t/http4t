@@ -1,6 +1,6 @@
 import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {authority, request} from "@http4t/core/requests";
-import {response} from "@http4t/core/responses";
+import {authority, requestOf} from "@http4t/core/requests";
+import {responseOf} from "@http4t/core/responses";
 import * as node from 'http';
 import {bodyToStream, streamToBody} from "./streams";
 
@@ -25,7 +25,7 @@ export function requestHttp4tToNode(request: HttpRequest): node.RequestOptions {
 
 
 export function requestNodeToHttp4t(nodeRequest: node.IncomingMessage): HttpRequest {
-    return request(
+    return requestOf(
         nodeRequest.method || "",
         nodeRequest.url || "",
         streamToBody(nodeRequest),
@@ -43,7 +43,7 @@ export function responseHttp4tToNode(response: HttpResponse, nodeResponse: node.
 }
 
 export function responseNodeToHttp4t(nodeResponse: node.IncomingMessage): HttpResponse {
-    return response(
+    return responseOf(
         nodeResponse.statusCode || -1,
         streamToBody(nodeResponse),
         ...fromRawHeaders(nodeResponse.rawHeaders));

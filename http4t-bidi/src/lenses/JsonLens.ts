@@ -16,7 +16,7 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TM
             const value = await bodyJson<T>(message.body);
             return success(value);
         } catch (e) {
-            return routeFailed(`Expected valid json${e.message ? `- "${e.message}"` : ""}`)
+            return routeFailed(`Expected valid json${e.message ? `- "${e.message}"` : ""}`, ["body"])
         }
     }
 

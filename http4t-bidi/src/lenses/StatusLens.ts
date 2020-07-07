@@ -7,7 +7,7 @@ export class StatusLens<T> implements ResponseLens<T> {
 
     async get(message: HttpResponse): Promise<RoutingResult<T>> {
         if (message.status != this.status)
-            return wrongRoute(`Status was not ${this.status}`)
+            return wrongRoute(`Status was not ${this.status}`, ["status"])
 
         return await this.lens.get(message);
     }

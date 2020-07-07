@@ -17,7 +17,7 @@ import {
 } from "./uri";
 import {modify} from "./util/objects";
 
-export function request(method: Method, uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
+export function requestOf(method: Method, uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
     return {
         method,
         uri: Uri.of(uri),
@@ -27,23 +27,23 @@ export function request(method: Method, uri: UriLike, body?: HttpBody, ...header
 }
 
 export function get(uri: UriLike, ...headers: Header[]): HttpRequest {
-    return request("GET", uri, undefined, ...headers);
+    return requestOf("GET", uri, undefined, ...headers);
 }
 
 export function post(uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
-    return request("POST", uri, body, ...headers);
+    return requestOf("POST", uri, body, ...headers);
 }
 
 export function put(uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
-    return request("PUT", uri, body, ...headers);
+    return requestOf("PUT", uri, body, ...headers);
 }
 
 export function patch(uri: UriLike, body?: HttpBody, ...headers: Header[]): HttpRequest {
-    return request("PATCH", uri, body, ...headers);
+    return requestOf("PATCH", uri, body, ...headers);
 }
 
 export function delete_(uri: UriLike | string, ...headers: Header[]): HttpRequest {
-    return request("DELETE", uri, undefined, ...headers);
+    return requestOf("DELETE", uri, undefined, ...headers);
 }
 
 export function query(message: HttpRequest, name: string): string | undefined {

@@ -11,7 +11,7 @@ export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<TMe
 
     async get(output: TMessage): Promise<RoutingResult<string>> {
         const headerValue = getHeaderValue(output.headers, this.name);
-        return headerValue ? success(headerValue) : routeFailed(`Expected header "${this.name}"`)
+        return headerValue ? success(headerValue) : routeFailed(`Expected header "${this.name}"`, ["headers"])
     }
 
     async set(into: TMessage, value: string): Promise<TMessage> {

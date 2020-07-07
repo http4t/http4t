@@ -1,6 +1,8 @@
 import {HttpHandler, HttpResponse} from "@http4t/core/contract";
 import {get} from "@http4t/core/requests";
 import {isFailure} from "@http4t/result";
+import {JsonPathError, ResultErrorOpts} from "@http4t/result/JsonPathError";
+import {prefix} from "@http4t/result/JsonPathResult";
 import {ResponseLens} from "./lenses";
 import {HandlerFn, RouteFor, Routes, ValidApi} from "./routes";
 
@@ -9,26 +11,28 @@ import {HandlerFn, RouteFor, Routes, ValidApi} from "./routes";
  * or throws `ResultError` if the result is a failure.
  */
 function validator<T>(
-    lens: ResponseLens<T>):
+    lens: ResponseLens<T>,
+    opts: Partial<ResultErrorOpts> = {}):
     (message: HttpResponse) => Promise<T> {
 
     return async (response: HttpResponse): Promise<T> => {
         const result = await lens.get(response);
         if (isFailure(result))
-            throw {message: result.error.message, response};
+            throw new JsonPathError(response, prefix(result.error.problems, ["response"]), opts);
         return result.value;
     }
 }
 
 export function routeClient<T extends HandlerFn>(
     route: RouteFor<T>,
-    http: HttpHandler)
+    http: HttpHandler,
+    opts: Partial<ResultErrorOpts> = {})
     : T {
 
     const f = async (value: any): Promise<any> => {
         return await route.request.set(get("/"), value)
             .then(http.handle)
-            .then(validator(route.response));
+            .then(validator(route.response, opts));
     };
 
     return f as any;
@@ -36,10 +40,11 @@ export function routeClient<T extends HandlerFn>(
 
 export function buildClient<T extends ValidApi>(
     routes: Routes<T>,
-    http: HttpHandler): T {
+    http: HttpHandler,
+    opts: Partial<ResultErrorOpts> = {}): T {
     return Object.entries(routes)
         .reduce((acc, [key, route]) => {
-                acc[key as keyof T] = routeClient(route, http) as any;
+                acc[key as keyof T] = routeClient(route, http, opts) as any;
                 return acc;
             },
             {} as T);

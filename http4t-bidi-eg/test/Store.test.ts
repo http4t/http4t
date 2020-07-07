@@ -1,14 +1,9 @@
-import {buildClient} from "@http4t/bidi/client";
-import {HttpHandler} from "@http4t/core/contract";
-import {response} from "@http4t/core/responses";
+import {responseOf} from "@http4t/core/responses";
 import {Closeable} from "@http4t/core/server";
-import {ServerHandler} from "@http4t/node/server";
+import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from "chai";
-import {Pool} from "pg";
-import {Api, routes} from "../src/api";
-import {startApp} from "../src/App";
-import {PostgresTransactionPool} from "../src/TransactionPool";
-import {testDatabase} from "./db";
+import {Api} from "../src/api";
+import {testClient} from "./helpers";
 import uuid = require("uuid");
 
 async function error(f: () => any): Promise<any> {
@@ -23,22 +18,14 @@ async function error(f: () => any): Promise<any> {
 describe('store', function () {
     this.timeout(2000);
 
-    let router: HttpHandler & Closeable;
-    let server: ServerHandler;
-    let client: Api;
+    let client: Api & Closeable;
 
     before(async () => {
-        router = await startApp(new PostgresTransactionPool(new Pool(testDatabase)));
-        server = new ServerHandler(router);
-        client = buildClient(routes, server)
+        client = await testClient();
     });
 
     after(async () => {
-        console.log("Closing...");
-        await server.close();
-        console.log("Server closed");
-        await router.close();
-        console.log("Transaction pool closed");
+        await client?.close();
     });
 
     it('stores some json', async () => {
@@ -59,10 +46,12 @@ describe('store', function () {
         };
 
         const e = await error(async () => await client.test(request));
-        expect(e).deep.eq({
-            message: "Status was not 200",
-            response: response(500, "{\"message\":\"Deliberate error\"}")
-        });
+        expect(e).deep.contains(
+            {
+                actual: responseOf(500, "{\"message\":\"Deliberate error\"}"),
+                problems: [problem("Status was not 200", ["response", "status"])]
+            }
+        );
 
         expect(await client.get({id: request.id})).eq(undefined)
     });

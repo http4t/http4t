@@ -1,4 +1,4 @@
-import {request} from "@http4t/core/requests";
+import {requestOf} from "@http4t/core/requests";
 import {success} from "@http4t/result";
 import {expect} from 'chai';
 import {headers} from "../../src/lenses/HeaderLens";
@@ -9,7 +9,7 @@ import {json} from "../../src/lenses/JsonLens";
 describe("IntersectionLens", () => {
 
     it("intersects lenses", async () => {
-        const message = request("GET", "/path", JSON.stringify({some: "value"}), ["X-Name", "tom"], ["X-Age", "young"]);
+        const message = requestOf("GET", "/path", JSON.stringify({some: "value"}), ["X-Name", "tom"], ["X-Age", "young"]);
         const methodLens = new MethodLens("GET");
 
         const jsonLens = json<{ some: "value" }>();
