@@ -35,7 +35,7 @@ Helpers
 -----------------------------------
  */
 
-function readableStream(body: HttpBody): ReadableStream<Uint8Array> {
+export function readableStream(body: HttpBody): ReadableStream<Uint8Array> {
     return new ReadableStream<Uint8Array>({
         start: async controller => {
             try {

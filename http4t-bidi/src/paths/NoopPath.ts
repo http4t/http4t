@@ -9,7 +9,7 @@ export class NoopPath implements PathMatcher<undefined> {
         });
     }
 
-    expand(value: undefined): string {
+    expand(_value: undefined): string {
         return "";
     }
 }

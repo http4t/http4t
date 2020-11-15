@@ -58,5 +58,5 @@ export function query(query: string | undefined, name: string): string | undefin
 }
 
 export function queries(query: string | undefined, name: string): (string | undefined)[] {
-    return decodePairs(query).filter(([n]) => n === name).map(([n, v]) => v);
+    return decodePairs(query).filter(([n]) => n === name).map(([_, v]) => v);
 }

@@ -18,7 +18,7 @@ export class MethodLens implements RequestLens<undefined> {
         return wrongRoute(`Method must be ${this.method}`, ["method"]);
     }
 
-    async set(into: HttpRequest, value: undefined): Promise<HttpRequest> {
+    async set(into: HttpRequest, _value: undefined): Promise<HttpRequest> {
         return {...into, method: this.method};
     }
 }

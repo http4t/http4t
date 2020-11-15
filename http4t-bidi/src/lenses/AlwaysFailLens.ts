@@ -11,7 +11,7 @@ class AlwaysFailLens<TMessage extends HttpMessage, T = never> implements Message
         return failure(this.error(message));
     }
 
-    async set(into: TMessage, value: T): Promise<TMessage> {
+    async set(into: TMessage, _value: T): Promise<TMessage> {
         return into;
     }
 }

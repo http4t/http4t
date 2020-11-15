@@ -6,7 +6,11 @@
     "declaration": true,
     "sourceMap": true,
     "downlevelIteration": true,
-    "strict": true
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "exclude": ["BumpVersion.ts"]
 }

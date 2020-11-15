@@ -3,11 +3,11 @@ import {success} from "@http4t/result";
 import {MessageLens, RoutingResult} from "../lenses";
 
 export class EmptyLens<TMessage extends HttpMessage> implements MessageLens<TMessage, undefined> {
-    async get(message: TMessage): Promise<RoutingResult<undefined>> {
+    async get(_message: TMessage): Promise<RoutingResult<undefined>> {
         return success(undefined);
     }
 
-    async set(into: TMessage, value: undefined): Promise<TMessage> {
+    async set(into: TMessage, _value: undefined): Promise<TMessage> {
         return into;
     }
 }

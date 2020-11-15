@@ -8,7 +8,7 @@ import {bufferText} from "./bodies";
  */
 export class BinHandler implements HttpHandler {
     async handle(request: HttpRequest): Promise<HttpResponse> {
-        const {method, uri: {path, query}} = request;
+        const {method, uri: {path}} = request;
 
         if (method === 'GET' && path.startsWith('/stream-bytes')) {
             const match = /\/stream-bytes\/(.+)/.exec(path);
@@ -23,7 +23,7 @@ export class BinHandler implements HttpHandler {
         return notFound();
     }
 
-    static async echo({uri, headers, body}: HttpRequest): Promise<HttpResponse> {
+    static async echo({headers, body}: HttpRequest): Promise<HttpResponse> {
         // TODO convert headers to object instead of array
         const jsonedHeaders = headers.reduce((acc: any, [n, v]) => {
             acc[n] = v;

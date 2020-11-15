@@ -10,7 +10,7 @@ export function isPrimitive(value: any): boolean {
  * @param rootObjectProblems all problems for the root object that actual is part of
  * @param pathToActual the path to actual, relative to the root object (or [] if actual is the root object)
  */
-function intertwingledValue<T>(actual: any, rootObjectProblems: Readonly<Problem[]>, pathToActual: JsonPath): any {
+function intertwingledValue(actual: any, rootObjectProblems: Readonly<Problem[]>, pathToActual: JsonPath): any {
     if (isPrimitive(actual))
         return actual;
 

@@ -1,6 +1,6 @@
 import {HttpMessage} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
-import {bodyJson, jsonBody, JsonBody} from "@http4t/core/json";
+import {bodyJson, jsonBody} from "@http4t/core/json";
 import {success} from "@http4t/result";
 import {MessageLens, routeFailed, RoutingResult} from "../lenses";
 

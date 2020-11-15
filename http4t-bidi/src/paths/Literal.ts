@@ -37,7 +37,7 @@ export class Literal implements PathMatcher<undefined> {
         return map(result, value => ({...value, value: undefined}))
     }
 
-    expand(value: undefined): string {
+    expand(_value: undefined): string {
         return this.text;
     }
 }

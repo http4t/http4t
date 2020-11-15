@@ -21,8 +21,9 @@ export function getHeaderValues(headers: readonly Header[], name: HeaderName): H
     if (typeof headers === 'undefined') return [];
 
     const lowerCaseName = name.toLowerCase();
-    return headers.filter(([name, value]) => name.toLowerCase() === lowerCaseName)
-        .map(([name, value]) => value)
+    return headers
+        .filter(([name, _]) => name.toLowerCase() === lowerCaseName)
+        .map(([_, value]) => value)
 }
 
 /**
