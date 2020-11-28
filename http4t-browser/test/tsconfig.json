@@ -9,6 +9,12 @@
     },
     {
       "path": "../../http4t-node/src"
+    },
+    {
+      "path": "../../http4t-browser/src"
+    },
+    {
+      "path": "../../http4t-mocha/src"
     }
   ]
 }

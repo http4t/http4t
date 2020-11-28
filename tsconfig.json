@@ -36,6 +36,9 @@
     },
     {
       "path": "./http4t-result/test"
+    },
+    {
+      "path": "./http4t-result/src"
     }
   ]
 }
