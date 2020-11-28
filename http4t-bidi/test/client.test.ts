@@ -1,16 +1,17 @@
+import {buildClient} from "@http4t/bidi/client";
+import {json} from "@http4t/bidi/lenses/JsonLens";
+import {named} from "@http4t/bidi/lenses/NamedLenses";
+import {path} from "@http4t/bidi/paths";
+import {v, VariablePaths} from "@http4t/bidi/paths/variables";
+import {$request} from "@http4t/bidi/requests";
+import {buildRouter} from "@http4t/bidi/router";
+import {route, Routes} from "@http4t/bidi/routes";
 import {HttpHandler, HttpRequest} from "@http4t/core/contract";
 import {handler} from "@http4t/core/handlers";
 import {responseOf} from "@http4t/core/responses";
+import {JsonPathError} from "@http4t/result/JsonPathError";
 import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from 'chai';
-import {buildClient} from "../src/client";
-import {json} from "../src/lenses/JsonLens";
-import {named} from "../src/lenses/NamedLenses";
-import {path} from "../src/paths";
-import {v, VariablePaths} from "../src/paths/variables";
-import {$request} from "../src/requests";
-import {buildRouter} from "../src/router";
-import {route, Routes} from "../src/routes";
 
 async function catchError(fn: () => any): Promise<any> {
     try {
@@ -167,10 +168,10 @@ describe('buildClient()', () => {
 
         const c = buildClient(routes, brokenServer);
 
-        const e = await catchError(() => c.example({}));
+        const e: JsonPathError = await catchError(() => c.example({}));
         expect(e).deep.contains({
             problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"])],
-            actual: responseOf(200, "not json}{")
+            actual: {response: responseOf(200, "not json}{")}
         });
     });
 });

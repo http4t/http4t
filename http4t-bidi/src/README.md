@@ -30,5 +30,5 @@ deserialising from `HttpResponse`.
 
 ## Examples
 
-See [client.test.ts](test/client.test.ts) for an example of a complete round trip
+See [client.test.ts](../test/client.test.ts) for an example of a complete round trip
 from client to server and back.

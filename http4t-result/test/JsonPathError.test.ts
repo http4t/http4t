@@ -1,6 +1,6 @@
 import {expect} from 'chai';
-import {JsonPathError} from "../src/JsonPathError";
-import {problem} from "../src/JsonPathResult";
+import {JsonPathError} from "@http4t/result/JsonPathError";
+import {problem} from "@http4t/result/JsonPathResult";
 
 describe('JsonPathError', () => {
     it('fails with an AssertionError with expected, actual and showDiff=true', () => {

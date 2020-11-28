@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {describe, it} from "mocha";
-import {bufferBinary, bufferText, streamBinary, streamText} from "../src/bodies";
-import {textEncoder} from "../src/util/textencoding";
+import {bufferBinary, bufferText, streamBinary, streamText} from "@http4t/core/bodies";
+import {textEncoder} from "@http4t/core/util/textencoding";
 
 describe('bufferText()', () => {
     it('handles strings', async () => {

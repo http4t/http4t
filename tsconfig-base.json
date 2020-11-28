@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "target": "es5",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "es2019",
+            "es2019.array",
+            "es2020.string"
+        ],
+        "module": "commonjs",
+        "experimentalDecorators": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "composite": true,
+        "downlevelIteration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "skipLibCheck": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

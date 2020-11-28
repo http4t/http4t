@@ -1,10 +1,12 @@
+import {XmlHttpHandler} from "@http4t/browser/xhr";
 import {handlerContract} from '@http4t/core-test/handler.contract';
+import {toHttpBin} from "./helpers";
 
 describe("XmlHttpHandler", function () {
-    handlerContract(async () => {
-        if (typeof XMLHttpRequest == 'undefined') throw new Error("Unsupported");
-
-        const {XmlHttpHandler} = await import('../src/xhr');
-        return new XmlHttpHandler();
+    describe('http', () => {
+        handlerContract(toHttpBin("http")(new XmlHttpHandler()));
+    });
+    describe('https', () => {
+        handlerContract(toHttpBin("https")(new XmlHttpHandler()));
     });
 });

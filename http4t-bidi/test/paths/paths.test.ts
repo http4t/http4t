@@ -1,7 +1,7 @@
 import {failure, success} from "@http4t/result";
 import {expect} from 'chai';
-import {path} from "../../src/paths";
-import {v} from "../../src/paths/variables";
+import {path} from "@http4t/bidi/paths";
+import {v} from "@http4t/bidi/paths/variables";
 
 const componentVars = {
     widgetId: v.segment,

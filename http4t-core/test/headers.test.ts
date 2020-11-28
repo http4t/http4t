@@ -1,7 +1,7 @@
 import {expect} from 'chai';
-import {header} from "../src/headers";
-import {appendHeader, removeHeaders, setHeader, updateHeaders} from "../src/messages";
-import {requestOf} from "../src/requests";
+import {header} from "@http4t/core/headers";
+import {appendHeader, removeHeaders, setHeader, updateHeaders} from "@http4t/core/messages";
+import {requestOf} from "@http4t/core/requests";
 
 describe("header()", () => {
     it("formats HeaderValueLike values for you", () => {

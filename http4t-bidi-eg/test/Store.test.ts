@@ -1,9 +1,8 @@
-import {responseOf} from "@http4t/core/responses";
-import {Closeable} from "@http4t/core/server";
+import {Api} from "@http4t/bidi-eg/api";
+import {JsonPathError} from "@http4t/result/JsonPathError";
 import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from "chai";
-import {Api} from "../src/api";
-import {testClient} from "./helpers";
+import {CloseableClient, testClient} from "./helpers";
 import uuid = require("uuid");
 
 async function error(f: () => any): Promise<any> {
@@ -16,16 +15,20 @@ async function error(f: () => any): Promise<any> {
 }
 
 describe('store', function () {
-    this.timeout(2000);
+    this.timeout(100000);
 
-    let client: Api & Closeable;
+    let client: CloseableClient<Api>;
 
     before(async () => {
         client = await testClient();
     });
 
-    after(async () => {
-        await client?.close();
+    it('returns undefined when getting a nonexistent resource', async () => {
+        const request = {
+            id: uuid(),
+            document: {name: 'Tom'}
+        };
+        expect(await client.get({id: request.id})).deep.eq(undefined)
     });
 
     it('stores some json', async () => {
@@ -33,7 +36,6 @@ describe('store', function () {
             id: uuid(),
             document: {name: 'Tom'}
         };
-
         expect(await client.post(request)).deep.eq({id: request.id});
 
         expect(await client.get({id: request.id})).deep.eq(request)
@@ -45,11 +47,18 @@ describe('store', function () {
             document: {name: 'Should not be created'}
         };
 
-        const e = await error(async () => await client.test(request));
-        expect(e).deep.contains(
-            {
-                actual: responseOf(500, "{\"message\":\"Deliberate error\"}"),
-                problems: [problem("Status was not 200", ["response", "status"])]
+        const e: JsonPathError = await error(() => client.test(request));
+
+        expect(e.actual.response).deep.contains({
+            status: 500,
+            body: "Deliberate error"
+        });
+        expect(e.problems).deep.eq([
+            problem("Status was not 200", ["response", "status"])]);
+
+        // expected should be actual, with the json path of each problem replaced with the message(s)
+        expect(e.expected.response).deep.contains({
+                status: "Status was not 200"
             }
         );
 

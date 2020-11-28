@@ -1,16 +1,41 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": ["dom", "esnext"],
-    "declaration": true,
-    "sourceMap": true,
-    "downlevelIteration": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "exclude": ["BumpVersion.ts"]
+  "files": [],
+  "references": [
+    {
+      "path": "./http4t-bidi/src"
+    },
+    {
+      "path": "./http4t-bidi/test"
+    },
+    {
+      "path": "./http4t-bidi-eg/src"
+    },
+    {
+      "path": "./http4t-bidi-eg/test"
+    },
+    {
+      "path": "./http4t-browser/src"
+    },
+    {
+      "path": "./http4t-browser/test"
+    },
+    {
+      "path": "./http4t-core/src"
+    },
+    {
+      "path": "./http4t-core/test"
+    },
+    {
+      "path": "./http4t-node/src"
+    },
+    {
+      "path": "./http4t-node/test"
+    },
+    {
+      "path": "./http4t-result/src"
+    },
+    {
+      "path": "./http4t-result/test"
+    }
+  ]
 }

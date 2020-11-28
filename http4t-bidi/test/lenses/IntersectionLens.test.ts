@@ -1,10 +1,10 @@
 import {requestOf} from "@http4t/core/requests";
 import {success} from "@http4t/result";
 import {expect} from 'chai';
-import {headers} from "../../src/lenses/HeaderLens";
-import {IntersectionLens} from "../../src/lenses/IntersectionLens";
-import {MethodLens} from "../../src/lenses/MethodLens";
-import {json} from "../../src/lenses/JsonLens";
+import {headers} from "@http4t/bidi/lenses/HeaderLens";
+import {IntersectionLens} from "@http4t/bidi/lenses/IntersectionLens";
+import {MethodLens} from "@http4t/bidi/lenses/MethodLens";
+import {json} from "@http4t/bidi/lenses/JsonLens";
 
 describe("IntersectionLens", () => {
 

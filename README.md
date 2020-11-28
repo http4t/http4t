@@ -9,3 +9,7 @@
 A modular web framework for Typescript
 
 Supports [RFC 2324](https://tools.ietf.org/html/rfc2324)
+
+## Project structure
+
+We use yarn workspaces and Typescript composite projects. 

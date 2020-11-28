@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {DecodedPair, decodePairs, encodePairs} from "../src/urlEncoding";
+import {DecodedPair, decodePairs, encodePairs} from "@http4t/core/urlEncoding";
 
 function checkParsing(value: string, expected: DecodedPair[]) {
     expect(decodePairs(value)).deep.eq(expected);

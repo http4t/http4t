@@ -1,20 +1,23 @@
-import {Readable, Writable} from 'stream';
-import {HttpBody} from "@http4t/core/contract";
 import {streamBinary} from "@http4t/core/bodies";
+import {HttpBody} from "@http4t/core/contract";
 import {AsyncIteratorHandler} from "@http4t/core/util/AsyncIteratorHandler";
 import {textEncoder} from "@http4t/core/util/textencoding";
+import {Readable, Writable} from 'stream';
 
 
 export async function bodyToStream(body: HttpBody, stream: Writable): Promise<void> {
     try {
         for await (const chunk of streamBinary(body)) {
-            stream.write(new Buffer(chunk));
+            const buffer = Buffer.alloc(chunk.buffer.byteLength);
+            buffer.set(chunk)
+            stream.write(buffer);
         }
         stream.end();
     } catch (e) {
         // TODO: check this is sensible behaviour
         stream.emit('error', e);
         stream.end();
+        throw e;
     }
 }
 
@@ -26,10 +29,10 @@ export function streamToBody(stream: Readable): HttpBody {
                 iterator.push(typeof chunk === 'string' ? textEncoder().encode(chunk) : chunk);
             });
             stream.on("end", () => {
-                iterator.end()
+                iterator.end();
             });
             stream.on("error", error => {
-                iterator.error(error)
+                iterator.error(error);
             });
             return iterator;
         }

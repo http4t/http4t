@@ -1,6 +1,6 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {Logger} from "../Logger";
-import {Filter} from "../utils/Filter";
+import {Filter} from "@http4t/core/Filter";
 
 export function httpInfoLogger(logger: Logger): Filter {
     return (handler: HttpHandler) => new HttpInfoLogger(handler, logger);

@@ -10,3 +10,5 @@
 **/*.js
 **/*.map
 **/*.d.ts
+.cache
+**/*.tsbuildinfo

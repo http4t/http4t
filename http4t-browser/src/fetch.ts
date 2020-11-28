@@ -74,7 +74,7 @@ export type Opts = Pick<RequestInit, 'mode' | 'cache' | 'redirect' | 'credential
 const DEFAULT_OPTS: Opts = {
     referrer: "client",
     credentials: "omit",
-    redirect: "manual",
+    redirect: "follow", // https://github.com/whatwg/fetch/issues/66
     cache: "no-store",
     mode: "cors" // TODO: is this right?
 };
@@ -89,15 +89,18 @@ function toFetchHeaders(request: HttpRequest) {
 }
 
 async function toFetchRequest(request: HttpRequest, opts: Partial<Opts>): Promise<Request> {
+    const uri = Uri.of(request.uri).toString();
+    const url = request.uri.authority && !request.uri.scheme ? `https:${uri}` : uri;
     const headers = toFetchHeaders(request);
-
+    const body = request.body ? {body: await bufferText(request.body)} : {};
+    opts = Object.assign({}, DEFAULT_OPTS, opts);
     return new Request(
-        Uri.of(request.uri).toString(),
+        url,
         {
             method: request.method,
             headers,
-            ...(request.body ? {body: await bufferText(request.body)} : {}),//TODO: it would be good if this was streaming
-            ...Object.assign({}, DEFAULT_OPTS, opts)
+            ...body, //TODO: it would be good if this was streaming
+            ...opts
         });
 }
 

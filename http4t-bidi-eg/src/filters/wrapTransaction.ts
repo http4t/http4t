@@ -1,6 +1,6 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {Filter} from "@http4t/core/Filter";
 import {Transaction} from "../TransactionPool";
-import {Filter} from "../utils/Filter";
 import {toHttpHandler} from "../utils/http";
 
 export function wrapTransaction(transaction: Transaction): Filter {
@@ -10,7 +10,11 @@ export function wrapTransaction(transaction: Transaction): Filter {
             await transaction.query('BEGIN');
             try {
                 const response = await decorated.handle(request);
-                await transaction.query('COMMIT');
+                if (response.status === 500) {
+                    await transaction.query('ROLLBACK');
+                } else {
+                    await transaction.query('COMMIT');
+                }
                 return response;
             } catch (e) {
                 await transaction.query('ROLLBACK');

@@ -1,9 +1,9 @@
 import {expect} from 'chai';
-import {json} from "../../src/lenses/JsonLens";
-import {StatusLens} from "../../src/lenses/StatusLens";
+import {json} from "@http4t/bidi/lenses/JsonLens";
+import {StatusLens} from "@http4t/bidi/lenses/StatusLens";
 import {HttpMessage, HttpResponse} from "@http4t/core/contract";
 import {ok, responseOf} from "@http4t/core/responses";
-import {UnionLens} from "../../src/lenses/UnionLens";
+import {UnionLens} from "@http4t/bidi/lenses/UnionLens";
 import {toJSON} from "@http4t/core/messages";
 
 describe("Union lens", () => {

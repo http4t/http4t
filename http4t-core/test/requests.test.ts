@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import {get, uri, uriString} from "../src/requests";
-import {Uri} from "../src/uri";
+import {get, uri, uriString} from "@http4t/core/requests";
+import {Uri} from "@http4t/core/uri";
 
 describe('requests', () => {
     describe('uri', () => {

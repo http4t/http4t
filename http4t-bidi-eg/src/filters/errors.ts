@@ -1,8 +1,8 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {Filter} from "@http4t/core/Filter";
 import {responseOf} from "@http4t/core/responses";
-import {toHttpHandler} from "../utils/http";
 import {Logger} from "../Logger";
-import {Filter} from "../utils/Filter";
+import {toHttpHandler} from "../utils/http";
 
 export function handleError(log: Logger): Filter {
     return (decorated: HttpHandler): HttpHandler => {
@@ -10,8 +10,9 @@ export function handleError(log: Logger): Filter {
             try {
                 return await decorated.handle(request);
             } catch (e) {
-                log.info(`${e}`);
-                return responseOf(500, JSON.stringify({message: e.message}));
+                const message = e.message || `${e}`;
+                log.info(`Unhandled HttpHandler exception ${message}`);
+                return responseOf(500, JSON.stringify({message}));
             }
         })
     }

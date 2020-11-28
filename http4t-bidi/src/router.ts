@@ -1,5 +1,6 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {responseOf} from "@http4t/core/responses";
+import {deleteMeLog} from "@http4t/core/util/logging";
 import {isFailure} from "@http4t/result";
 import {RequestLens} from "./lenses";
 import {Routes, ValidApi} from "./routes";
@@ -7,12 +8,13 @@ import {Routes, ValidApi} from "./routes";
 export class Router<T extends ValidApi> implements HttpHandler {
     constructor(private readonly routes: Routes<T>,
                 private readonly handlers: T) {
-
     }
 
     handle = async (request: HttpRequest): Promise<HttpResponse> => {
+        deleteMeLog("Router", "request", request);
         for (const [key, route] of Object.entries(this.routes)) {
             const result = await (route.request as RequestLens<any>).get(request);
+            deleteMeLog("Router", `result ${key}`, JSON.stringify(result));
 
             if (isFailure(result)) {
                 switch (result.error.type) {
@@ -24,8 +26,12 @@ export class Router<T extends ValidApi> implements HttpHandler {
             }
 
             const handler = this.handlers[key];
-            const value = await handler(result.value);
-            return route.response.set(responseOf(200), value);
+            try {
+                const value = await handler(result.value);
+                return route.response.set(responseOf(200), value);
+            } catch (e) {
+                return responseOf(500, e.message || e.toString());
+            }
         }
         return responseOf(404);
     }

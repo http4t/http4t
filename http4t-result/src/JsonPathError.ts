@@ -98,12 +98,13 @@ export class JsonPathError extends Error {
     public readonly expected?: any;
     public readonly showDiff: boolean;
 
-    constructor(actual: any,
-                public readonly problems: Problems,
-                {
-                    message = 'Validation failed',
-                    leakActualValuesInError = false,
-                }: Partial<ResultErrorOpts> = {}
+    constructor(
+        actual: any,
+        public readonly problems: Problems,
+        {
+            message = 'Validation failed',
+            leakActualValuesInError = false,
+        }: Partial<ResultErrorOpts> = {}
     ) {
         super(`${message}:\n${problems.join("\n")}${leakActualValuesInError ? `\n\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
         if (!leakActualValuesInError) {

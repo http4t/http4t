@@ -9,7 +9,6 @@ import {CumulativeLogger} from "./Logger";
 import {migrate} from "./migrations";
 import {Doc, PostgresStore} from "./Store";
 import {Transaction, TransactionPool} from "./TransactionPool";
-import {middlewares} from "./utils/Filter";
 
 function behaviour(transaction: Transaction, logger: CumulativeLogger): Api {
     const store = new PostgresStore(transaction);
@@ -23,12 +22,12 @@ function behaviour(transaction: Transaction, logger: CumulativeLogger): Api {
             return undefined;
         },
         async get(request: { id: string }): Promise<Doc | undefined> {
-            const document = await store.get(request.id);
-            logger.info(`retrieved json: "${JSON.stringify(document)}"`);
-            return document
+            const doc = await store.get(request.id);
+            logger.info(`retrieved json: "${JSON.stringify(doc)}"`);
+            return doc;
         },
         async post(doc: Doc): Promise<{ id: string }> {
-            logger.info('storing json');
+            logger.info(`storing json: "${JSON.stringify(doc)}"`);
             await store.save(doc);
             return {id: doc.id};
         },
@@ -52,12 +51,11 @@ export async function startApp(transactionPool: TransactionPool): Promise<HttpHa
         async handle(request: HttpRequest): Promise<HttpResponse> {
             const transaction = await transactionPool.getTransaction();
 
-            const middleware = middlewares(
-                wrapTransaction(transaction),
-                httpInfoLogger(logger),
-                handleError(logger));
-
-            return middleware(router(transaction, logger)).handle(request);
+            return httpInfoLogger(logger)(
+                handleError(logger)(
+                    wrapTransaction(transaction)(
+                        router(transaction, logger))))
+                .handle(request);
         },
         async close(): Promise<void> {
             await transactionPool.stop();

@@ -31,7 +31,7 @@ export const routes: Routes<Api> = {
         response(201, json<{ id: string }, HttpResponse>())
     ),
     get: route(
-        $request('GET', path({id: v.segment}, p => ["store", p.id]), json()),
+        $request('GET', path({id: v.segment}, p => ["store", p.id])),
         maybe(json<Doc, HttpResponse>())
     ),
     test: route(

@@ -7,7 +7,7 @@ import {
     nextSlashOrEnd,
     upToChars,
     upToSegments
-} from "../../src/paths/consume";
+} from "@http4t/bidi/paths/consume";
 
 describe('consume()', () => {
     it('consumes up to index defined by consumer function', async () => {

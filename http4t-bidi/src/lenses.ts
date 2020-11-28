@@ -3,22 +3,6 @@ import * as responses from "@http4t/core/responses";
 import {failure, Failure, Result} from "@http4t/result";
 import {JsonPath, problem, Problem} from "@http4t/result/JsonPathResult";
 
-/**
- * A lens is something that, for example, knows how to both extract a named
- * header from an http request, and how to add it to a request.
- *
- * Or how to deserialize a request body into an object, and how to serialize
- * the same type of object, and put it into a request body.
- *
- * It's useful because the same lens can be used on the client side to
- * inject the header or body into the request, and on the server side to
- * read out the header, or deserialise the body.
- */
-export interface PolymorphicLens<Source, SourceAfterInjection, InjectedValue, ExtractedValue> {
-    get(from: Source): ExtractedValue;
-
-    set(into: Source, value: InjectedValue): SourceAfterInjection;
-}
 
 export type WrongRoute = {
     readonly type: "wrong-route",
@@ -50,15 +34,24 @@ export function routeFailedError(message: string, path: JsonPath, response: Http
     };
 }
 
-export function routeFailed(message: string, path: JsonPath, response: HttpResponse = responses.responseOf(400)): Failure<RoutingError> {
+export function routeFailed(message: string, path: JsonPath, response: HttpResponse = responses.responseOf(400, message)): Failure<RoutingError> {
     return failure(routeFailedError(message, path, response));
 }
 
 /**
- * Serializes/deserializes a value into/out of a message
+ * A lens is something that, for example, knows how to both extract a named
+ * header from an http request, and how to add it to a request.
+ *
+ * Or how to deserialize a request body into an object, and how to serialize
+ * the same type of object, and put it into a request body.
+ *
+ * It's useful because the same lens can be used on the client side to
+ * inject the header or body into the request, and on the server side to
+ * read out the header, or deserialise the body.
  */
-export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown>
-    extends PolymorphicLens<TMessage, Promise<TMessage>, T, Promise<RoutingResult<T>>> {
+export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown> {
+    get(from: TMessage): Promise<RoutingResult<T>>;
+    set(into: TMessage, value: T): Promise<TMessage>;
 }
 
 export interface RequestLens<T> extends MessageLens<HttpRequest, T> {

@@ -11,14 +11,18 @@ Core functions
 -----------------------------------
  */
 
-export function requestHttp4tToNode(request: HttpRequest): node.RequestOptions {
-    const {host, port = 80} = authority(request);
+export function requestHttp4tToNode(request: HttpRequest, defaultProtocol:'http'|'https'): node.RequestOptions {
     const uri = request.uri;
+    const scheme = uri.scheme;
+    const path = `${uri.path.startsWith("/") ? uri.path : `/${uri.path}`}${uri.query ? `?${uri.query}` : ''}`;
+    const {host, port} = authority(request);
+    // console.log({host,port,scheme,path});
     return {
+        protocol: `${scheme || defaultProtocol}:`,
         method: request.method,
-        path: `${uri.path}${uri.query ? `?${uri.query}` : ''}`,
         hostname: host,
         port: port,
+        path: path,
         headers: toOutgoingHeaders(request.headers)
     };
 }
@@ -33,13 +37,13 @@ export function requestNodeToHttp4t(nodeRequest: node.IncomingMessage): HttpRequ
 }
 
 
-export function responseHttp4tToNode(response: HttpResponse, nodeResponse: node.ServerResponse) {
+export async function responseHttp4tToNode(response: HttpResponse, nodeResponse: node.ServerResponse): Promise<void> {
     nodeResponse.statusCode = response.status;
     for (const [name, value] of response.headers) {
         if (value) nodeResponse.setHeader(name, value);
     }
 
-    bodyToStream(response.body, nodeResponse);
+    await bodyToStream(response.body, nodeResponse);
 }
 
 export function responseNodeToHttp4t(nodeResponse: node.IncomingMessage): HttpResponse {

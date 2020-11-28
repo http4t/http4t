@@ -1,14 +1,12 @@
+import {toHttpBin} from "@http4t/browser-test/helpers";
 import {handlerContract} from "@http4t/core-test/handler.contract";
-
-export function runningInNode() {
-    return (typeof process !== 'undefined') && (typeof process.versions.node !== 'undefined');
-}
+import {ClientHandler} from "@http4t/node/client";
 
 describe("ClientHandler", function () {
-    handlerContract(async () => {
-        if (!runningInNode()) throw new Error("Unsupported");
-
-        const {ClientHandler} = await import('../src/client');
-        return new ClientHandler();
+    describe('http', () => {
+        handlerContract(toHttpBin("http")(ClientHandler.defaultTo('https')/* test that protocol in request overrides default*/));
+    });
+    describe('https', () => {
+        handlerContract(toHttpBin("https")(ClientHandler.defaultTo('http')/* test that protocol in request overrides default*/));
     });
 });

@@ -2,13 +2,13 @@ import {bufferText} from "@http4t/core/bodies";
 import {get} from "@http4t/core/requests";
 import {responseOf as responseOf} from "@http4t/core/responses";
 import {expect} from 'chai';
-import {routeFailedError, wrongRouteError} from "../src/lenses";
-import {fail} from "../src/lenses/AlwaysFailLens";
-import {empty} from "../src/lenses/EmptyLens";
-import {json} from "../src/lenses/JsonLens";
-import {$request} from "../src/requests";
-import {buildRouter} from "../src/router";
-import {route} from "../src/routes";
+import {routeFailedError, wrongRouteError} from "@http4t/bidi/lenses";
+import {fail} from "@http4t/bidi/lenses/AlwaysFailLens";
+import {empty} from "@http4t/bidi/lenses/EmptyLens";
+import {json} from "@http4t/bidi/lenses/JsonLens";
+import {$request} from "@http4t/bidi/requests";
+import {buildRouter} from "@http4t/bidi/router";
+import {route} from "@http4t/bidi/routes";
 
 describe('Server', () => {
     it('matches route and calls handler', async () => {

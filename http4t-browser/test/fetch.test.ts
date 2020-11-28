@@ -1,10 +1,12 @@
-import {handlerContract} from '@http4t/core-test/handler.contract';
+import {FetchHandler} from "@http4t/browser/fetch";
+import {handlerContract} from "@http4t/core-test/handler.contract";
+import {toHttpBin} from "./helpers";
 
 describe("FetchHandler", function () {
-    handlerContract(async () => {
-        if (typeof fetch == 'undefined') throw new Error("Unsupported");
-
-        const {FetchHandler} = await import('../src/fetch');
-        return new FetchHandler();
+    describe('http', () => {
+        handlerContract(toHttpBin("http")(new FetchHandler()));
+    });
+    describe('https', () => {
+        handlerContract(toHttpBin("https")(new FetchHandler()));
     });
 });

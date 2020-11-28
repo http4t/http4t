@@ -1,46 +1,30 @@
-import {Authority} from "@http4t/core/uri";
-import {runningInNode} from "./client.test";
-import {Server} from "@http4t/core/server";
-import {BinHandler} from "@http4t/core/bin";
 import {handlerContract} from "@http4t/core-test/handler.contract";
+import {BinHandler} from "@http4t/core/bin";
+import {HttpHandler} from "@http4t/core/contract";
+import {filterRequest} from "@http4t/core/Filter";
+import {ClientHandler} from "@http4t/node/client";
+import {NodeServer} from "@http4t/node/server";
 
 describe("ServerHandler", function () {
-    let server = new Promise<Server>(async (resolve, reject) => {
-            if (!runningInNode())
-                resolve(null as any);
-            try {
-                const {ServerHandler} = await import('../src/server');
-                resolve(new ServerHandler(new BinHandler()));
-            } catch (e) {
-                reject(e);
-            }
-        })
-    ;
+    let server: NodeServer;
 
-    before(async function () {
-        if (!runningInNode()) this.skip();
-
-    });
-
-    async function host(): Promise<string> {
-        const s = await server;
-        const url = await s.url();
-        if (url.authority) return Authority.of(url.authority).toString();
-        throw new Error("Should never get here");
+    async function handler(): Promise<HttpHandler> {
+        server = await NodeServer.start(new BinHandler())
+        const url = await server.url();
+        return filterRequest(request => ({
+            ...request,
+            uri: {...request.uri, authority: url.authority}
+        }))(ClientHandler.defaultTo('http'));
     }
 
-    handlerContract(async () => {
-            if (!runningInNode()) throw new Error("Unsupported");
-
-            const {ClientHandler} = await import('../src/client');
-            return new ClientHandler();
-        },
-        runningInNode() ? host() : null as any);
+    handlerContract(handler());
 
     after(async function () {
         try {
-            return (await server).close();
+            return server.close();
         } catch (ignore) {
+            console.log("could not close node server", ignore);
         }
     });
+
 });

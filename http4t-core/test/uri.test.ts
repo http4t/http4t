@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import {describe, it} from "mocha";
-import {ParsedAuthority} from "../src/contract";
-import {Authority, Uri} from "../src/uri";
+import {ParsedAuthority} from "@http4t/core/contract";
+import {Authority, Uri} from "@http4t/core/uri";
 
 describe('Uri', function () {
     describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function () {

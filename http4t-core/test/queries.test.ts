@@ -10,7 +10,7 @@ import {
     setQueries,
     setQuery,
     uriString
-} from "../src/requests";
+} from "@http4t/core/requests";
 
 describe('query()', () => {
     it("gets a single value", () => {

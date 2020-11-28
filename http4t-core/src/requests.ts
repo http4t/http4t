@@ -91,7 +91,8 @@ export function authority(request: HttpRequest): ParsedAuthority {
         return request.uri.authority;
 
     const value = getHeaderValue(request.headers, 'Host');
-    if (typeof value != 'string') throw new Error(`Could not get authority from request uri '${request.uri}'`);
+    if (typeof value != 'string')
+        throw new Error(`Could not get authority from request uri '${Uri.of(request.uri).toString()}'`);
 
     return Authority.parse(value);
 }

@@ -1,6 +1,6 @@
 import {expect} from "chai";
-import {bodyJson, JsonBody, jsonBody, parseJson} from "../src/json";
-import {post} from "../src/requests";
+import {bodyJson, JsonBody, jsonBody, parseJson} from "@http4t/core/json";
+import {post} from "@http4t/core/requests";
 
 function nextResult<T>(it: AsyncIterable<T>): Promise<IteratorResult<T>> {
     return it[Symbol.asyncIterator]().next();
