@@ -1,3 +1,2 @@
-export function hello(){
-    return "hello";
-}
+#!/usr/bin/env node
+console.log("HELLLLLLO!");

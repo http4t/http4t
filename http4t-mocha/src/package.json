@@ -2,5 +2,10 @@
   "name": "@http4t/mocha",
   "version": "1.0.0",
   "license": "Apache-2.0",
-  "type": "module"
+  "type": "module",
+  "bin": {
+    "hello": "./index.js"
+  },
+  "dependencies": {
+  }
 }

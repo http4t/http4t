@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo tests do not run outside browser",
     "test:browser": "cypress run",
-    "bundle": "parcel ../../mocha-browser/mocha.html"
+    "hello": "hello"
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
@@ -19,9 +19,7 @@
     "@types/mocha": "^5.2.6",
     "@types/uuid": "^8.3.0",
     "chai": "^4.1.7",
-    "cypress": "^6.0.0",
     "mocha": "^7.0.1",
-    "parcel-bundler": "^1.12.4",
     "typedoc": "^0.16.9"
   }
 }
