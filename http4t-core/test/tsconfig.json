@@ -5,7 +5,7 @@
       "path": "../src"
     },
     {
-      "path": "../../http4t-mocha/src"
+      "path": "../../http4t-mocha-puppeteer/src"
     }
   ]
 }

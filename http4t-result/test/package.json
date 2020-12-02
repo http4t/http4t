@@ -8,7 +8,7 @@
     "test:browser": "puppet"
   },
   "dependencies": {
-    "@http4t/mocha": "1.0.0",
+    "@http4t/mocha-puppeteer": "1.0.0",
     "@http4t/result": "1.0.0"
   },
   "devDependencies": {
