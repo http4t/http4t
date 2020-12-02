@@ -53,22 +53,22 @@ if (importMocha.length !== 0) {
 
 async function run() {
     const parcel = spawn("parcel", ["serve", "mocha.html"]);
+    parcel.stdout.pipe(process.stdout);
+    parcel.stderr.pipe(process.stderr);
+
     const parcelStarted = new Promise((resolve, reject) => {
-        parcel.on("error", (err: Error) => {
-            console.error(err)
-            reject(err);
-        });
+        parcel.on("exit", (code: number | null) => {
+            if (code == 0) {
+                resolve(code);
+            } else {
+                reject(code);
+            }
+        })
         parcel.stdout.on('data', (data: Buffer) => {
             const text = decoder.decode(data)
             if (text.startsWith("Server running at ")) {
                 resolve(null)
             }
-            console.log(text);
-        });
-        parcel.stderr.on('data', (data: any) => {
-            const text = decoder.decode(data);
-            console.error(text);
-            reject(text);
         });
     });
     const browser: Browser = await Puppeteer.launch.bind(Puppeteer)({headless: true});

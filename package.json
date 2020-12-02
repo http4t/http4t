@@ -8,7 +8,8 @@
     "http4t-*/test"
   ],
   "scripts": {
-    "bumpVersion": "./node_modules/.bin/ts-node BumpVersion write"
+    "version": "./node_modules/.bin/ts-node build/version $BUILD_NUMBER write",
+    "build": "./node_modules/.bin/ts-node build/build"
   },
   "devDependencies": {
     "@types/node": "^10",
