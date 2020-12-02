@@ -43,6 +43,14 @@ ${testFiles.map(f => `<script src="${f}"></script>`).join("\n")}
 const htmlFile = `${process.cwd()}/mocha.html`;
 fs.writeFileSync(htmlFile, html);
 console.log(testFiles);
+const importMocha = testFiles.filter(f => {
+    const file = decoder.decode(fs.readFileSync(f));
+    return /from\s+['"]mocha['"]/.test(file);
+});
+if (importMocha.length !== 0) {
+    throw new Error(`Importing 'describe' or 'it' from mocha in test files breaks browser testing in ${importMocha.join(", ")}`);
+}
+
 async function run() {
     const parcel = spawn("parcel", ["serve", "mocha.html"]);
     const parcelStarted = new Promise((resolve, reject) => {
