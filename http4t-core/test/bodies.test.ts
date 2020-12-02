@@ -1,5 +1,4 @@
 import {expect} from "chai";
-import {describe, it} from "mocha";
 import {bufferBinary, bufferText, streamBinary, streamText} from "@http4t/core/bodies";
 import {textEncoder} from "@http4t/core/util/textencoding";
 

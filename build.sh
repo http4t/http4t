@@ -29,15 +29,18 @@ function compile() {
   compileDir "$dir/src"
   compileDir "$tests"
 
-  cd "$tests" > /dev/null
-    yarn run test || {
+  cd "$tests" >/dev/null
+  yarn run test || {
+    cd - >/dev/null
+    exit 1
+  }
+  yarn run test:browser || {
     cd - >/dev/null
     exit 1
   }
   cd - >/dev/null
 }
 
-nvm use
 compile http4t-core
 compile http4t-node
 compile http4t-browser

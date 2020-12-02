@@ -4,10 +4,12 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "test": "NODE_ENV=development mocha --require ts-node/register --exit  '**/*.test.ts'"
+    "test": "NODE_ENV=development mocha --require ts-node/register --exit  '**/*.test.ts'",
+    "test:browser": "puppet"
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
+    "@http4t/mocha": "1.0.0",
     "@http4t/result": "1.0.0"
   },
   "devDependencies": {

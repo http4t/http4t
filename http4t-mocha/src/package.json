@@ -4,8 +4,15 @@
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "hello": "./index.js"
+    "puppet": "./index.js"
   },
   "dependencies": {
+    "@parcel/config-default": "^2.0.0-alpha.3",
+    "@parcel/core": "^2.0.0-alpha.3",
+    "@parcel/fs": "^2.0.0-alpha.3",
+    "@parcel/package-manager": "^2.0.0-alpha.3"
+  },
+  "devDependencies": {
+    "@types/node": "^10.17.47"
   }
 }

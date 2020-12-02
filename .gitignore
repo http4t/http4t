@@ -12,3 +12,4 @@
 **/*.d.ts
 .cache
 **/*.tsbuildinfo
+**/mocha.html

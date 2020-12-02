@@ -3,6 +3,9 @@
   "references": [
     {
       "path": "../src"
+    },
+    {
+      "path": "../../http4t-mocha/src"
     }
   ]
 }

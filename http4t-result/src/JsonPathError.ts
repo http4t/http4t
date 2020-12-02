@@ -15,7 +15,7 @@ function intertwingledValue(actual: any, rootObjectProblems: Readonly<Problem[]>
         return actual;
 
     const actualKeys: Set<string | number> = Array.isArray(actual)
-        ? [...new Array(actual.length).keys()].reduce((set: Set<number>, _, i) => set.add(i), new Set<number>())
+        ? Array.from(new Array(actual.length).keys()).reduce((set: Set<number>, _, i) => set.add(i), new Set<number>())
         : new Set(Object.keys(actual));
 
     // Keys that appear in a problems path, but aren't in actual.
@@ -29,7 +29,10 @@ function intertwingledValue(actual: any, rootObjectProblems: Readonly<Problem[]>
             && !actualKeys.has(problem.path[problem.path.length - 1]))
         .map(p => p.path[p.path.length - 1]);
 
-    return [...actualKeys, ...missingKeys]
+    // stupid kludge to get around parcel's __spreadArray polyfill only working
+    // for actual arrays, and not iterables
+    const actualKeysArray = Array.from(actualKeys);
+    return [...actualKeysArray, ...missingKeys]
         .reduce((result: any, k) => {
             result[k] = intertwingle(actual[k], rootObjectProblems, [...pathToActual, k]);
             return result;

@@ -1,5 +1,4 @@
 import {assert} from 'chai';
-import {describe, it} from "mocha";
 import {ParsedAuthority} from "@http4t/core/contract";
 import {Authority, Uri} from "@http4t/core/uri";
 

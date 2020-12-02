@@ -4,7 +4,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "test": "NODE_ENV=development mocha --require ts-node/register --exit  '**/*.test.ts'"
+    "test": "NODE_ENV=development mocha --require ts-node/register --exit  '**/*.test.ts'",
+    "test:browser": "echo no browser tests yet"
   },
   "dependencies": {
     "@http4t/bidi": "1.0.0",
