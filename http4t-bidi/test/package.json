@@ -8,6 +8,7 @@
     "test:browser": "puppet"
   },
   "dependencies": {
+    "@http4t/bidi": "1.0.0",
     "@http4t/core": "1.0.0",
     "@http4t/mocha-puppeteer": "1.0.0",
     "@http4t/result": "1.0.0"
