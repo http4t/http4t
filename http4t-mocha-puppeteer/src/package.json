@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "license": "Apache-2.0",
   "type": "module",
+  "scripts": {
+    "build": "tsc --build; chmod +x index.js"
+  },
   "bin": {
     "puppet": "./index.js"
   },

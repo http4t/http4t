@@ -92,7 +92,8 @@ const ignored = new Set(["@http4t/root", "@http4t/site"]);
         console.log(name);
         console.log(module.path);
         const cwd = module.path;
-        await spawnPromise("tsc", [], cwd);
+        await spawnPromise("yarn", ["install"], cwd);
+        await spawnPromise("yarn", ["build"], cwd);
         if (cwd.endsWith("/test")) {
             await spawnPromise("yarn", ["run", "test"], cwd);
             await spawnPromise("yarn", ["run", "test:browser"], cwd);

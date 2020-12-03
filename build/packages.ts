@@ -17,17 +17,32 @@ export function readPackage(path: string): Package {
     return json;
 }
 
-export function packages(dir: string | undefined = undefined): string[] {
+export type FilesOpts = {
+    skipDir: (fullPath: string) => boolean,
+    collect: (fullPath: string) => boolean
+}
+
+export function files(dir: string, opts: Partial<FilesOpts> = {}) {
+    const {skipDir = () => false, collect = () => true} = opts;
     return fs.readdirSync(dir)
         .reduce(
             (acc: string[], f: string) => {
-                if (f === 'node_modules') return acc;
                 const fullPath = `${dir}/${f}`;
-                if (fs.statSync(fullPath).isDirectory())
-                    return [...acc, ...packages(fullPath)]
-                if (f === 'package.json')
-                    return [...acc, fullPath];
-                return acc;
+                const result = collect(fullPath) ? [...acc, fullPath] : acc;
+                if (fs.statSync(fullPath).isDirectory() && !skipDir(fullPath)) {
+                    return [...result, ...files(fullPath, opts)]
+                } else {
+                    return result;
+                }
             },
             [] as string[]);
+}
+
+export function packages(dir: string | undefined = undefined): string[] {
+    return files(dir,
+        {
+            skipDir: path => path.endsWith('/node_modules'),
+            collect: path => path.endsWith('/package.json')
+        }
+    );
 }

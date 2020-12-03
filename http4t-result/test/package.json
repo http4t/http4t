@@ -4,6 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "build": "tsc --build",
     "test": "NODE_ENV=development mocha --require ts-node/register --colors --exit  '**/*.test.ts'",
     "test:browser": "puppet"
   },

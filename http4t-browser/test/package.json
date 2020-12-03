@@ -4,18 +4,18 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "build": "tsc --build",
     "test": "echo tests do not run outside browser",
     "test:browser": "puppet"
   },
   "dependencies": {
+    "@http4t/browser": "1.0.0",
     "@http4t/core": "1.0.0",
     "@http4t/mocha-puppeteer": "1.0.0",
     "@http4t/node": "1.0.0",
-    "@http4t/browser": "1.0.0",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@http4t/node": "1.0.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/uuid": "^8.3.0",

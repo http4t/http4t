@@ -18,6 +18,7 @@ Add to `package.json`:
 ```json
 {
   "scripts": {
+    "build": "tsc --build",
     "test:browser": "puppet"
   },
   "devDependencies": {

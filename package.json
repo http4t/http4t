@@ -8,8 +8,10 @@
     "http4t-*/test"
   ],
   "scripts": {
-    "version": "./node_modules/.bin/ts-node build/version $BUILD_NUMBER write",
-    "build": "./node_modules/.bin/ts-node build/build"
+    "build": "tsc --build",
+    "version": "ts-node build/version $BUILD_NUMBER write",
+    "build": "ts-node build/build",
+    "clean": "ts-node build/clean"
   },
   "devDependencies": {
     "@types/node": "^10",
