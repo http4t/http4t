@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig-base.json",
+  "references": [
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../../packages/bidi/src"
+    },
+    {
+      "path": "../../../packages/core/src"
+    },
+    {
+      "path": "../../../packages/result/src"
+    }
+  ]
+}

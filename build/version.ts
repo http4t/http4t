@@ -1,6 +1,15 @@
 import * as fs from 'fs';
-import {Dependencies, readPackage, packages} from "./packages";
+import {Dependencies, packages, readPackage} from "./packages";
 
+/**
+ * Updates package.json version with build number
+ *
+ * Pass build number as first parameter
+ */
+
+/**
+ * Updates @http4t/* dependencies to the correct version
+ */
 function fixDependencies(dependencies: Dependencies | undefined, version: string) {
     if (!dependencies) return;
     Object.keys(dependencies)
@@ -19,19 +28,25 @@ function fixDependencies(dependencies: Dependencies | undefined, version: string
     if (!buildNumber)
         throw new Error("First argument should be build number");
 
-    const version = readPackage("./package.json").version.replace(/0$/, buildNumber);
+    const version = readPackage("./package.json").version.replace(/\.[^.]+$/, `.${buildNumber}`);
 
-    packages(".")
-        .filter(path => path.startsWith("./http4t-"))
-        .forEach(path => {
-            const json = readPackage(path);
+    Object.values(packages("packages"))
+        .forEach(pack => {
+            const json = pack.package;
             json.version = version;
             fixDependencies(json.dependencies, version);
             fixDependencies(json.devDependencies, version);
             if (write) {
-                fs.writeFileSync(path, JSON.stringify(json, null, 2))
+                fs.writeFileSync(pack.path, JSON.stringify(json, null, 2))
             } else {
-                console.log(path, json);
+                console.log(pack.path, json);
             }
         })
-})();
+    console.log(version);
+})().then(_result => {
+    process.exit(0);
+}).catch(err => {
+    console.error(err);
+    process.exit(1);
+});
+;

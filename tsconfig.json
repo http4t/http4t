@@ -2,43 +2,43 @@
   "files": [],
   "references": [
     {
-      "path": "./http4t-bidi/src"
+      "path": "./packages/bidi/src"
     },
     {
-      "path": "./http4t-bidi/test"
+      "path": "./packages/bidi/test"
     },
     {
-      "path": "./http4t-bidi-eg/src"
+      "path": "./examples/http4t-bidi-eg/src"
     },
     {
-      "path": "./http4t-bidi-eg/test"
+      "path": "./examples/http4t-bidi-eg/test"
     },
     {
-      "path": "./http4t-browser/src"
+      "path": "./packages/browser/src"
     },
     {
-      "path": "./http4t-browser/test"
+      "path": "./packages/browser/test"
     },
     {
-      "path": "./http4t-core/src"
+      "path": "./packages/core/src"
     },
     {
-      "path": "./http4t-core/test"
+      "path": "./packages/core/test"
     },
     {
-      "path": "./http4t-node/src"
+      "path": "./packages/node/src"
     },
     {
-      "path": "./http4t-node/test"
+      "path": "./packages/node/test"
     },
     {
-      "path": "./http4t-result/src"
+      "path": "./packages/result/src"
     },
     {
-      "path": "./http4t-result/test"
+      "path": "./packages/result/test"
     },
     {
-      "path": "./http4t-result/src"
+      "path": "./packages/result/src"
     }
   ]
 }

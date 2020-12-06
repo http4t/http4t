@@ -1,5 +1,5 @@
-import {spawn} from 'child_process';
-import {Package, packages, readPackage} from "./packages";
+import {packages, Packages} from "./packages";
+import {spawnPromise} from "./processes";
 
 /**
  * Builds all modules
@@ -22,12 +22,6 @@ type Graph = {
     edges: Edges,
     reverseEdges: Edges,
     roots: Set<string>
-}
-type Packages = {
-    [name: string]: {
-        path: string,
-        package: Package
-    }
 }
 
 function buildGraph(packages: Packages): Graph {
@@ -73,32 +67,11 @@ function topological(graph: Graph): string[] {
 }
 
 /**
- * Spawns a process
- * pipes stderr/stdout
- * Resolves or rejects promise on completion
- */
-function spawnPromise(command: string, args: string[], cwd: string) {
-    console.log(`${command} ${args.join(" ")}`);
-    const test = spawn(command, args, {cwd});
-    test.stderr.pipe(process.stderr);
-    test.stdout.pipe(process.stdout);
-    return new Promise((resolve, reject) => {
-        test.on("exit", (code: number | null) => {
-            if (code == 0) {
-                resolve(code);
-            } else {
-                reject(code);
-            }
-        })
-    });
-}
-
-const ignored = new Set(["@http4t/root", "@http4t/site"]);
-
-/**
  * For some reason installing other yarn workspaces does not reliably
  * create the `puppet` command in `node_modules/bin`, whereas linking
  * works consistently.
+ *
+ * yarn v2 workspace: dependencies might fix this.
  */
 async function linkMochaPuppeteer(modules: Packages, install: boolean) {
     const mochaPuppeteer = modules["@http4t/mocha-puppeteer"];
@@ -109,19 +82,12 @@ async function linkMochaPuppeteer(modules: Packages, install: boolean) {
     const args = process.argv.slice(2);
     const install = args[0] === 'install';
 
-    const modules = packages(".")
-        .reduce(
-            (acc, path) => {
-                const pack = readPackage(path);
-                if (ignored.has(pack.name))
-                    return acc;
-                const dir = path.replace(/\/package.json/, "");
-                acc[pack.name] = {path: dir, package: pack};
-                return acc;
-            },
-            {} as Packages);
+    const modules = {
+        ...packages("packages"),
+        ...packages("examples")
+    };
 
-    if(install) await linkMochaPuppeteer(modules, install);
+    if (install) await linkMochaPuppeteer(modules, install);
 
     const graph = buildGraph(modules);
 
@@ -135,7 +101,7 @@ async function linkMochaPuppeteer(modules: Packages, install: boolean) {
             await spawnPromise("yarn", ["install"], cwd);
 
             // See linkMochaPuppeteer
-            if (module.package.devDependencies["@http4t/mocha-puppeteer"]
+            if (module.package.devDependencies["@http4/mocha-puppeteer"]
                 || module.package.dependencies["@http4t/mocha-puppeteer"]) {
                 await spawnPromise("yarn", ["link", "@http4t/mocha-puppeteer"], cwd);
             }

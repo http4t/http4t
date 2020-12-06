@@ -1,0 +1,33 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+    name: Node ${{ matrix.node-version }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: install
+        run: yarn install
+      - name: build and test
+        run: yarn run test
+      - name: generate build number
+          uses: einaregilsson/build-number@v2
+        with:
+          token: ${{ secrets.github_token }}
+      - name: set version
+        run: yarn run version
+      - name: create .npmrc file
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+      - name: publish
+        run: npm publish --access public
+

@@ -1,11 +1,12 @@
 {
   "name": "@http4t/root",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "http4t-*",
-    "http4t-*/src",
-    "http4t-*/test"
+    "examples/**/src",
+    "examples/**/test",
+    "packages/**/src",
+    "packages/**/test"
   ],
   "scripts": {
     "version": "ts-node build/version $BUILD_NUMBER write",

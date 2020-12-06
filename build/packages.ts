@@ -7,6 +7,12 @@ export type Package = {
     dependencies: Dependencies,
     devDependencies: Dependencies
 };
+export type Packages = {
+    [name: string]: {
+        path: string,
+        package: Package
+    }
+}
 
 export function readPackage(path: string): Package {
     const json = JSON.parse(fs.readFileSync(path).toString('utf-8'));
@@ -38,11 +44,23 @@ export function files(dir: string, opts: Partial<FilesOpts> = {}) {
             [] as string[]);
 }
 
-export function packages(dir: string | undefined = undefined): string[] {
+export function packageFiles(dir: string | undefined = undefined): string[] {
     return files(dir,
         {
             skipDir: path => path.endsWith('/node_modules'),
             collect: path => path.endsWith('/package.json')
         }
     );
+}
+
+export function packages(dir: string = "."): Packages {
+    return packageFiles(dir)
+        .reduce(
+            (acc, path) => {
+                const pack = readPackage(path);
+                const dir = path.replace(/\/package.json/, "");
+                acc[pack.name] = {path: dir, package: pack};
+                return acc;
+            },
+            {} as Packages)
 }

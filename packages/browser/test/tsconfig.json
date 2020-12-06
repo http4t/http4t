@@ -1,0 +1,20 @@
+{
+  "extends": "../../../tsconfig-base.json",
+  "references": [
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../node/src"
+    },
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../mocha-puppeteer/src"
+    }
+  ]
+}
