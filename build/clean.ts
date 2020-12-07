@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import {files} from "./packages";
+import {files} from "./util/packages";
 
 const patterns = [
     /.*\/dist(\/.*|$)/,
@@ -26,7 +26,7 @@ const shouldBeCleaned = path => !!patterns.find(regex => regex.test(path));
             if (stats.isDirectory()) {
                 const thing = fs.rmdirSync as any;
                 thing(path, {recursive: true});
-            } else if(stats.isFile() || stats.isSymbolicLink()) {
+            } else if (stats.isFile() || stats.isSymbolicLink()) {
                 fs.unlinkSync(path);
             }
         });

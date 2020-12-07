@@ -14,16 +14,11 @@ async function linkMochaPuppeteer(modules: Packages, install: boolean) {
     if (install) await spawnPromise("yarn", ["link"], mochaPuppeteer.path)
 }
 
-(async function build() {
-    const args = process.argv.slice(2);
-    const install = args[0] === 'install';
-
+(async function test() {
     const modules = {
         ...packages("packages"),
         ...packages("examples")
     };
-
-    if (install) await linkMochaPuppeteer(modules, install);
 
     for (const name of dependencyOrder(modules)) {
         const module = modules[name];
@@ -31,17 +26,10 @@ async function linkMochaPuppeteer(modules: Packages, install: boolean) {
         console.log(module.path);
         const cwd = module.path;
 
-        if (install) {
-            await spawnPromise("yarn", ["install"], cwd);
-
-            // See linkMochaPuppeteer
-            if (module.package.devDependencies["@http4/mocha-puppeteer"]
-                || module.package.dependencies["@http4t/mocha-puppeteer"]) {
-                await spawnPromise("yarn", ["link", "@http4t/mocha-puppeteer"], cwd);
-            }
+        if (cwd.endsWith("/test")) {
+            await spawnPromise("yarn", ["run", "test"], cwd);
+            await spawnPromise("yarn", ["run", "test:browser"], cwd);
         }
-
-        await spawnPromise("yarn", ["build"], cwd);
     }
 })().then(_result => {
     process.exit(0);

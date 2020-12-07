@@ -18,16 +18,33 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: install
         run: yarn install
-      - name: build and test
+      - name: build
+        run: yarn run build
+      - name: test
         run: yarn run test
+  publish:
+    name: Publish
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
       - name: generate build number
-          uses: einaregilsson/build-number@v2
+        # Sets $BUILD_NUMBER, used in yarn run version
+        uses: einaregilsson/build-number@v2
         with:
           token: ${{ secrets.github_token }}
-      - name: set version
+      - name: install
+        run: yarn run install
+      - name: build
+        run: yarn build
+      - name: version
         run: yarn run version
-      - name: create .npmrc file
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
       - name: publish
-        run: npm publish --access public
+        run: yarn run publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 

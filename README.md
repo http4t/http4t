@@ -16,14 +16,19 @@ We have separate
 
 ### Build commands
 
-#### On first checkout
+#### Install and build
 
 ```
 yarn install
 yarn run build
+yarn run test
 ```
 
-####To run all tests
+#### To run all tests
+
+Runs tests in both node and browser environments.
+
+(see [mocha-puppeteer](./packages/mocha-puppeteer))
 
 ```
 yarn run test
@@ -36,7 +41,9 @@ yarn run clean
 ./delete_node_modules
 yarn install
 yarn run build
+yarn run test
 ```
+
 ### Creating a new module
 
 Add new directory to root:
@@ -55,7 +62,7 @@ http4t-my-module
 
 Note dependency on `@http4t/core`.
 
-```
+```json
 {
   "name": "@http4t/my-module",
   "version": "1.0.0",
@@ -74,7 +81,7 @@ Note dependency on `@http4t/core`.
 
 Note reference to `@http4t/core` source.
 
-```
+```json
 {
   "extends": "../../tsconfig-base.json",
   "references": [
@@ -89,7 +96,7 @@ Note reference to `@http4t/core` source.
 
 Note `name: "@http4t/my-module-test"`
 
-```
+```json
 {
   "name": "@http4t/my-module-test",
   "version": "1.0.0",
@@ -118,7 +125,7 @@ Note `name: "@http4t/my-module-test"`
 
 Note reference to `@http4t/core` source.
 
-```
+```json
 {
   "extends": "../../tsconfig-base.json",
   "references": [

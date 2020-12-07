@@ -11,8 +11,9 @@
   "scripts": {
     "version": "ts-node build/version $BUILD_NUMBER write",
     "build": "ts-node build/build install",
-    "test": "ts-node build/build",
-    "clean": "ts-node build/clean"
+    "test": "ts-node build/test",
+    "clean": "ts-node build/clean",
+    "publish": "ts-node build/clean"
   },
   "devDependencies": {
     "@types/node": "^10",

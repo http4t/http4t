@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import {Dependencies, packages, readPackage} from "./packages";
+import {Dependencies, packages, readPackage} from "./util/packages";
 
 /**
  * Updates package.json version with build number
@@ -36,8 +36,9 @@ function fixDependencies(dependencies: Dependencies | undefined, version: string
             json.version = version;
             fixDependencies(json.dependencies, version);
             fixDependencies(json.devDependencies, version);
+
             if (write) {
-                fs.writeFileSync(pack.path, JSON.stringify(json, null, 2))
+                fs.writeFileSync(`${pack.path}/package.json`, JSON.stringify(json, null, 2))
             } else {
                 console.log(pack.path, json);
             }
@@ -49,4 +50,3 @@ function fixDependencies(dependencies: Dependencies | undefined, version: string
     console.error(err);
     process.exit(1);
 });
-;
