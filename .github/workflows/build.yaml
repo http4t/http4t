@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: install
-        run: yarn install
+        run: yarn install --scripts-prepend-node-path
       - name: test
         run: yarn run test
   publish:
@@ -28,10 +28,10 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 14
           registry-url: https://registry.npmjs.org/
       - name: install
-        run: yarn run install
+        run: yarn install --scripts-prepend-node-path
       - name: version
         run: yarn run version
       - name: publish
