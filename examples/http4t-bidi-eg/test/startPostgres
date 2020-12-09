@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+
 set -e
 
 docker run --rm -d -e POSTGRES_DB=bidi-example -e POSTGRES_USER=bidi-example -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:12-alpine

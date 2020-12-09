@@ -12,9 +12,6 @@
     },
     {
       "path": "../src"
-    },
-    {
-      "path": "../../mocha-puppeteer/src"
     }
   ]
 }

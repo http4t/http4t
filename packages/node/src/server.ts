@@ -1,7 +1,6 @@
 import {HttpHandler, ParsedUri} from "@http4t/core/contract";
 import {Server} from "@http4t/core/server";
 import {Uri} from "@http4t/core/uri";
-import {deleteMeLog} from "@http4t/core/util/logging";
 import * as node from 'http';
 import {requestNodeToHttp4t, responseHttp4tToNode} from "./conversions";
 
@@ -36,22 +35,17 @@ export class NodeServer implements Server {
 
 export function adapter(handler: HttpHandler) {
     return (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
-        deleteMeLog("NodeServer", "reached server");
         try {
-            deleteMeLog("NodeServer", "nodeRequest", nodeRequest);
             const req = requestNodeToHttp4t(nodeRequest);
-            deleteMeLog("NodeServer", "HttpRequest", req);
             (async () => {
                 try {
                     const response = await handler.handle(req);
                     await responseHttp4tToNode(response, nodeResponse);
                 } catch (e) {
-                    deleteMeLog("NodeServer", "handler exception", e);
                     nodeResponse.end()
                 }
             })();
         } catch (e) {
-            deleteMeLog("NodeServer", "exception", e);
             nodeResponse.end();
         }
     };

@@ -1,5 +1,4 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {deleteMeLog} from "@http4t/core/util/logging";
 import * as http from "http";
 import * as https from "https";
 import {RequestOptions} from "https";
@@ -29,32 +28,23 @@ export class ClientHandler implements HttpHandler {
     }
 
     async handle(request: HttpRequest): Promise<HttpResponse> {
-        deleteMeLog("ClientHandler", "request", request);
         return new Promise<HttpResponse>(async (resolve, reject) => {
                 try {
                     const responseHandler = (nodeResponse: http.IncomingMessage) => {
-                        deleteMeLog("ClientHandler", "nodeResponse", {
-                            status: nodeResponse.statusCode,
-                            headers: nodeResponse.headers,
-                        });
                         const response = responseNodeToHttp4t(nodeResponse);
-                        deleteMeLog("ClientHandler", "response", response);
                         resolve(response);
                     };
                     const nodeOptions = requestHttp4tToNode(request, this.defaultProtocol);
                     const strategy = getStrategy(nodeOptions.protocol as any);
 
-                    deleteMeLog("ClientHandler", "nodeOptions", nodeOptions);
                     const nodeRequest = strategy.request(nodeOptions, responseHandler);
 
-                    deleteMeLog("ClientHandler", "nodeRequest", nodeRequest);
                     if (request.body === '') {
                         nodeRequest.end();
                     } else {
                         await bodyToStream(request.body, nodeRequest);
                     }
                 } catch (e) {
-                    deleteMeLog("ClientHandler", "exception", e);
                     reject(e);
                 }
             }

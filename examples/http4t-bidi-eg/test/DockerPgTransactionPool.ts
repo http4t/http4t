@@ -52,9 +52,11 @@ export class DockerPgTransactionPool implements TransactionPool {
         try {
             return await this.decorated.getTransaction();
         } catch (e) {
+            console.log("BEFORE");
             if (e.errno !== "ECONNREFUSED") {
                 throw e;
             }
+            console.log("BEFORE" + `${__dirname}/startPostgres`);
             await exec(`${__dirname}/startPostgres`);
             return retry(() => this.decorated.getTransaction(), 50, 100)
         }

@@ -36,9 +36,6 @@
     },
     {
       "path": "./packages/result/test"
-    },
-    {
-      "path": "./packages/result/src"
     }
   ]
 }

@@ -15,7 +15,7 @@ async function error(f: () => any): Promise<any> {
 }
 
 describe('store', function () {
-    this.timeout(10000);
+    this.timeout(30000);
 
     let client: CloseableClient<Api>;
 

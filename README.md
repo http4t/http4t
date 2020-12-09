@@ -2,9 +2,7 @@
 
 ![teapot](https://user-images.githubusercontent.com/123496/53679728-5e9d3e80-3cc8-11e9-81ff-af48da63d422.png)
 
-[![CircleCI](https://circleci.com/gh/http4t/http4t.svg?style=svg)](https://circleci.com/gh/http4t/http4t)
-
-[![Testing Powered By SauceLabs](https://opensource.saucelabs.com/images/opensauce/powered-by-saucelabs-badge-gray.png?sanitize=true "Testing Powered By SauceLabs")](https://saucelabs.com)
+![Build](https://github.com/http4t/http4t/workflows/Build/badge.svg?branch=master)
 
 A modular web framework for Typescript
 
@@ -12,36 +10,31 @@ Supports [RFC 2324](https://tools.ietf.org/html/rfc2324)
 
 ## Contributing
 
-We have separate 
+### Development loop
 
-### Build commands
-
-#### Install and build
+To run all tests from the root project:
 
 ```
 yarn install
-yarn run build
 yarn run test
 ```
 
-#### To run all tests
+`yarn run test` in the root project runs both `test` and `test:browser` scripts
+in all subprojects. 
 
-Runs tests in both node and browser environments.
+See https://github.com/http4t/mocha-puppeteer for more on browser testing.
 
-(see [mocha-puppeteer](./packages/mocha-puppeteer))
+### Gotchas
 
-```
-yarn run test
-```
+In normal local development, you should never need to compile the typescript.
 
-#### To run a clean build
+You'll get `ERR_UNKNOWN_FILE_EXTENSION` when you run the tests if there are compiled
+`.js` files in any of the source directories.
+
+To fix that, from the root run:
 
 ```
 yarn run clean
-./delete_node_modules
-yarn install
-yarn run build
-yarn run test
 ```
 
 ### Creating a new module
@@ -104,12 +97,12 @@ Note `name: "@http4t/my-module-test"`
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "test": "NODE_ENV=development mocha --require ts-node/register --colors --exit  '**/*.test.ts'",
-    "test:browser": "puppet"
+    "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
+    "test:browser": "mocha_puppeteer"
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
-    "@http4t/mocha-puppeteer": "1.0.0",
+    "@http4t/mocha-puppeteer": "^0.0.8",
     "@http4t/my-module": "1.0.0"
   },
   "devDependencies": {
@@ -131,9 +124,6 @@ Note reference to `@http4t/core` source.
   "references": [
     {
       "path": "../src"
-    },
-    {
-      "path": "../../http4t-mocha-puppeteer/src"
     },
     {
       "path": "../../http4t-core/src"

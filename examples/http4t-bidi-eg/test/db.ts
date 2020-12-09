@@ -1,1 +1,7 @@
-export const testDatabase = {database: "bidi-example", user: "bidi-example", password: "password"};
+import {PoolConfig} from 'pg'
+
+export const testDatabase: PoolConfig = {
+    database: "bidi-example",
+    user: "bidi-example",
+    password: "password",
+};

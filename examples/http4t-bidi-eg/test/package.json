@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "test": "NODE_ENV=development mocha --require ts-node/register --colors --exit  '**/*.test.ts'",
+    "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
     "test:browser": "echo no browser tests yet"
   },
   "dependencies": {
@@ -16,7 +16,8 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "chai": "^4.1.7",
-    "mocha": "^7.0.1",
+    "mocha": "^8.2.1",
+    "ts-node": "git+https://github.com/TypeStrong/ts-node.git",
     "typedoc": "^0.16.9"
   }
 }

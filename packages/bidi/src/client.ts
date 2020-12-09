@@ -1,7 +1,6 @@
 import {bufferText} from "@http4t/core/bodies";
 import {HttpHandler, HttpResponse} from "@http4t/core/contract";
 import {get} from "@http4t/core/requests";
-import {deleteMeLog} from "@http4t/core/util/logging";
 import {isFailure} from "@http4t/result";
 import {JsonPathError, ResultErrorOpts} from "@http4t/result/JsonPathError";
 import {prefix} from "@http4t/result/JsonPathResult";
@@ -18,9 +17,7 @@ function validator<T>(
     (message: HttpResponse) => Promise<T> {
 
     return async (response: HttpResponse): Promise<T> => {
-        deleteMeLog("validator", "response", response);
         const result = await lens.get(response);
-        deleteMeLog("validator", "result", JSON.stringify(result, null,3));
         if (isFailure(result))
             throw new JsonPathError({
                     response: {
@@ -43,12 +40,8 @@ export function routeClient<T extends HandlerFn>(
     const v = validator(route.response, opts);
     const f = async (value: any): Promise<any> => {
         const request = await route.request.set(get("/"), value);
-        deleteMeLog("validator", "")
-        deleteMeLog("routeClient", `${routeName} request`, request);
         const response = await http.handle(request);
-        deleteMeLog("routeClient", "response", response);
         const bufferedResponse = {...response, body: await bufferText(response.body)};
-        deleteMeLog("routeClient", `${routeName} bufferedResponse`, bufferedResponse);
         return v(bufferedResponse);
     };
 

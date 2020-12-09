@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [14.x, 15.x]
     name: Node ${{ matrix.node-version }}
     steps:
       - uses: actions/checkout@v1
@@ -18,8 +18,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: install
         run: yarn install
-      - name: build
-        run: yarn run build
       - name: test
         run: yarn run test
   publish:
@@ -32,15 +30,8 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
-      - name: generate build number
-        # Sets $BUILD_NUMBER, used in yarn run version
-        uses: einaregilsson/build-number@v2
-        with:
-          token: ${{ secrets.github_token }}
       - name: install
         run: yarn run install
-      - name: build
-        run: yarn build
       - name: version
         run: yarn run version
       - name: publish

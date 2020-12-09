@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "test": "NODE_ENV=development mocha --require ts-node/register --colors --exit  '**/*.test.ts'",
-    "test:browser": "puppet"
+    "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
+    "test:browser": "mocha_puppeteer"
   },
   "dependencies": {
-    "@http4t/mocha-puppeteer": "1.0.0",
+    "@http4t/mocha-puppeteer": "^0.0.8",
     "@http4t/result": "1.0.0"
   },
   "devDependencies": {
@@ -17,9 +17,8 @@
     "@types/mocha": "^5.2.6",
     "@types/uuid": "^3.4.7",
     "chai": "^4.1.7",
-    "madge": "^3.2.0",
-    "mocha": "^7.0.1",
-    "typedoc": "^0.16.9",
-    "uuid": "^3.4.0"
+    "mocha": "^8.2.1",
+    "ts-node": "git+https://github.com/TypeStrong/ts-node.git",
+    "typescript": "^4.1.2"
   }
 }

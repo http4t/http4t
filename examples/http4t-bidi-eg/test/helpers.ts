@@ -5,7 +5,6 @@ import {buildClient} from "@http4t/bidi/client";
 import {HttpHandler} from "@http4t/core/contract";
 import {filterRequest} from "@http4t/core/Filter";
 import {Closeable} from "@http4t/core/server";
-import {deleteMeLog} from "@http4t/core/util/logging";
 import {ClientHandler} from "@http4t/node/client";
 import {NodeServer} from "@http4t/node/server";
 import {Pool} from "pg";
@@ -20,9 +19,10 @@ export type CloseableClient<T> = T & Closeable & { port: number | undefined };
  */
 export async function testClient(): Promise<CloseableClient<Api>> {
     const router = await startApp(new DockerPgTransactionPool(new PostgresTransactionPool(new Pool(testDatabase))));
+
     const server = await NodeServer.start(router);
     const url = await server.url();
-    deleteMeLog("testClient", "server url", url);
+
     const http: HttpHandler = filterRequest(r => ({
         ...r,
         uri: {...r.uri, authority: url.authority}

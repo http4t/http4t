@@ -1,20 +1,5 @@
 import {Packages} from "./packages";
 
-/**
- * Builds all modules
- *
- * Responsibilities:
- *
- * - Find all modules by `package.json` file
- * - Figure out topological order of projects by dependency so we build dependencies first
- * - For each module:
- *   - yarn install
- *   - Link mocha-puppeteer into the projects that need it, because installing it doesn't work
- *   - Compile typescript
- *   - yarn test
- *   - yarn test:browser
- */
-
 type Edges = { [node: string]: Set<string> };
 type Graph = {
     nodes: string[],
@@ -24,13 +9,14 @@ type Graph = {
 }
 
 export function buildGraph(packages: Packages): Graph {
+    const names = new Set(Object.keys(packages));
     return Object.entries(packages)
         .reduce((graph, module) => {
             const pack = module[1].package;
             const deps = new Set([
                 ...Object.keys(pack.dependencies),
                 ...Object.keys(pack.devDependencies)]
-                .filter(k => k.startsWith("@http4t/")));
+                .filter(k => names.has(k)));
 
             graph.nodes.push(pack.name);
             graph.edges[pack.name] = deps;

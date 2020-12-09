@@ -17,6 +17,7 @@ import {spawnPromise} from "./util/processes";
         if (pack.path.endsWith("/test"))
             continue;
 
+        await spawnPromise("yarn", ["run", "build"], pack.path);
         // Picks up NODE_AUTH_TOKEN set in github action
         await spawnPromise("npm", ["publish", '--access', 'public'], pack.path);
     }
