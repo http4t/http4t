@@ -17,7 +17,7 @@
     "@types/mocha": "^5.2.6",
     "chai": "^4.1.7",
     "mocha": "^8.2.1",
-    "ts-node": "git+https://github.com/TypeStrong/ts-node.git",
+    "ts-node": "^9.1.1",
     "typedoc": "^0.16.9"
   }
 }

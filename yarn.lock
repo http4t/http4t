@@ -5759,9 +5759,9 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-"ts-node@git+https://github.com/TypeStrong/ts-node.git":
+"ts-node@^9.1.1":
   version "9.1.1"
-  resolved "git+https://github.com/TypeStrong/ts-node.git#d2ccc5cd20c77828817cd3acb639430eac4a884d"
+  resolved "^9.1.1#d2ccc5cd20c77828817cd3acb639430eac4a884d"
   dependencies:
     arg "^4.1.0"
     create-require "^1.1.0"
