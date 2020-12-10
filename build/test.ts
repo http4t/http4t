@@ -3,10 +3,12 @@ import {packages, Packages} from "./util/packages";
 import {spawnPromise} from "./util/processes";
 
 (async function test() {
-    const modules = {
-        ...packages("packages"),
-        ...packages("examples")
-    };
+    const dirs = process.argv.slice(2);
+
+    const modules = dirs.reduce(
+        (packs, dir) => {
+            return {...packs, ...packages("packages")};
+        }, {} as Packages)
 
     for (const name of dependencyOrder(modules)) {
         const module = modules[name];

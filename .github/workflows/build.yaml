@@ -22,7 +22,35 @@ jobs:
       - name: test
         uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
         with:
-           args: yarn run test
+           args: yarn run test:packages
+  test-examples:
+    runs-on: ubuntu-latest
+    name: Node 15.x
+    services:
+      postgres:
+        image: postgis/postgis:10-2.5
+        env:
+          # must specify password for PG Docker container image, see: https://registry.hub.docker.com/_/postgres?tab=description&page=1&name=10
+          POSTGRES_DB: bidi-example
+          POSTGRES_USER: bidi-example
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 15.x
+          registry-url: https://registry.npmjs.org/
+      - name: install
+        run: yarn install --scripts-prepend-node-path
+      - name: test
+        uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
+        with:
+           args: yarn run test:examples
   publish:
     name: Publish
     needs: [ build ]

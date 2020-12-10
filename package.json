@@ -1,6 +1,6 @@
 {
   "name": "@http4t/root",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "workspaces": [
     "examples/*/src",
@@ -11,7 +11,9 @@
   "scripts": {
     "version": "ts-node build/version $GITHUB_RUN_NUMBER write",
     "build": "ts-node build/build install",
-    "test": "ts-node build/clean && ts-node build/test",
+    "test": "ts-node build/clean && ts-node build/test packages examples",
+    "test:packages": "ts-node build/clean && ts-node build/test packages",
+    "test:examples": "ts-node build/clean && ts-node build/test examples",
     "clean": "ts-node build/clean",
     "publish": "ts-node build/clean"
   },
