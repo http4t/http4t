@@ -18,6 +18,9 @@ import {spawnPromise} from "./util/processes";
 
     console.log(`Publishing ${tag}`);
 
+
+    await spawnPromise("cat", ["/home/runner/work/_temp/.npmrc"]);
+
     // Make sure everything builds before publishing, so we
     // release either all modules or none to npm
     for (const pack of Object.values(packages("packages"))) {
