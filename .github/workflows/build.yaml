@@ -22,7 +22,7 @@ jobs:
       - name: test
         uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
         with:
-           args: yarn run test:packages
+          args: yarn run test:packages
   test-examples:
     runs-on: ubuntu-latest
     name: Test examples
@@ -50,7 +50,7 @@ jobs:
       - name: test
         uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
         with:
-           args: yarn run test:examples
+          args: yarn run test:examples
   publish:
     name: Publish
     needs: [ build, test-examples ]
@@ -69,4 +69,5 @@ jobs:
         run: yarn run publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -1,3 +1,4 @@
+import {context, getOctokit} from '@actions/github';
 import {packages, readPackage} from "./util/packages";
 import {spawnPromise} from "./util/processes";
 
@@ -9,11 +10,10 @@ import {spawnPromise} from "./util/processes";
 (async function publish() {
     const version = readPackage("./package.json").version;
     const tag = `v${version}`;
+    const github = getOctokit(process.env.GITHUB_TOKEN)
+    const {owner, repo} = context.repo;
 
     console.log(`Publishing ${tag}`);
-
-    await spawnPromise("git", ["tag", tag]);
-    await spawnPromise("git", ["push", "origin", tag]);
 
     // Make sure everything builds before publishing, so we
     // release either all modules or none to npm
@@ -23,6 +23,14 @@ import {spawnPromise} from "./util/processes";
 
         await spawnPromise("yarn", ["run", "build"], pack.path);
     }
+
+    await github.repos.createRelease({
+        owner,
+        repo,
+        tag_name: tag,
+        body: tag,
+        target_commitish: context.sha
+    })
 
     for (const pack of Object.values(packages("packages"))) {
         if (pack.path.endsWith("/test"))
