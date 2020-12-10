@@ -2,14 +2,14 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - '*'
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [14.x, 15.x]
-    name: Node ${{ matrix.node-version }}
+    name: Test node ${{ matrix.node-version }}
     steps:
       - uses: actions/checkout@v1
       - name: Setup node
@@ -20,9 +20,24 @@ jobs:
       - name: install
         run: yarn install
       - name: test
+        with:
+          args: yarn run test:packages:node
+  test-browser:
+    runs-on: ubuntu-latest
+    name: Browser test
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 15.x
+          registry-url: https://registry.npmjs.org/
+      - name: install
+        run: yarn install
+      - name: test
         uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
         with:
-          args: yarn run test:packages
+          args: yarn run test:packages:browser
   test-examples:
     runs-on: ubuntu-latest
     name: Test examples
@@ -53,7 +68,8 @@ jobs:
           args: yarn run test:examples
   publish:
     name: Publish
-    needs: [ build, test-examples ]
+    needs: [ test, test-browser ]
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
