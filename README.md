@@ -102,7 +102,7 @@ Note `name: "@http4t/my-module-test"`
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
-    "@http4t/mocha-puppeteer": "^0.0.8",
+    "@http4t/mocha-puppeteer": "^0.0.9",
     "@http4t/my-module": "1.0.0"
   },
   "devDependencies": {

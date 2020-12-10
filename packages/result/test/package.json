@@ -9,7 +9,7 @@
     "test:browser": "mocha_puppeteer"
   },
   "dependencies": {
-    "@http4t/mocha-puppeteer": "^0.0.8",
+    "@http4t/mocha-puppeteer": "^0.0.9",
     "@http4t/result": "1.0.0"
   },
   "devDependencies": {

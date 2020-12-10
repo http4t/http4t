@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
-    "@http4t/mocha-puppeteer": "^0.0.8"
+    "@http4t/mocha-puppeteer": "^0.0.9"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

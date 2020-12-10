@@ -864,10 +864,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@http4t/mocha-puppeteer@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@http4t/mocha-puppeteer/-/mocha-puppeteer-0.0.8.tgz#3b0cad986cef55ddff3a35c521b33c9761894470"
-  integrity sha512-RLU5cUIHXwvPpSAC89D7wZNtLjk9NbnT22tWgMxTFgyY7fO7Hfk1MQSx2ravDPZ7mGrYlTxRJfSVKvIVU1h6Nw==
+"@http4t/mocha-puppeteer@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@http4t/mocha-puppeteer/-/mocha-puppeteer-0.0.9.tgz#268b383e662906f351ac0252eb83b32f129ef907"
+  integrity sha512-r0ePZRQ/R+7ZFPXDvdgaIxew3LGIDFFGEQ9Qnc7va9/07bRXYJ7ON4S8mxZARFwld+SjjvXM1KfNT3le97HRVg==
   dependencies:
     parcel-bundler "^1.12.4"
     puppeteer "^5.5.0"
