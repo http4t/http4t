@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import {Dependencies, packages, readPackage} from "./util/packages";
+import {Dependencies, PackageFile, packages, readPackage} from "./util/packages";
 
 /**
  * Updates package.json version with build number
@@ -20,28 +20,33 @@ function fixDependencies(dependencies: Dependencies | undefined, version: string
         });
 }
 
+function fixVersion(pack: PackageFile, version: string) {
+    const json = pack.package;
+    json.version = version;
+    fixDependencies(json.dependencies, version);
+    fixDependencies(json.devDependencies, version);
+
+    fs.writeFileSync(`${pack.path}/package.json`, JSON.stringify(json, null, 2))
+}
+
 (async function setVersion() {
     const args = process.argv.slice(2);
     const buildNumber = args[0];
-    const write = args[1] === 'write';
 
     if (!buildNumber)
         throw new Error("First argument should be build number");
 
-    const version = readPackage("./package.json").version.replace(/\.[^.]+$/, `.${buildNumber}`);
+    const root = readPackage("./package.json");
+    const version = root.version.replace(/\.[^.]+$/, `.${buildNumber}`);
+    console.log(`Version ${version}`);
+
+    fixVersion(
+        {path: "./package.json", package: root},
+        version)
 
     Object.values(packages("packages"))
         .forEach(pack => {
-            const json = pack.package;
-            json.version = version;
-            fixDependencies(json.dependencies, version);
-            fixDependencies(json.devDependencies, version);
-
-            if (write) {
-                fs.writeFileSync(`${pack.path}/package.json`, JSON.stringify(json, null, 2))
-            } else {
-                console.log(pack.path, json);
-            }
+            fixVersion(pack, version);
         })
     console.log(version);
 })().then(_result => {

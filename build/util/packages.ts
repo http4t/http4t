@@ -7,11 +7,12 @@ export type Package = {
     dependencies: Dependencies,
     devDependencies: Dependencies
 };
+export type PackageFile = {
+    path: string,
+    package: Package
+};
 export type Packages = {
-    [name: string]: {
-        path: string,
-        package: Package
-    }
+    [name: string]: PackageFile
 }
 
 export function readPackage(path: string): Package {

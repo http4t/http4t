@@ -14,7 +14,7 @@
     "test:packages": "ts-node build/clean && ts-node build/test packages",
     "test:examples": "ts-node build/clean && ts-node build/test examples",
     "clean": "ts-node build/clean",
-    "version": "ts-node build/version $GITHUB_RUN_NUMBER write",
+    "version": "ts-node build/version $GITHUB_RUN_NUMBER",
     "publish": "ts-node build/publish"
   },
   "devDependencies": {
