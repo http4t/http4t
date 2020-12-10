@@ -41,7 +41,7 @@ function fixVersion(pack: PackageFile, version: string) {
     console.log(`Version ${version}`);
 
     fixVersion(
-        {path: "./package.json", package: root},
+        {path: "./", package: root},
         version)
 
     Object.values(packages("packages"))
