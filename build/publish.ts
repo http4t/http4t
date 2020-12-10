@@ -8,6 +8,9 @@ import {spawnPromise} from "./util/processes";
  * Create and pushes git tag
  */
 (async function publish() {
+    if(!process.env.NODE_AUTH_TOKEN)
+        throw new Error("$NODE_AUTH_TOKEN was not set");
+
     const version = readPackage("./package.json").version;
     const tag = `v${version}`;
     const github = getOctokit(process.env.GITHUB_TOKEN)
