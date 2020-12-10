@@ -8,7 +8,7 @@ import {spawnPromise} from "./util/processes";
  * Create and pushes git tag
  */
 (async function publish() {
-    if(!process.env.NODE_AUTH_TOKEN)
+    if (!process.env.NODE_AUTH_TOKEN)
         throw new Error("$NODE_AUTH_TOKEN was not set");
 
     const version = readPackage("./package.json").version;
@@ -45,7 +45,7 @@ import {spawnPromise} from "./util/processes";
         console.log(`Publishing ${pack.package.name} ${pack.package.version}`);
 
         // Picks up NODE_AUTH_TOKEN set in github action
-        await spawnPromise("npm", ["publish", '--access', 'public'], pack.path);
+        await spawnPromise("yarn", ["publish", '--access', 'public', pack.path]);
     }
 })().then(_result => {
     process.exit(0);
