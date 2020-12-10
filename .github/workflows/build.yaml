@@ -20,8 +20,7 @@ jobs:
       - name: install
         run: yarn install
       - name: test
-        with:
-          args: yarn run test:packages:node
+        run: yarn run test:packages:node
   test-browser:
     runs-on: ubuntu-latest
     name: Browser test
@@ -63,9 +62,7 @@ jobs:
       - name: install
         run: yarn install
       - name: test
-        uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
-        with:
-          args: yarn run test:examples
+        run: yarn run test:examples
   publish:
     name: Publish
     needs: [ test, test-browser ]
