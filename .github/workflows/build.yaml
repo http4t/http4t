@@ -18,14 +18,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org/
       - name: install
-        run: yarn install --scripts-prepend-node-path
+        run: yarn install
       - name: test
         uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
         with:
            args: yarn run test:packages
   test-examples:
     runs-on: ubuntu-latest
-    name: Node 15.x
+    name: Test examples
     services:
       postgres:
         image: postgis/postgis:10-2.5
@@ -46,14 +46,14 @@ jobs:
           node-version: 15.x
           registry-url: https://registry.npmjs.org/
       - name: install
-        run: yarn install --scripts-prepend-node-path
+        run: yarn install
       - name: test
         uses: ianwalter/puppeteer-container@acc52cd2334ad9eaf6e1974562d263e0a711b7e8
         with:
            args: yarn run test:examples
   publish:
     name: Publish
-    needs: [ build ]
+    needs: [ build, test-examples ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -62,7 +62,7 @@ jobs:
           node-version: 14
           registry-url: https://registry.npmjs.org/
       - name: install
-        run: yarn install --scripts-prepend-node-path
+        run: yarn install
       - name: version
         run: yarn run version
       - name: publish

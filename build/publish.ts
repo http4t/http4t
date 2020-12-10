@@ -10,12 +10,16 @@ import {spawnPromise} from "./util/processes";
     const version = readPackage("./package.json").version;
     const tag = `v${version}`;
 
+    console.log(`Publishing ${tag}`);
+
     await spawnPromise("git", ["tag", tag]);
     await spawnPromise("git", ["push", "origin", tag]);
 
     for (const pack of Object.values(packages("packages"))) {
         if (pack.path.endsWith("/test"))
             continue;
+
+        console.log(`Publishing ${pack.package.name} ${pack.package.version}`);
 
         await spawnPromise("yarn", ["run", "build"], pack.path);
         // Picks up NODE_AUTH_TOKEN set in github action
