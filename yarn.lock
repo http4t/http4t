@@ -5759,9 +5759,10 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-"ts-node@^9.1.1":
+ts-node@^9.1.1:
   version "9.1.1"
-  resolved "^9.1.1#d2ccc5cd20c77828817cd3acb639430eac4a884d"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-9.1.1.tgz#51a9a450a3e959401bda5f004a72d54b936d376d"
+  integrity sha512-hPlt7ZACERQGf03M253ytLY3dHbGNGrAq9qIHWUY9XHYl1z7wYngSr3OQ5xmui8o2AaxsONxIzjafLUiWBo1Fg==
   dependencies:
     arg "^4.1.0"
     create-require "^1.1.0"
