@@ -9,6 +9,7 @@
     "packages/*/test"
   ],
   "scripts": {
+    "build": "ts-node build/build",
     "clean": "ts-node build/clean",
 
     "test": "ts-node build/clean && ts-node build/test node,browser packages examples",
