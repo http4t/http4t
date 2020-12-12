@@ -11,7 +11,7 @@ export class NodeServer implements Server {
     }
 
     static async start(handler: HttpHandler | HttpHandlerFn, {port = 0} = {}): Promise<NodeServer> {
-        const httpHandler = typeof handler === 'function' ? handlers.handler(handler);
+        const httpHandler = typeof handler === 'function' ? handlers.handler(handler) : handler;
         const server = node.createServer(adapter(httpHandler));
         server.listen(port);
         const uri = await new Promise<ParsedUri>((resolve) => {
