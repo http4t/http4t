@@ -1,4 +1,6 @@
 import {HttpHandler, ParsedUri} from "@http4t/core/contract";
+import * as handlers from "@http4t/core/handlers";
+import {HttpHandlerFn} from "@http4t/core/handlers";
 import {Server} from "@http4t/core/server";
 import {Uri} from "@http4t/core/uri";
 import * as node from 'http';
@@ -8,8 +10,9 @@ export class NodeServer implements Server {
     private constructor(private readonly server: node.Server, public readonly uri: ParsedUri) {
     }
 
-    static async start(handler: HttpHandler, {port = 0} = {}): Promise<NodeServer> {
-        const server = node.createServer(adapter(handler));
+    static async start(handler: HttpHandler | HttpHandlerFn, {port = 0} = {}): Promise<NodeServer> {
+        const httpHandler = typeof handler === 'function' ? handlers.handler(handler);
+        const server = node.createServer(adapter(httpHandler));
         server.listen(port);
         const uri = await new Promise<ParsedUri>((resolve) => {
             server.on('listening', () => {
