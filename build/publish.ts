@@ -10,6 +10,8 @@ import {spawnPromise} from "./util/processes";
 (async function publish() {
     if (!process.env.NODE_AUTH_TOKEN)
         throw new Error("$NODE_AUTH_TOKEN was not set");
+    if (!process.env.GITHUB_TOKEN)
+        throw new Error("$GITHUB_TOKEN was not set");
 
     const version = readPackage("./package.json").version;
     const tag = `v${version}`;

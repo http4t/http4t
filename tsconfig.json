@@ -26,6 +26,12 @@
       "path": "./packages/core/test"
     },
     {
+      "path": "./packages/lambda/src"
+    },
+    {
+      "path": "./packages/lambda/test"
+    },
+    {
       "path": "./packages/node/src"
     },
     {

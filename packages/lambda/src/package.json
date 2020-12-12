@@ -1,0 +1,15 @@
+{
+  "name": "@http4t/lambda",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@http4t/core": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.66"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@http4t/lambda-test",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
+    "test:browser": "echo no browser tests"
+  },
+  "dependencies": {
+    "@http4t/lambda": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "chai": "^4.1.7",
+    "mocha": "^8.2.1",
+    "ts-node": "^9.1.1",
+    "typedoc": "^0.16.9",
+    "typescript": "^4.1.2"
+  }
+}

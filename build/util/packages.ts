@@ -29,7 +29,7 @@ export type FilesOpts = {
     collect: (fullPath: string) => boolean
 }
 
-export function files(dir: string, opts: Partial<FilesOpts> = {}) {
+export function files(dir: string, opts: Partial<FilesOpts> = {}): string[] {
     const {skipDir = () => false, collect = () => true} = opts;
     return fs.readdirSync(dir)
         .reduce(
@@ -45,7 +45,7 @@ export function files(dir: string, opts: Partial<FilesOpts> = {}) {
             [] as string[]);
 }
 
-export function packageFiles(dir: string | undefined = undefined): string[] {
+export function packageFiles(dir: string = "."): string[] {
     return files(dir,
         {
             skipDir: path => path.endsWith('/node_modules'),
