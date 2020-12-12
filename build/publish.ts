@@ -1,4 +1,5 @@
 import {context, getOctokit} from '@actions/github';
+import * as fs from "fs";
 import {packages, readPackage} from "./util/packages";
 import {spawnPromise} from "./util/processes";
 
@@ -25,6 +26,10 @@ import {spawnPromise} from "./util/processes";
     for (const pack of Object.values(packages("packages"))) {
         if (pack.path.endsWith("/test"))
             continue;
+
+        const json = pack.package;
+        delete json["type"];
+        fs.writeFileSync(`${pack.path}/package.json`, JSON.stringify(json, null, 2))
 
         await spawnPromise("yarn", ["run", "build"], pack.path);
     }
