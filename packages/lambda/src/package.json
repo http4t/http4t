@@ -7,9 +7,7 @@
     "build": "tsc --build"
   },
   "dependencies": {
-    "@http4t/core": "1.0.0"
-  },
-  "devDependencies": {
+    "@http4t/core": "1.0.0",
     "@types/aws-lambda": "^8.10.66"
   }
 }
