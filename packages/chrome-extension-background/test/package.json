@@ -1,0 +1,23 @@
+{
+  "name": "@http4t/chrome-extension-background-test",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "echo no tests",
+    "test:browser": "echo no tests"
+  },
+  "dependencies": {
+    "@http4t/core": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "chai": "^4.1.7",
+    "mocha": "^8.2.1",
+    "ts-node": "^9.1.1",
+    "typedoc": "^0.16.9",
+    "typescript": "^4.1.2"
+  }
+}

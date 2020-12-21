@@ -1,0 +1,12 @@
+{
+  "name": "@http4t/chrome-extension-background",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.127"
+  }
+}
