@@ -1,38 +1,104 @@
-import {bufferText} from "@http4t/core/bodies";
-import {HttpRequest} from "@http4t/core/contract";
+import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {uriString} from "@http4t/core/requests";
 import {Uri} from "@http4t/core/uri";
-import {FetchMessage, isFetchMessage} from "./FetchViaBackgroundScript";
+import {FetchMessage, fetchMessage, isFetchMessage} from "./FetchMessage";
+import CreateProperties = chrome.tabs.CreateProperties;
 import QueryInfo = chrome.tabs.QueryInfo;
+import Tab = chrome.tabs.Tab;
 
-function findTabByUrl(request: HttpRequest): QueryInfo {
-    const uri = Uri.of(request.uri);
-    const pattern = `${uri.scheme}://${uri.authority?.host}/*`;
-    return {url: pattern};
+
+export function rootUrl(request: HttpRequest): CreateProperties {
+    const uri = Uri.of({
+        scheme: request.uri.scheme,
+        authority: request.uri.authority,
+        path: "/"
+    });
+    return {
+        url: uri.toString(),
+        active: false
+    };
+}
+
+export function sameHost(request: HttpRequest): QueryInfo {
+    const uri = Uri.of({
+        scheme: request.uri.scheme,
+        authority: request.uri.authority,
+        path: "/*"
+    });
+    return {url: uri.toString()};
+}
+
+export function findOrCreateTab(
+    queryInfo: QueryInfo,
+    properties: CreateProperties): Promise<Tab> {
+    return new Promise<Tab>((resolve, reject) =>
+        chrome.tabs.query(queryInfo, (tabs) => {
+            const tab = tabs?.[0];
+            if (tab)
+                return resolve(tab);
+
+            chrome.tabs.create(properties, (tab) => {
+                if (!tab) {
+                    reject({message: "Could not create tab", properties})
+                } else {
+                    resolve(tab);
+                }
+            })
+        }))
+}
+
+export const findTabByHost: TabFinder =
+    request => {
+        return findOrCreateTab(
+            sameHost(request),
+            rootUrl(request));
+    }
+
+export type TabFinder = (request: HttpRequest) => Promise<Tab>;
+
+export class SendToTabHandler implements HttpHandler {
+    constructor(private readonly findTab: TabFinder) {
+    }
+
+    handle(request: HttpRequest): Promise<HttpResponse> {
+        return this.findTab(request)
+            .then(tab => {
+                if (!tab)
+                    throw {
+                        message: `Could not find tab for ${request.method} ${uriString(request)}`,
+                        request
+                    };
+
+                const tabId = tab.id;
+                if (!tabId)
+                    throw {message: "Tab did not have an id", tab};
+
+                return new Promise<HttpResponse>((resolve) =>
+                    chrome.tabs.sendMessage(
+                        tabId,
+                        fetchMessage(request),
+                        resolve));
+            })
+    }
 }
 
 /**
- * Run this in a background script
+ * Routes requests from {@link FetchViaBackgroundScript} to the appropriate tabs
+ *
+ * Depends on the tabs running a content script which has called {@link startContentPageListener}
  */
 export function startBackgroundListener(
-    tabQuery: (request: HttpRequest) => chrome.tabs.QueryInfo = findTabByUrl) {
-    chrome.runtime.onMessage.addListener((message: FetchMessage | any, sender, sendResponse) => {
+    http: HttpHandler = new SendToTabHandler(findTabByHost),
+    onError: (err: any) => void = console.error
+) {
+    chrome.runtime.onMessage.addListener(async (message: FetchMessage | any, sender, sendResponse) => {
         if (!isFetchMessage(message))
             return;
-        const request = message.request;
-        // see https://developer.chrome.com/docs/extensions/mv2/match_patterns/
-        chrome.tabs.query(tabQuery(request), (tabs) => {
-            const tabId = tabs?.[0]?.id;
-            if (!tabId)
-                return;
-            chrome.tabs.sendMessage(
-                tabId,
-                message,
-                async (response) => {
-                    const buffered = {...response, body: await bufferText(response.body)};
-                    console.log("response", buffered);
-                    sendResponse(buffered);
-                });
-        });
+
+        http.handle(message.request)
+            .then(sendResponse)
+            .catch(onError)
+
         return true;
     });
 }

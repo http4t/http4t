@@ -1,35 +1,27 @@
-import {bufferText} from "@http4t/core/bodies";
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-
-export type FetchMessage = { msg: "fetch", request: HttpRequest };
-
-export function isFetchMessage(value: any): value is FetchMessage {
-    return value && value["msg"] === "fetch";
-}
+import {fetchMessage} from "./FetchMessage";
+import MessageOptions = chrome.runtime.MessageOptions;
 
 /**
- * Routes a request to a tab running the same
+ * Routes a request to another tab which is also running this extension.
  *
- * background script, which has called startBackgroundListener()
- *
- * The background script will send
+ * Depends on a running background script which has called {@link startBackgroundListener}
  */
 export class FetchViaBackgroundScript implements HttpHandler {
+    constructor(
+        private readonly extensionId: (request: HttpRequest) => any =
+            () => undefined as any,
+        private readonly options: (request: HttpRequest) => MessageOptions =
+            () => ({})) {
+    }
+
     async handle(request: HttpRequest): Promise<HttpResponse> {
         return new Promise((resolve) => {
-            console.log("request", request);
             chrome.runtime.sendMessage(
-                undefined as any,
-                {
-                    msg: "fetch",
-                    request
-                },
-                {},
-                async response => {
-                    const buffered = {...response, body: await bufferText(response.body)};
-                    console.log("response", buffered)
-                    resolve(buffered);
-                });
+                this.extensionId(request),
+                fetchMessage(request),
+                this.options(request),
+                resolve);
         })
     }
 }
