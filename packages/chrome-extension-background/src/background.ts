@@ -25,7 +25,7 @@ export function sameHost(request: HttpRequest): QueryInfo {
     const uri = Uri.of({
         scheme: requestUri.scheme,
         authority: requestUri.authority,
-        path: "*"
+        path: "/*"
     });
     return {url: uri.toString()};
 }
