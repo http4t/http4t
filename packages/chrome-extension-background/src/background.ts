@@ -8,9 +8,10 @@ import Tab = chrome.tabs.Tab;
 
 
 export function rootUrl(request: HttpRequest): CreateProperties {
+    const requestUri = Uri.of(request.uri);
     const uri = Uri.of({
-        scheme: request.uri.scheme,
-        authority: request.uri.authority,
+        scheme: requestUri.scheme,
+        authority: requestUri.authority,
         path: "/"
     });
     return {
@@ -20,9 +21,10 @@ export function rootUrl(request: HttpRequest): CreateProperties {
 }
 
 export function sameHost(request: HttpRequest): QueryInfo {
+    const requestUri = Uri.of(request.uri);
     const uri = Uri.of({
-        scheme: request.uri.scheme,
-        authority: request.uri.authority,
+        scheme: requestUri.scheme,
+        authority: requestUri.authority,
         path: "*"
     });
     return {url: uri.toString()};
