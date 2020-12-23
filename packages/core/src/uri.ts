@@ -15,7 +15,7 @@ export class Uri implements ParsedUri {
     constructor({scheme, authority, path, query, fragment}: ParsedUri) {
         this.scheme = scheme;
         this.authority = authority;
-        this.path = path;
+        this.path = path.startsWith("/") ? path : `/${path}`;
         this.query = query;
         this.fragment = fragment;
     }
