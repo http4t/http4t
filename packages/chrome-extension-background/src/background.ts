@@ -59,7 +59,7 @@ export const findTabByHost: TabFinder =
 export type TabFinder = (request: HttpRequest) => Promise<Tab>;
 
 export class SendToTabHandler implements HttpHandler {
-    constructor(private readonly findTab: TabFinder) {
+    constructor(private readonly findTab: TabFinder = findTabByHost) {
     }
 
     handle(request: HttpRequest): Promise<HttpResponse> {
