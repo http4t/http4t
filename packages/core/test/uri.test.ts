@@ -1,6 +1,6 @@
-import {assert} from 'chai';
 import {ParsedAuthority} from "@http4t/core/contract";
 import {Authority, Uri} from "@http4t/core/uri";
+import {assert} from 'chai';
 
 describe('Uri', function () {
     describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function () {
@@ -97,5 +97,8 @@ describe('Uri', function () {
 
     it('supports toJSON ', function () {
         assert.equal(JSON.stringify(Uri.parse('http://www.ics.uci.edu/pub/ietf/uri/#Related')), '"http://www.ics.uci.edu/pub/ietf/uri/#Related"');
+    });
+    it('is forgiving of paths that do not begin /', function () {
+        assert.equal(Uri.of({authority: {host: "localhost"}, path: "path"}).toString(), "//localhost/path");
     });
 });
