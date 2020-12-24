@@ -1,7 +1,7 @@
 import {HttpRequest, HttpResponse} from "@http4t/core/contract";
 
-export type ErrorAdapter = (request: HttpRequest, err: any) => Promise<HttpResponse & { err: any }>
-export const badGateway: ErrorAdapter =
+export type ErrorResponder = (request: HttpRequest, err: any) => Promise<HttpResponse & { err: any }>
+export const badGateway: ErrorResponder =
     async (request, err) => {
         return {
             status: 502,
