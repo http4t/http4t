@@ -1,6 +1,10 @@
 import {Data, HttpBody} from "./contract";
 import {textDecoder, textEncoder} from "./util/textencoding";
 
+function wrongBodyType(body: never) {
+    return new Error(`Not a valid HttpBody: '${body}' (${typeDescription(body)})`);
+}
+
 /*
 -----------------------------------
 Core functions
@@ -23,7 +27,7 @@ export async function bufferText(body: HttpBody): Promise<string> {
     if (isIterable(body)) {
         return Array.from(body).map(asString).join("")
     }
-    throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
+    throw wrongBodyType(body);
 }
 
 export async function bufferBinary(body: HttpBody): Promise<Uint8Array> {
@@ -43,7 +47,7 @@ export async function bufferBinary(body: HttpBody): Promise<Uint8Array> {
     if (isIterable(body)) {
         return Array.from(body).map(asBinary).reduce(merge)
     }
-    throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
+    throw wrongBodyType(body);
 }
 
 export async function* streamText(body: HttpBody): AsyncIterable<string> {
@@ -70,7 +74,7 @@ export async function* streamText(body: HttpBody): AsyncIterable<string> {
         }
         return;
     }
-    throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
+    throw wrongBodyType(body)
 }
 
 export async function* streamBinary(body: HttpBody): AsyncIterable<Uint8Array> {
@@ -94,7 +98,7 @@ export async function* streamBinary(body: HttpBody): AsyncIterable<Uint8Array> {
         }
         return;
     }
-    throw new Error(`Not a valid body: '${body}' (${typeDescription(body)})`)
+    throw wrongBodyType(body)
 }
 
 export function asString(data: Data): string {

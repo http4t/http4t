@@ -1,6 +1,6 @@
 import {FetchHandler} from "@http4t/browser/fetch";
 import {HttpHandler} from "@http4t/core/contract";
-import {badGateway, ErrorAdapter} from "./ErrorAdapter";
+import {badGateway, ErrorResponder} from "./util/ErrorResponder";
 import {handleFetchMessages} from "./FetchMessage";
 
 /**
@@ -8,6 +8,6 @@ import {handleFetchMessages} from "./FetchMessage";
  */
 export function startContentScriptListener(
     http: HttpHandler = new FetchHandler(),
-    onError: ErrorAdapter = badGateway) {
+    onError: ErrorResponder = badGateway) {
     handleFetchMessages(http, onError);
 }

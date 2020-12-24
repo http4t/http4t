@@ -1,5 +1,8 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 
+/**
+ * Wraps an HttpRequest to send to listeners
+ */
 export type FetchMessage = { msg: "fetch", request: HttpRequest };
 
 export function fetchMessage(request: HttpRequest): FetchMessage {

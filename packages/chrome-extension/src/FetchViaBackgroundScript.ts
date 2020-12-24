@@ -1,5 +1,5 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {badGateway, ErrorAdapter} from "./ErrorAdapter";
+import {badGateway, ErrorResponder} from "./util/ErrorResponder";
 import {fetchMessage} from "./FetchMessage";
 import MessageOptions = chrome.runtime.MessageOptions;
 
@@ -14,7 +14,7 @@ export class FetchViaBackgroundScript implements HttpHandler {
             () => undefined as any,
         private readonly options: (request: HttpRequest) => MessageOptions =
             () => ({}),
-        private readonly onError: ErrorAdapter =
+        private readonly onError: ErrorResponder =
             badGateway) {
     }
 
