@@ -12,7 +12,7 @@ export function isFetchMessage(value: any): value is FetchMessage {
 
 export function handleFetchMessages(http: HttpHandler, onError: (request: HttpRequest, err: any) => Promise<HttpResponse & { err: any }>) {
     chrome.runtime.onMessage.addListener(
-        (message: FetchMessage | any, sender, sendResponse) => {
+        (message: FetchMessage | any, sender, sendResponse) : boolean => {
             if (!isFetchMessage(message)) {
                 return false;
             }
