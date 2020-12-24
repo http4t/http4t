@@ -22,7 +22,7 @@ yarn run test
 `yarn run test` in the root project runs both `test` and `test:browser` scripts
 in all subprojects. 
 
-See https://github.com/http4t/mocha-puppeteer for more on browser testing.
+See https://github.com/http4t/muppeteer for more on browser testing.
 
 ### Gotchas
 
@@ -98,11 +98,11 @@ Note `name: "@http4t/my-module-test"`
   "scripts": {
     "build": "tsc --build",
     "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
-    "test:browser": "mocha_puppeteer"
+    "test:browser": "muppeteer"
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
-    "@http4t/mocha-puppeteer": "^0.0.9",
+    "@http4t/muppeteer": "^0.0.17",
     "@http4t/my-module": "1.0.0"
   },
   "devDependencies": {

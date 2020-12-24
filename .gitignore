@@ -13,3 +13,4 @@
 **/*.tsbuildinfo
 **/mocha.html
 cdk.out
+.parcel-cache

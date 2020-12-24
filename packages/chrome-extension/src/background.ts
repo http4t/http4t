@@ -1,6 +1,7 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {uriString} from "@http4t/core/requests";
 import {Uri} from "@http4t/core/uri";
+import {badGateway, ErrorAdapter} from "./ErrorAdapter";
 import {FetchMessage, fetchMessage, isFetchMessage} from "./FetchMessage";
 import CreateProperties = chrome.tabs.CreateProperties;
 import QueryInfo = chrome.tabs.QueryInfo;
@@ -35,6 +36,8 @@ export function findOrCreateTab(
     properties: CreateProperties): Promise<Tab> {
     return new Promise<Tab>((resolve, reject) =>
         chrome.tabs.query(queryInfo, (tabs) => {
+            console.log("tabs", tabs);
+            console.log("queryInfo", queryInfo);
             const tab = tabs?.[0];
             if (tab)
                 return resolve(tab);
@@ -45,6 +48,7 @@ export function findOrCreateTab(
                 } else {
                     resolve(tab);
                 }
+                return true;
             })
         }))
 }
@@ -65,6 +69,7 @@ export class SendToTabHandler implements HttpHandler {
     handle(request: HttpRequest): Promise<HttpResponse> {
         return this.findTab(request)
             .then(tab => {
+                console.log("tab", tab);
                 if (!tab)
                     throw {
                         message: `Could not find tab for ${request.method} ${uriString(request)}`,
@@ -79,7 +84,10 @@ export class SendToTabHandler implements HttpHandler {
                     chrome.tabs.sendMessage(
                         tabId,
                         fetchMessage(request),
-                        resolve));
+                        response=>{
+                            resolve(response);
+                            return true;
+                        }));
             })
     }
 }
@@ -91,7 +99,7 @@ export class SendToTabHandler implements HttpHandler {
  */
 export function startBackgroundListener(
     http: HttpHandler = new SendToTabHandler(findTabByHost),
-    onError: (err: any) => void = console.error
+    onError: ErrorAdapter = badGateway
 ) {
     chrome.runtime.onMessage.addListener(async (message: FetchMessage | any, sender, sendResponse) => {
         if (!isFetchMessage(message))
@@ -99,7 +107,7 @@ export function startBackgroundListener(
 
         http.handle(message.request)
             .then(sendResponse)
-            .catch(onError)
+            .catch(err => sendResponse(onError(message.request, err)));
 
         return true;
     });
