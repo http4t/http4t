@@ -1,4 +1,5 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
+import {badGateway, ErrorAdapter} from "./ErrorAdapter";
 import {fetchMessage} from "./FetchMessage";
 import MessageOptions = chrome.runtime.MessageOptions;
 
@@ -12,7 +13,9 @@ export class FetchViaBackgroundScript implements HttpHandler {
         private readonly extensionId: (request: HttpRequest) => any =
             () => undefined as any,
         private readonly options: (request: HttpRequest) => MessageOptions =
-            () => ({})) {
+            () => ({}),
+        private readonly onError: ErrorAdapter =
+            badGateway) {
     }
 
     async handle(request: HttpRequest): Promise<HttpResponse> {
@@ -21,7 +24,10 @@ export class FetchViaBackgroundScript implements HttpHandler {
                 this.extensionId(request),
                 fetchMessage(request),
                 this.options(request),
-                resolve);
+                response => response
+                    ? resolve(response)
+                    : this.onError(request, {message: "No response from background script"})
+            );
         })
     }
 }

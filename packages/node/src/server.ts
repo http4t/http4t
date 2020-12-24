@@ -4,20 +4,21 @@ import {HttpHandlerFn} from "@http4t/core/handlers";
 import {Server} from "@http4t/core/server";
 import {Uri} from "@http4t/core/uri";
 import * as node from 'http';
+import {ListenOptions} from 'net';
 import {requestNodeToHttp4t, responseHttp4tToNode} from "./conversions";
 
 export class NodeServer implements Server {
     private constructor(private readonly server: node.Server, public readonly uri: ParsedUri) {
     }
 
-    static async start(handler: HttpHandler | HttpHandlerFn, {port = 0} = {}): Promise<NodeServer> {
+    static async start(handler: HttpHandler | HttpHandlerFn, opts: ListenOptions = {}): Promise<NodeServer> {
         const httpHandler = typeof handler === 'function' ? handlers.handler(handler) : handler;
         const server = node.createServer(adapter(httpHandler));
-        server.listen(port);
+        server.listen(opts);
         const uri = await new Promise<ParsedUri>((resolve) => {
             server.on('listening', () => {
                 const address: string | any = server.address();
-                resolve(Uri.parse(`http://localhost:${typeof address === 'string' ? port : address.port}/`))
+                resolve(Uri.parse(`http://localhost:${typeof address === 'string' ? opts.port : address.port}/`))
             })
         });
         return new NodeServer(server, uri);

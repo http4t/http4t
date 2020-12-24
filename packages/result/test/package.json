@@ -6,10 +6,10 @@
   "scripts": {
     "build": "tsc --build",
     "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
-    "test:browser": "mocha_puppeteer"
+    "test:browser": "muppeteer"
   },
   "dependencies": {
-    "@http4t/mocha-puppeteer": "^0.0.9",
+    "@http4t/muppeteer": "^0.0.17",
     "@http4t/result": "1.0.0"
   },
   "devDependencies": {
