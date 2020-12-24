@@ -1,8 +1,5 @@
 {
   "extends": "../../../tsconfig-base.json",
-  "compilerOptions": {
-    "module": "es2020"
-  },
   "references": [
     {
       "path": "../src"
