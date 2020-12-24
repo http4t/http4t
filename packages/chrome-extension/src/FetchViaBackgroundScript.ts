@@ -20,14 +20,19 @@ export class FetchViaBackgroundScript implements HttpHandler {
 
     async handle(request: HttpRequest): Promise<HttpResponse> {
         return new Promise((resolve) => {
-            chrome.runtime.sendMessage(
-                this.extensionId(request),
-                fetchMessage(request),
-                this.options(request),
-                response => response
-                    ? resolve(response)
-                    : this.onError(request, {message: "No response from background script"})
-            );
+            try {
+                chrome.runtime.sendMessage(
+                    this.extensionId(request),
+                    fetchMessage(request),
+                    this.options(request),
+                    response => response
+                        ? resolve(response)
+                        : this.onError(request, {message: "No response from background script"})
+                );
+
+            } catch (e) {
+                resolve(this.onError(request, e))
+            }
         })
     }
 }

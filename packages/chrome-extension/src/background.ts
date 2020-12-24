@@ -2,7 +2,7 @@ import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {uriString} from "@http4t/core/requests";
 import {Uri} from "@http4t/core/uri";
 import {badGateway, ErrorAdapter} from "./ErrorAdapter";
-import {FetchMessage, fetchMessage, isFetchMessage} from "./FetchMessage";
+import {fetchMessage, handleFetchMessages} from "./FetchMessage";
 import CreateProperties = chrome.tabs.CreateProperties;
 import QueryInfo = chrome.tabs.QueryInfo;
 import Tab = chrome.tabs.Tab;
@@ -84,10 +84,7 @@ export class SendToTabHandler implements HttpHandler {
                     chrome.tabs.sendMessage(
                         tabId,
                         fetchMessage(request),
-                        response=>{
-                            resolve(response);
-                            return true;
-                        }));
+                        resolve));
             })
     }
 }
@@ -95,20 +92,11 @@ export class SendToTabHandler implements HttpHandler {
 /**
  * Routes requests from {@link FetchViaBackgroundScript} to the appropriate tabs
  *
- * Depends on the tabs running a content script which has called {@link startContentPageListener}
+ * Depends on the tabs running a content script which has called {@link startContentScriptListener}
  */
 export function startBackgroundListener(
     http: HttpHandler = new SendToTabHandler(findTabByHost),
     onError: ErrorAdapter = badGateway
 ) {
-    chrome.runtime.onMessage.addListener(async (message: FetchMessage | any, sender, sendResponse) => {
-        if (!isFetchMessage(message))
-            return;
-
-        http.handle(message.request)
-            .then(sendResponse)
-            .catch(err => sendResponse(onError(message.request, err)));
-
-        return true;
-    });
+    handleFetchMessages(http, onError);
 }
