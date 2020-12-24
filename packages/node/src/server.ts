@@ -14,11 +14,12 @@ export class NodeServer implements Server {
     static async start(handler: HttpHandler | HttpHandlerFn, opts: ListenOptions = {}): Promise<NodeServer> {
         const httpHandler = typeof handler === 'function' ? handlers.handler(handler) : handler;
         const server = node.createServer(adapter(httpHandler));
-        server.listen(opts);
+        const fixedOpts = opts.path || opts.port ? opts : Object.assign({}, {...opts, port: 0})
+        server.listen(fixedOpts);
         const uri = await new Promise<ParsedUri>((resolve) => {
             server.on('listening', () => {
                 const address: string | any = server.address();
-                resolve(Uri.parse(`http://localhost:${typeof address === 'string' ? opts.port : address.port}/`))
+                resolve(Uri.parse(`http://localhost:${typeof address === 'string' ? fixedOpts.port : address.port}/`))
             })
         });
         return new NodeServer(server, uri);

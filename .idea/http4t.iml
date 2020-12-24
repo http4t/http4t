@@ -3,13 +3,14 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.git" />
+      <excludeFolder url="file://$MODULE_DIR$/.parcel-cache" />
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/http4t-bidi/test/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/http4t-browser/test/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/http4t-core/test/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/http4t-result/test/.cache" />
-      <excludeFolder url="file://$MODULE_DIR$/packages/chrome-extension-background/test/.cache" />
-      <excludeFolder url="file://$MODULE_DIR$/packages/chrome-extension-background/test/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/chrome-extension/test/.cache" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/chrome-extension/test/dist" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
     </content>
