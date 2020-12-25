@@ -38,10 +38,10 @@ export async function waitForTabState(tabId: number, predicate: (tab: Tab, chang
             matchingTab.resolve(tab);
     };
     chrome.tabs.onUpdated.addListener(listener);
-    const currentState = await new Promise<Tab>(resolve => chrome.tabs.get(tabId, resolve));
-    if (predicate(currentState, undefined))
-        return currentState;
     try {
+        const currentState = await new Promise<Tab>(resolve => chrome.tabs.get(tabId, resolve));
+        if (predicate(currentState, undefined))
+            return currentState;
         return await Promise.race([matchingTab, timeout]);
     } finally {
         clearTimeout(timeoutId);
