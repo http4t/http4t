@@ -11,7 +11,7 @@ import MessageOptions = chrome.runtime.MessageOptions;
 export class FetchViaBackgroundScript implements HttpHandler {
     constructor(
         private readonly extensionId: (request: HttpRequest) => any =
-            () => undefined as any,
+            () => chrome.runtime.id,
         private readonly options: (request: HttpRequest) => MessageOptions =
             () => ({}),
         private readonly onError: ErrorResponder =
