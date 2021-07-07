@@ -26,14 +26,32 @@ export function getHeaderValues(headers: readonly Header[], name: HeaderName): H
         .map(([_, value]) => value)
 }
 
+export function appendHeader(headers: readonly Header[], name: HeaderName, value: HeaderValueLike): readonly Header[] ;
+export function appendHeader(headers: readonly Header[], header: Header): readonly Header[] ;
+export function appendHeader(headers: readonly Header[], headerOrName: Header | HeaderName, maybeValue?: HeaderValueLike): readonly Header[] {
+    if (isHeader(headerOrName))
+        return [...headers, headerOrName];
+    else
+        return [...headers, header(headerOrName, maybeValue as HeaderValueLike)];
+}
+
 /**
  * Replaces header(s) with same name in headers.
  *
- * Case insensitive on header name
+ * Case insensitive on header name when replacing
  */
-export function setHeader(headers: readonly Header[], header: Header): readonly Header[] {
-    const lowerCaseName = headerName(header).toLowerCase();
-    return [...headers.filter(([name]) => name.toLowerCase() !== lowerCaseName), header];
+export function setHeader(headers: readonly Header[], name: HeaderName, value: HeaderValueLike): readonly Header[] ;
+export function setHeader(headers: readonly Header[], header: Header): readonly Header[] ;
+export function setHeader(headers: readonly Header[], headerOrName: Header | HeaderName, maybeValue?: HeaderValueLike): readonly Header[] {
+    const lowerCaseHeaderName: string = isHeader(headerOrName)
+        ? headerName(headerOrName).toLowerCase()
+        : headerOrName.toLowerCase();
+
+    const newHeader = isHeader(headerOrName)
+        ? headerOrName
+        : header(headerOrName, maybeValue as HeaderValueLike);
+
+    return [...headers.filter(([name]) => name.toLowerCase() !== lowerCaseHeaderName), newHeader];
 }
 
 export function updateHeaders(headers: readonly Header[], name: HeaderName, f: (value: HeaderValue) => HeaderValue): readonly Header[] {
@@ -62,4 +80,16 @@ export function headerName(header: Header): HeaderName {
 
 export function headerValue(header: Header): HeaderValue {
     return header[1];
+}
+
+export function isHeaderName(obj: any): obj is HeaderName {
+    return typeof obj === 'string';
+}
+
+export function isHeaderValue(obj: any): obj is HeaderValue {
+    return typeof obj === 'string';
+}
+
+export function isHeader(obj: any): obj is Header {
+    return Array.isArray(obj) && obj.length === 2 && isHeaderName(obj[0]) && isHeaderValue(obj[1]);
 }
