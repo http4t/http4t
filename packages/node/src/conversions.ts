@@ -59,7 +59,7 @@ Helpers
 -----------------------------------
  */
 
-function toOutgoingHeaders(headers: Header[]): node.OutgoingHttpHeaders {
+function toOutgoingHeaders(headers: readonly Header[]): node.OutgoingHttpHeaders {
     return headers.reduce((acc: node.OutgoingHttpHeaders, h: Header) => {
         const [n, v] = h;
         const existing: string | string[] | number | undefined = acc[n];

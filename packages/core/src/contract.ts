@@ -111,7 +111,7 @@ export interface ParsedAuthority {
  * HttpMessage contain headers followed by an optional body
  */
 export interface HttpMessage {
-    readonly headers: Header[],
+    readonly headers: readonly  Header[],
     readonly body: HttpBody
 }
 
