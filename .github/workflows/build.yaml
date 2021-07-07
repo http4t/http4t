@@ -33,14 +33,12 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: install yarn
         run: npm install -g yarn
-      - name: install
-        run: yarn install
       - name: test
         uses: mujo-code/puppeteer-headful@12.3.1
         env:
           CI: 'true'
         with:
-          args: yarn run test:packages:browser
+          args: npm install -g yarn; yarn run test:packages:browser
   test-examples:
     runs-on: ubuntu-latest
     name: Test examples
