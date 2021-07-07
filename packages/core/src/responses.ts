@@ -11,3 +11,5 @@ export function ok(body?: HttpBody, ...headers: Header[]): HttpResponse {
 export function notFound(body?: HttpBody, ...headers: Header[]): HttpResponse {
     return responseOf(404, body, ...headers);
 }
+
+export * from "./messages";
