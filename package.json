@@ -11,12 +11,10 @@
   "scripts": {
     "build": "ts-node build/build",
     "clean": "ts-node build/clean",
-
     "test": "ts-node build/clean && ts-node build/test node,browser packages examples",
     "test:packages:node": "ts-node build/clean && ts-node build/test node packages",
     "test:packages:browser": "ts-node build/clean && ts-node build/test browser packages",
     "test:examples": "ts-node build/clean && ts-node build/test node,browser examples",
-
     "version": "ts-node build/version $GITHUB_RUN_NUMBER",
     "publish": "ts-node build/publish"
   },
