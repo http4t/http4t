@@ -37,8 +37,7 @@ jobs:
         uses: mujo-code/puppeteer-headful@12.3.1
         env:
           CI: 'true'
-        with:
-          args: npm run test:packages:browser
+        run: yarn run test:packages:browser
   test-examples:
     runs-on: ubuntu-latest
     name: Test examples
