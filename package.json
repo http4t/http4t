@@ -25,6 +25,12 @@
     "typescript": "^4.1.2"
   },
   "resolutions": {
-    "node-forge": "0.10.0"
+    "browserslist": "4.16.5",
+    "css-what": "5.0.1",
+    "elliptic": "6.5.4",
+    "lodash": "4.17.21",
+    "node-forge": "0.10.0",
+    "postcss": "8.2.10",
+    "ws": "7.4.6"
   }
 }
