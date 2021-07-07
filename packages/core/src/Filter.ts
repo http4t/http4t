@@ -26,3 +26,7 @@ export function middlewares(...ms: Filter[]): Filter {
         return ms.reduce((handler, m) => m(handler), handler);
     }
 }
+
+export function withFilters(http: HttpHandler, ...ms: Filter[]): HttpHandler {
+    return middlewares(...ms)(http);
+}
