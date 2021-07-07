@@ -38,7 +38,7 @@ jobs:
         env:
           CI: 'true'
         with:
-          args: npm install -g yarn; yarn run test:packages:browser
+          args: npm run test:packages:browser
   test-examples:
     runs-on: ubuntu-latest
     name: Test examples
