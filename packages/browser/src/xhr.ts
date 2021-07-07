@@ -10,7 +10,7 @@ function getHeaders(xhr: XMLHttpRequest): Header[] {
 
 const unsafeHeaders: Readonly<HeaderName[]> = ['content-length', 'host'];
 
-function setHeaders(xhr: XMLHttpRequest, headers: Header[]) {
+function setHeaders(xhr: XMLHttpRequest, headers: readonly Header[]) {
     headers.forEach(([name, value]) => {
         if (unsafeHeaders.indexOf(name.toLowerCase()) != -1) return;
         if (typeof value == 'undefined') return;
