@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
-    "@http4t/muppeteer": "^0.0.18"
+    "@http4t/muppeteer": "^0.0.20"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

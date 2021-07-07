@@ -34,7 +34,9 @@ jobs:
       - name: install
         run: yarn install
       - name: test
-        uses: ianwalter/puppeteer-container@v4.0.0
+        uses: mujo-code/puppeteer-headful@12.3.1
+        env:
+          CI: 'true'
         with:
           args: yarn run test:packages:browser
   test-examples:

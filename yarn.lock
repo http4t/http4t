@@ -1018,10 +1018,10 @@
     "@babel/helper-validator-identifier" "^7.14.5"
     to-fast-properties "^2.0.0"
 
-"@http4t/muppeteer@^0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@http4t/muppeteer/-/muppeteer-0.0.18.tgz#84f2e262b4676120f96bf61f22f1ba6d5c88fdcf"
-  integrity sha512-DgjF4jdz1sXBroSlaBYhMapicrrKKAYvO5yCEpmqSvbVbebRSJZhBp1aIBgZJFnPrIkJMY3WGNcVv8PWfiP5yw==
+"@http4t/muppeteer@^0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@http4t/muppeteer/-/muppeteer-0.0.20.tgz#594a2f65625a67254b028d138adbc2c2ce907878"
+  integrity sha512-5inr2ulyHEnFb6IUG+Ka7+di8ddNKaqTbFpgF4jMdRKT+ZZKEcpuNRHM4XcyQJFpg9eNr3YdB6y+T99Tu4Wcvw==
   dependencies:
     mocha "^9.0.2"
     parcel "^2.0.0-beta.2"
