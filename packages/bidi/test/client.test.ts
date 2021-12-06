@@ -3,7 +3,7 @@ import {json} from "@http4t/bidi/lenses/JsonLens";
 import {named} from "@http4t/bidi/lenses/NamedLenses";
 import {path} from "@http4t/bidi/paths";
 import {v, VariablePaths} from "@http4t/bidi/paths/variables";
-import {$request} from "@http4t/bidi/requests";
+import {request} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
 import {route, Routes} from "@http4t/bidi/routes";
 import {HttpHandler, HttpRequest} from "@http4t/core/contract";
@@ -29,7 +29,7 @@ describe('buildClient()', () => {
 
         const routes: Routes<Api> = {
             example: route(
-                $request('GET', "/some/path"),
+                request('GET', "/some/path"),
                 json()
             )
         };
@@ -50,7 +50,7 @@ describe('buildClient()', () => {
         }
         const routes: Routes<Api> = {
             example: route(
-                $request('GET', "/"),
+                request('GET', "/"),
                 json()
             )
         };
@@ -81,13 +81,13 @@ describe('buildClient()', () => {
 
         const routes: Routes<Api> = {
             userAccounts: route(
-                $request('GET', path({
+                request('GET', path({
                     username: v.segment
                 }, v => ["accounts/", v.username])),
                 json<UserAccounts>()
             ),
             createAccount: route(
-                $request(
+                request(
                     'POST',
                     path({username: v.segment}, v => ["accounts/", v.username]),
                     named({account: json<Account, HttpRequest>()})),
@@ -137,7 +137,7 @@ describe('buildClient()', () => {
 
         const routes: Routes<Example> = {
             example: route(
-                $request('GET', path(paths, v => ["prefix", v.path])),
+                request('GET', path(paths, v => ["prefix", v.path])),
                 json<Vars>()
             )
         };
@@ -156,7 +156,7 @@ describe('buildClient()', () => {
     it('throws ResultError on response lens failure', async () => {
         const routes = {
             example: route(
-                $request('GET', "/some/path"),
+                request('GET', "/some/path"),
                 json<any>()
             )
         };

@@ -3,9 +3,10 @@ import * as responses from "@http4t/core/responses";
 import {failure, Failure, Result} from "@http4t/result";
 import {JsonPath, problem, Problem} from "@http4t/result/JsonPathResult";
 
+export const WRONG_ROUTE = "wrong-route";
 
 export type WrongRoute = {
-    readonly type: "wrong-route",
+    readonly type: typeof WRONG_ROUTE,
     readonly problems: Problem[]
 };
 

@@ -6,7 +6,7 @@ import {routeFailedError, wrongRouteError} from "@http4t/bidi/lenses";
 import {fail} from "@http4t/bidi/lenses/AlwaysFailLens";
 import {empty} from "@http4t/bidi/lenses/EmptyLens";
 import {json} from "@http4t/bidi/lenses/JsonLens";
-import {$request} from "@http4t/bidi/requests";
+import {request} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
 import {route} from "@http4t/bidi/routes";
 
@@ -14,7 +14,7 @@ describe('Server', () => {
     it('matches route and calls handler', async () => {
         const routes = {
             example: route(
-                $request('GET', "/some/path"),
+                request('GET', "/some/path"),
                 json<string>()
             )
         };
@@ -33,7 +33,7 @@ describe('Server', () => {
     it('ignores trailing slashes in url', async () => {
         const routes = {
             example: route(
-                $request('GET', "/some/path"),
+                request('GET', "/some/path"),
                 json<string>()
             )
         };
@@ -52,7 +52,7 @@ describe('Server', () => {
     it('404 on match failure', async () => {
         const routes = {
             example: route(
-                $request('GET', "/some/path"),
+                request('GET', "/some/path"),
                 json<string>()
             )
         };

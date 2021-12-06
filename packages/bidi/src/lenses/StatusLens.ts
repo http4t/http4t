@@ -17,6 +17,3 @@ export class StatusLens<T> implements ResponseLens<T> {
     }
 }
 
-export function response<T>(status: number, lens: ResponseLens<T>): StatusLens<T> {
-    return new StatusLens(status, lens);
-}
