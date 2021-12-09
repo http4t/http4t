@@ -4,14 +4,26 @@ import {failure, Failure, Result} from "@http4t/result";
 import {JsonPath, problem, Problem} from "@http4t/result/JsonPathResult";
 
 export const WRONG_ROUTE = "wrong-route";
+export const ROUTE_FAILED = "route-failed";
 
+/**
+ * This was the wrong route- usually because either the url or method did not matched.
+ *
+ * The Router should continue looking for a matching route
+ */
 export type WrongRoute = {
     readonly type: typeof WRONG_ROUTE,
     readonly problems: Problem[]
 };
 
+/**
+ * This was the right route to handle the request, but the request is not valid for this route (e.g. the url and method
+ * matched but the body is not valid json)
+ *
+ * The Router should not consider any more routes, and should return the provided response to the user
+ */
 export type RouteFailed = {
-    readonly type: "route-failed",
+    readonly type: typeof ROUTE_FAILED,
     readonly problems: Problem[],
     readonly response: HttpResponse
 };
@@ -20,7 +32,7 @@ export type RoutingError = WrongRoute | RouteFailed;
 export type RoutingResult<T> = Result<RoutingError, T>;
 
 export function wrongRouteError(message: string, path: (string | number)[]): WrongRoute {
-    return {type: "wrong-route", problems: [problem(message, path)]};
+    return {type: WRONG_ROUTE, problems: [problem(message, path)]};
 }
 
 export function wrongRoute(message: string, path: JsonPath): Failure<RoutingError> {
@@ -29,7 +41,7 @@ export function wrongRoute(message: string, path: JsonPath): Failure<RoutingErro
 
 export function routeFailedError(message: string, path: JsonPath, response: HttpResponse): RouteFailed {
     return {
-        type: "route-failed",
+        type: ROUTE_FAILED,
         problems: [problem(message, path)],
         response
     };
@@ -52,6 +64,7 @@ export function routeFailed(message: string, path: JsonPath, response: HttpRespo
  */
 export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown> {
     get(from: TMessage): Promise<RoutingResult<T>>;
+
     set(into: TMessage, value: T): Promise<TMessage>;
 }
 

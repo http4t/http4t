@@ -1,8 +1,8 @@
 import {Header, HeaderName, HeaderValue, HttpBody, HttpMessage, HttpRequest, HttpResponse} from "./contract";
 import * as h from "./headers";
 import {HeaderValueLike, isHeader, isHeaderValue} from "./headers";
+import * as b from "./bodies";
 import {modify} from "./util/objects";
-import {bufferText} from "./bodies";
 
 /*
 * these operate on headers in a case-insensitive way
@@ -28,9 +28,16 @@ export function appendHeader<T extends HttpMessage>(message: T, headerOrName: He
         return modify(message, {headers: h.appendHeader(message.headers, headerOrName, maybeValue as HeaderValueLike)} as Partial<T>);
 }
 
+export function appendHeaders<T extends HttpMessage>(message: T, ...headers: Header[]): T {
+    return modify(message, {headers: h.appendHeaders(message.headers, ...headers)} as Partial<T>)
+}
 
-export function removeHeaders<T extends HttpMessage>(message: T, name: HeaderName): T {
-    return modify(message, {headers: h.removeHeader(message.headers, name)} as Partial<T>);
+export function removeHeaders<T extends HttpMessage>(message: T, ...names: HeaderName[]): T {
+    return modify(message, {headers: h.removeHeaders(message.headers, ...names)} as Partial<T>);
+}
+
+export function selectHeaders<T extends HttpMessage>(message: T, ...names: HeaderName[]): T {
+    return modify(message, {headers: h.selectHeaders(message.headers, ...names)} as Partial<T>);
 }
 
 export function updateHeaders<T extends HttpMessage>(message: T, name: HeaderName, f: (value: HeaderValue) => HeaderValue): T {
@@ -39,6 +46,14 @@ export function updateHeaders<T extends HttpMessage>(message: T, name: HeaderNam
 
 export function setBody<T extends HttpMessage>(message: T, body: HttpBody): T {
     return modify(message, {body} as Partial<T>);
+}
+
+export async function bufferText<T extends HttpMessage>(message: T): Promise<T> {
+    return setBody(message, await b.bufferText(message.body));
+}
+
+export async function bufferedText(message: HttpMessage): Promise<string> {
+    return await b.bufferText(message.body);
 }
 
 export function isResponse(message: HttpMessage): message is HttpResponse {
@@ -51,5 +66,5 @@ export function isRequest(message: HttpMessage): message is HttpRequest {
 
 /* turns streaming bodies into text bodies so that messages are directly json serialisable  */
 export async function toJSON<T extends HttpMessage>(message: T): Promise<T> {
-    return {...message, body: await bufferText(message.body)}
+    return {...message, body: await b.bufferText(message.body)}
 }

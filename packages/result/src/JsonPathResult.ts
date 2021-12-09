@@ -5,7 +5,7 @@ import {Failure, mapFailure, Result} from "./index";
  */
 export type JsonPath = (string | number)[];
 
-export function toString(path: JsonPath): string {
+export function pathToString(path: JsonPath): string {
     return ['$', ...path].map(x => typeof x === 'string' ? x : `[${x}]`).join('.')
 }
 
@@ -41,7 +41,7 @@ export class Problem {
     }
 
     toString(): string {
-        return `${toString(this.path)}: ${this.message}`
+        return `${pathToString(this.path)}: ${this.message}`
     }
 }
 

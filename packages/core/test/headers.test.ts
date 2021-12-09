@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {header} from "@http4t/core/headers";
-import {appendHeader, removeHeaders, setHeader, updateHeaders} from "@http4t/core/messages";
+import {appendHeader, removeHeaders, selectHeaders, setHeader, updateHeaders} from "@http4t/core/messages";
 import {requestOf} from "@http4t/core/requests";
 
 describe("header()", () => {
@@ -45,8 +45,14 @@ describe('appendHeader()', () => {
 
 describe("removeHeaders()", () => {
     it("removes all headers case-insensitively", () => {
-        const message = requestOf("GET", "/", undefined, ["X-Matt", "S"], ["X-matt", "S"], ["X-Tom", "S"]);
-        expect(removeHeaders(message, "X-Matt").headers).deep.eq([["X-Tom", "S"]])
+        const message = requestOf("GET", "/", undefined, ["X-Removed-1", "S"], ["X-removed-1", "S"], ["X-removed-2", "S"], ["X-Tom", "S"]);
+        expect(removeHeaders(message, "X-REmoved-1", "X-REmoved-2").headers).deep.eq([["X-Tom", "S"]])
+    });
+});
+describe("selectHeaders()", () => {
+    it("selects all headers case-insensitively", () => {
+        const message = requestOf("GET", "/", undefined, ["X-Selected-1", "S"], ["X-selected-1", "S"], ["X-selected-2", "S"], ["X-Tom", "S"]);
+        expect(selectHeaders(message, "X-SElected-1", "X-SElected-2").headers).deep.eq([["X-Selected-1", "S"], ["X-selected-1", "S"], ["X-selected-2", "S"]])
     });
 });
 

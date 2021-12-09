@@ -35,6 +35,10 @@ export function appendHeader(headers: readonly Header[], headerOrName: Header | 
         return [...headers, header(headerOrName, maybeValue as HeaderValueLike)];
 }
 
+export function appendHeaders(headers: readonly Header[], ...next: Header[]): readonly Header[] {
+    return [...headers, ...next];
+}
+
 /**
  * Replaces header(s) with same name in headers.
  *
@@ -59,9 +63,18 @@ export function updateHeaders(headers: readonly Header[], name: HeaderName, f: (
     return headers.map(([name, value]) => (name.toLowerCase() === lowerCaseName) ? [name, f(value)] : [name, value]);
 }
 
-export function removeHeader(headers: readonly Header[], name: HeaderName): readonly Header[] {
-    const lowerCaseName = name.toLowerCase();
-    return headers.filter(([name]) => name.toLowerCase() !== lowerCaseName);
+export function removeHeader(headers: readonly Header[], name: string): readonly Header[] {
+    return removeHeaders(headers, name);
+}
+
+export function removeHeaders(headers: readonly Header[], ...names: HeaderName[]): readonly Header[] {
+    const lowerCaseNames = new Set(names.map(n => n.toLowerCase()));
+    return headers.filter(([name]) => !lowerCaseNames.has(name.toLowerCase()));
+}
+
+export function selectHeaders(headers: readonly Header[], ...names: HeaderName[]): readonly Header[] {
+    const lowerCaseNames = new Set(names.map(n => n.toLowerCase()));
+    return headers.filter(([name]) => lowerCaseNames.has(name.toLowerCase()));
 }
 
 export type HeaderValueLike = string | number | Date;
