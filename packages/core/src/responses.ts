@@ -12,4 +12,8 @@ export function notFound(body?: HttpBody, ...headers: Header[]): HttpResponse {
     return responseOf(404, body, ...headers);
 }
 
+export function noContent(...headers: Header[]): HttpResponse {
+    return responseOf(204, undefined, ...headers);
+}
+
 export * from "./messages";
