@@ -1,24 +1,28 @@
 import {HttpRequest, Method} from "@http4t/core/contract";
 import {success} from "@http4t/result";
-import {RequestLens, RoutingResult, wrongRoute} from "../lenses";
+import {BaseRequestLens, RequestLens, RoutingResult, wrongRouteError} from "../lenses";
+import {value} from "./StaticValueLens";
 
 /**
- * Injects method into request.
- *
- * Fails to extract if method is not correct.
+ * Note- method is normalised to uppercase when extracting
  */
-export class MethodLens implements RequestLens<undefined> {
-    constructor(private readonly method: Method) {
+export class MethodLens extends BaseRequestLens<Method> {
+    async get(request: HttpRequest): Promise<RoutingResult<Method>> {
+        return success(request.method.toUpperCase());
     }
 
-    async get(request: HttpRequest): Promise<RoutingResult<undefined>> {
-        if (request.method.toUpperCase() === this.method.toUpperCase()) {
-            return success(undefined);
-        }
-        return wrongRoute(`Method must be ${this.method}`, ["method"]);
+    async setRequest(into: HttpRequest, value: Method): Promise<HttpRequest> {
+        return {...into, method: value};
     }
+}
 
-    async set(into: HttpRequest, _value: undefined): Promise<HttpRequest> {
-        return {...into, method: this.method};
-    }
+export function method(): RequestLens<Method> {
+    return new MethodLens();
+}
+
+export function expectMethod(expected: Method): RequestLens<undefined> {
+    return value(
+        expected,
+        method(),
+        {failure: actual => wrongRouteError(`Expected method ${expected} but was ${actual}`, ["method"])})
 }

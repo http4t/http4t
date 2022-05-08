@@ -2,11 +2,12 @@ import {HttpRequest} from "@http4t/core/contract";
 import {uri} from "@http4t/core/requests";
 import {stripSlashes} from "@http4t/core/uri";
 import {isSuccess, success} from "@http4t/result";
-import {RequestLens, RoutingResult, wrongRoute} from "../lenses";
+import {BaseRequestLens, RoutingResult, wrongRoute} from "../lenses";
 import {PathMatcher} from "../paths/PathMatcher";
 
-export class PathLens<T> implements RequestLens<T> {
+export class PathLens<T> extends BaseRequestLens<T> {
     constructor(private readonly path: PathMatcher<T>) {
+        super();
     }
 
     async get(request: HttpRequest): Promise<RoutingResult<T>> {
@@ -19,7 +20,7 @@ export class PathLens<T> implements RequestLens<T> {
             : wrongRoute(`${result.error.message}. Remaining path: "${result.error.remaining}"`, ["uri", "path"]);
     }
 
-    async set(into: HttpRequest, value: T): Promise<HttpRequest> {
+    async setRequest(into: HttpRequest, value: T): Promise<HttpRequest> {
         const path = await this.path.expand(value);
         return {...into, uri: {...uri(into), path}};
     }

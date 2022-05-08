@@ -1,4 +1,4 @@
-import {Transaction, TransactionPool} from "@http4t/bidi-eg/TransactionPool";
+import {Transaction, TransactionPool} from "@http4t/bidi-eg/utils/transactions/TransactionPool";
 
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
@@ -52,11 +52,10 @@ export class DockerPgTransactionPool implements TransactionPool {
         try {
             return await this.decorated.getTransaction();
         } catch (e) {
-            console.log("BEFORE");
-            if (e.errno !== "ECONNREFUSED") {
+            if (e.code !== "ECONNREFUSED") {
                 throw e;
             }
-            console.log("BEFORE" + `${__dirname}/startPostgres`);
+            console.log(`RUNNING ${__dirname}/startPostgres`);
             await exec(`${__dirname}/startPostgres`);
             return retry(() => this.decorated.getTransaction(), 50, 100)
         }

@@ -1,6 +1,6 @@
 import {RequestLifecycle} from "../router";
 import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {appendHeaders, bufferedText, bufferText} from "@http4t/core/messages";
+import {appendHeaders, bufferedText, bufferText, setHeader} from "@http4t/core/messages";
 import * as lenses from "../lenses";
 import {WrongRoute} from "../lenses";
 import {Route} from "../routes";
@@ -59,7 +59,7 @@ async function printResponse(response: HttpResponse): Promise<string[]> {
 }
 
 type RequestMismatch = {
-    routeKey: string
+    key: string
     route: Route<unknown, unknown>
     reason: WrongRoute
 }
@@ -68,12 +68,15 @@ function printUnmatchedRoutes(markerColour: string, mismatches: RequestMismatch[
     if (mismatches.length === 0) return [];
     return [
         marker(markerColour, "unmatched"),
-        ...mismatches.flatMap(mismatch => `${colour(YELLOW, mismatch.routeKey)}\r\n${mismatch.reason.problems.map(p => `   ${colour(CYAN, pathToString(p.path))}: ${colour(BLUE, p.message.replace("\n", "\n   "))}`).join("\r\n")}`)
+        ...mismatches.flatMap(mismatch => `${colour(YELLOW, mismatch.key)}\r\n${mismatch.reason.problems.map(p => `   ${colour(CYAN, pathToString(p.path))}: ${colour(BLUE, p.message.replace("\n", "\n   "))}`).join("\r\n")}`)
     ];
 }
 
 const DEBUG_ID_HEADER = 'DebugRequestLifecycle-Id';
 
+/**
+ * TODO: read and then re-stream bodies instead of buffering them, so that streaming logic is still exercised
+ */
 export class DebugRequestLifecycle implements RequestLifecycle {
     private readonly requestMismatches: { [id: string]: RequestMismatch[] } = {};
 
@@ -87,7 +90,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
 
     async mismatch(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: WrongRoute): Promise<void> {
         this.requestMismatches[getHeaderValue(request, DEBUG_ID_HEADER)!].push({
-            routeKey,
+            key: routeKey,
             route,
             reason
         });
@@ -106,12 +109,12 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             marker(GREEN, "request", "="),
             ...(await printRequest(request)),
             marker(GREEN, "result"),
-            colour(CYAN, `Successfully matched route :${routeKey}`),
+            colour(CYAN, `Successfully matched route "${routeKey}"`),
             marker(GREEN, "response"),
             ...(await printResponse(response)),
             ...printUnmatchedRoutes(GREEN, this.consumeUnmatched(request))
         ].join("\r\n"));
-        return response;
+        return setHeader(response, "Matched-Route", routeKey);
     }
 
     async clientError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: lenses.RouteFailed): Promise<HttpResponse> {
@@ -138,7 +141,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             marker(RED, "request", "="),
             ...(await printRequest(request)),
             marker(RED, "result"),
-            colour(CYAN, `SERVER ERROR ${routeKey}`),
+            colour(CYAN, `Unexpected server error due to route "${routeKey}"`),
             colour(RED, errorString),
             marker(RED, "response"),
             ...(await printResponse(response)),

@@ -25,8 +25,8 @@ export class NamedLenses<TMessage extends HttpMessage, T extends object> impleme
         return success(value);
     }
 
-    set(into: TMessage, value: T): Promise<TMessage> {
-        const injectField = async (message: Promise<TMessage>, [k, lens]: [string, unknown]): Promise<TMessage> => {
+    set<SetInto extends TMessage>(into: SetInto, value: T): Promise<SetInto> {
+        const injectField = async (message: Promise<SetInto>, [k, lens]: [string, unknown]): Promise<SetInto> => {
             return await (lens as MessageLens<TMessage, any>).set(await message, value[k as keyof T]);
         };
         return Object.entries(this.lenses).reduce(injectField, Promise.resolve(into));

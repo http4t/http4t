@@ -1,4 +1,4 @@
-import {Transaction, TransactionPool} from "../TransactionPool";
+import {Transaction, TransactionPool} from "./TransactionPool";
 
 export async function inTransaction<T>(transactionPool: TransactionPool, f: (t: Transaction) => T) {
     const transaction = await transactionPool.getTransaction();

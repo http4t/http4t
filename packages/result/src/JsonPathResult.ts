@@ -36,12 +36,13 @@ export function prefixFailure<T>(result: JsonPathResult<T>,
 
 export class Problem {
     constructor(readonly message: string,
-                readonly path: JsonPath
+                readonly path: JsonPath,
+                readonly producedBy: string | undefined
     ) {
     }
 
     toString(): string {
-        return `${pathToString(this.path)}: ${this.message}`
+        return `${this.producedBy ? `${this.producedBy} ` : ""}${pathToString(this.path)}: ${this.message}`
     }
 }
 
@@ -61,6 +62,16 @@ export function prefix(value: JsonPathFailure | Problems, path: JsonPath): JsonP
         : value.map(p => problem(p.message, [...path, ...p.path]));
 }
 
+export function modifyProducedBy(value: Problems, producedBy: string): Problems;
+export function modifyProducedBy(value: Problems, producedBy: (old: string | undefined) => string): Problems;
+export function modifyProducedBy(value: Problems, producedBy: string | ((old: string | undefined) => string)): Problems {
+    return value.map(p => problem(p.message, p.path, typeof producedBy === "string" ? producedBy : producedBy((p.producedBy))));
+}
+
+export function prefixProducedBy(value: Problems, prefix: string, delimiter:string = ";"): Problems{
+    return modifyProducedBy(value, old => old ? prefix + delimiter + old: prefix);
+}
+
 export function pathsEq(a: JsonPath, b: JsonPath) {
     return a.length === b.length
         && a.every((v, i) => v === b[i]);
@@ -71,8 +82,8 @@ export function pathStartsWith(path: JsonPath, startsWith: JsonPath) {
         && startsWith.every((v, i) => v === path[i]);
 }
 
-export function problem(message: string, path: JsonPath = []): Problem {
-    return new Problem(message, path);
+export function problem(message: string, path: JsonPath = [], producedBy: string | undefined = undefined): Problem {
+    return new Problem(message, path, producedBy);
 }
 
 

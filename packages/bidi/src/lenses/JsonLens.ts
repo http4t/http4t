@@ -10,8 +10,8 @@ import {MessageLens, routeFailed, RoutingResult} from "../lenses";
  *
  * Uses {@link JsonBody} to avoid deserialising twice.
  */
-export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TMessage, T> {
-    async get(message: TMessage): Promise<RoutingResult<T>> {
+export class JsonLens<T> implements MessageLens<HttpMessage, T> {
+    async get(message: HttpMessage): Promise<RoutingResult<T>> {
         try {
             const value = await bodyJson<T>(message.body);
             return success(value);
@@ -20,7 +20,7 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TM
         }
     }
 
-    async set(into: TMessage, value: T): Promise<TMessage> {
+    async set<SetInto extends HttpMessage>(into: SetInto, value: T): Promise<SetInto> {
         return {
             ...into,
             headers: [...into.headers, header('Content-Type', 'application/json')],
@@ -29,6 +29,6 @@ export class JsonLens<T, TMessage extends HttpMessage> implements MessageLens<TM
     }
 }
 
-export function json<T = unknown, TMessage extends HttpMessage = HttpMessage>(): JsonLens<T, TMessage> {
-    return new JsonLens<T, TMessage>();
+export function json<T extends object>(): MessageLens<HttpMessage, T> {
+    return new JsonLens<T>();
 }

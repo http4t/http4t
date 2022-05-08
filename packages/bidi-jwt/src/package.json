@@ -1,0 +1,15 @@
+{
+  "name": "@http4t/bidi-jwt",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@http4t/core": "1.0.0",
+    "@http4t/result": "1.0.0",
+    "@http4t/bidi": "1.0.0",
+    "jose": "^4.8.1"
+  }
+}
