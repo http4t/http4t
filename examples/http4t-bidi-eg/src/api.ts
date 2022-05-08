@@ -1,4 +1,4 @@
-import {header, intersect, json, result, text, value} from "@http4t/bidi/messages";
+import {header, json, result, text, value} from "@http4t/bidi/messages";
 import {empty, maybe, response} from "@http4t/bidi/responses";
 import {path} from "@http4t/bidi/paths";
 import {v} from "@http4t/bidi/paths/variables";
@@ -26,7 +26,7 @@ export type WithOurClaims<T> = WithClaims<T, Claims>;
 export type Creds = { userName: string, password: string };
 
 export interface Auth {
-    register(request: Creds): Promise<Result<string,User>>
+    register(request: Creds): Promise<Result<string, User>>
 
     login(request: Creds): Promise<Result<string, Jwt>>
 }
@@ -69,17 +69,11 @@ export function authRoutes(opts: { jwt: JwtStrategy }): Routes<Auth> {
 export const healthRoutes: Routes<Health> = {
     ready: route(
         request('GET', '/probe/ready'),
-        response(200, intersect(
-            value("*", header("Access-Control-Allow-Origin")),
-            empty()
-        ))
+        response(200, value("*", header("Access-Control-Allow-Origin")))
     ),
     live: route(
         request('GET', '/probe/live'),
-        response(200, intersect(
-            value("*", header("Access-Control-Allow-Origin")),
-            empty()
-        ))
+        response(200, value("*", header("Access-Control-Allow-Origin")))
     ),
 }
 
