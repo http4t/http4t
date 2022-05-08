@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --noEmit",
     "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
     "test:browser": "muppeteer"
   },
@@ -18,9 +18,9 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^8.2.3",
     "chai": "^4.1.7",
-    "mocha": "^9.0.2",
-    "ts-node": "^9.1.1",
+    "mocha": "9.0.2",
+    "ts-node": "9.1.1",
     "typedoc": "^0.16.9",
-    "typescript": "^4.1.2"
+    "typescript": "4.1.2"
   }
 }

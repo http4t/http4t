@@ -12,10 +12,16 @@ export class HttpInfoLogger implements HttpHandler {
 
     async handle(request: HttpRequest): Promise<HttpResponse> {
         this.logger.info(`Received ${request.method} to ${request.uri.path}`);
-        const response = await this.handler.handle(request);
-        this.logger.info(`Responded ${response.status} \n`);
-        this.logger.flush();
-        return response;
+        try {
+            const response = await this.handler.handle(request);
+            this.logger.info(`Responded ${response.status} \n`);
+            return response;
+        } catch (e) {
+            this.logger.info(`Threw error ${e} \n`);
+            throw e;
+        } finally {
+            this.logger.flush();
+        }
     }
 
 }

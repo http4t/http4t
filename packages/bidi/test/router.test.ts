@@ -7,21 +7,11 @@ import {fail} from "@http4t/bidi/lenses/AlwaysFailLens";
 import {empty} from "@http4t/bidi/lenses/EmptyLens";
 import {intersect, request, text} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
-import {route, Routes} from "@http4t/bidi/routes";
+import {route} from "@http4t/bidi/routes";
 import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
 
 describe('Router', () => {
-    interface Api {
-        helloWorld(): Promise<string>
-
-        routeFailed(): Promise<undefined>
-
-        wrongRoute(): Promise<undefined>
-
-        zzzLastRouteAlsoMatchesWrongRoute(): Promise<string>
-    }
-
-    const routes: Routes<Api> = {
+    const routes = {
         helloWorld: route(
             request('GET', "/some/path"),
             text()
@@ -72,10 +62,8 @@ describe('Router', () => {
             {
                 status: 200,
                 "headers": [
-                    [
-                        "Content-Type",
-                        "text/plain"
-                    ]
+                    ["Content-Type", "text/plain"],
+                    ["Matched-Route", "helloWorld"]
                 ],
                 body: "hello world"
             });

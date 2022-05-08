@@ -1,12 +1,12 @@
 import {CredStore} from "./auth";
-import {Doc, DocStore} from "./docstore";
+import {Doc, DocRepository} from "./docstore";
 import {CumulativeLogger} from "./utils/Logger";
 import {Jwt, JwtStrategy} from "@http4t/bidi-jwt";
 import {FullApi, User, WithOurClaims} from "./api";
 import {isFailure, Result, success} from "@http4t/result";
 import {AuthError} from "@http4t/bidi/auth";
 
-export type LogicOpts = { creds: CredStore, store: DocStore, logger: CumulativeLogger, jwt: JwtStrategy };
+export type LogicOpts = { creds: CredStore, store: DocRepository, logger: CumulativeLogger, jwt: JwtStrategy };
 
 export function businessLogic(opts: LogicOpts): FullApi {
     const {creds, jwt, logger, store} = opts;

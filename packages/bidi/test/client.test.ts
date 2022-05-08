@@ -3,9 +3,9 @@ import {json} from "@http4t/bidi/lenses/JsonLens";
 import {named} from "@http4t/bidi/lenses/NamedLenses";
 import {path} from "@http4t/bidi/paths";
 import {v, VariablePaths} from "@http4t/bidi/paths/variables";
-import {request} from "@http4t/bidi/requests";
+import {request, text} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
-import {route, Routes} from "@http4t/bidi/routes";
+import {route} from "@http4t/bidi/routes";
 import {HttpHandler} from "@http4t/core/contract";
 import {handler} from "@http4t/core/handlers";
 import {responseOf} from "@http4t/core/responses";
@@ -23,14 +23,10 @@ async function catchError(fn: () => any): Promise<any> {
 
 describe('buildClient()', () => {
     it('serialises request, sends to http handler, and then deserialises response', async () => {
-        type Api = {
-            example: () => Promise<any>;
-        }
-
-        const routes: Routes<Api> = {
+        const routes = {
             example: route(
                 request('GET', "/some/path"),
-                json()
+                text()
             )
         };
 
@@ -45,13 +41,10 @@ describe('buildClient()', () => {
     });
 
     it('supports root path', async () => {
-        type Api = {
-            example: () => Promise<any>;
-        }
-        const routes: Routes<Api> = {
+        const routes = {
             example: route(
                 request('GET', "/"),
-                json()
+                text()
             )
         };
 
@@ -74,12 +67,7 @@ describe('buildClient()', () => {
             readonly accounts: Account[]
         }
 
-        type Api = {
-            userAccounts: (request: { username: string }) => Promise<UserAccounts>;
-            createAccount: (request: { username: string, account: Account }) => Promise<Account>;
-        }
-
-        const routes: Routes<Api> = {
+        const routes = {
             userAccounts: route(
                 request('GET', path({
                     username: v.segment
@@ -131,11 +119,7 @@ describe('buildClient()', () => {
             path: v.restOfPath
         };
 
-        type Example = {
-            readonly example: (request: Vars) => Promise<Vars>;
-        }
-
-        const routes: Routes<Example> = {
+        const routes = {
             example: route(
                 request('GET', path(paths, v => ["prefix", v.path])),
                 json<Vars>()
@@ -154,7 +138,7 @@ describe('buildClient()', () => {
     });
 
     it('throws ResultError on response lens failure', async () => {
-        const routes: Routes<{ example: () => Promise<any> }> = {
+        const routes = {
             example: route(
                 request('GET', "/some/path"),
                 json<any>()
@@ -170,7 +154,7 @@ describe('buildClient()', () => {
 
         const e: JsonPathError = await catchError(() => c.example());
         expect(e).deep.contains({
-            problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"])],
+            problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"], "example")],
             actual: {response: responseOf(200, "not json}{")}
         });
     });

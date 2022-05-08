@@ -1,14 +1,15 @@
-import {context, getOctokit} from '@actions/github';
-import {packages, readPackage} from "./util/packages";
+import {packages} from "./util/packages";
 import {spawnPromise} from "./util/processes";
 
 (async function build() {
-    for (const pack of Object.values(packages("packages"))) {
-        if (pack.path.endsWith("/test"))
+    const allPackages = Object.assign({},
+        packages("examples"),
+        packages("packages"));
+    for (const pkg of Object.values(allPackages)) {
+        if (pkg.path.endsWith("/test"))
             continue;
-
-        console.log(`Building ${pack.path}`);
-        await spawnPromise("yarn", ["run", "build"], pack.path);
+        console.log(`Building ${pkg.path}`);
+        await spawnPromise("yarn", ["run", "build"], pkg.path);
     }
 
 

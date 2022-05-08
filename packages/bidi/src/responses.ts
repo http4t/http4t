@@ -7,5 +7,5 @@ export function response<T>(status: number, lens: ResponseLens<T>): ResponseLens
 }
 
 export * from "./messages"
-export {maybe} from "./lenses/OrNotFoundLens"
+export {orNotFound} from "./lenses/OrNotFoundLens"
 export {statuses} from "./lenses/ResponseByStatusLens"

@@ -9,7 +9,7 @@ export const WRONG_ROUTE = "wrong-route";
 export const ROUTE_FAILED = "route-failed";
 
 /**
- * This was the wrong route- usually because either the url or method did not matched.
+ * This was the wrong route- usually because either the url or method did not match.
  *
  * The Router should continue looking for a matching route
  */

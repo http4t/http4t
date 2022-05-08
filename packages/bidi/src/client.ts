@@ -5,7 +5,8 @@ import {isFailure} from "@http4t/result";
 import {JsonPathError, ResultErrorOpts} from "@http4t/result/JsonPathError";
 import {prefix, prefixProducedBy} from "@http4t/result/JsonPathResult";
 import {RequestLens, ResponseLens} from "./lenses";
-import {HandlerFn, RouteFor, Routes} from "./routes";
+import {ApiFnFor, ApiFor, Route, Routes} from "./routes";
+import {Mutable} from "./util/mutable";
 
 /**
  * Creates a function that returns `lens.extract(message)`,
@@ -37,12 +38,12 @@ function validator<T>(
     }
 }
 
-export function routeClient<T extends HandlerFn>(
+export function routeClient<TRoute extends Route>(
     routeName: string,
-    route: RouteFor<T>,
+    route: TRoute,
     http: HttpHandler,
     opts: Partial<ResultErrorOpts> = {})
-    : T {
+    : ApiFnFor<TRoute> {
     const validate = validator(routeName, route.response, opts);
     const f = async (value: any): Promise<any> => {
         const lens = route.request as RequestLens<any>;
@@ -51,20 +52,19 @@ export function routeClient<T extends HandlerFn>(
         const bufferedResponse = {...response, body: await bufferText(response.body)};
         return validate(bufferedResponse);
     };
-
     return f as any;
 }
 
-export function buildClient<T>(
-    routes: Routes<T>,
+export function buildClient<TRoutes extends Routes>(
+    routes: TRoutes,
     http: HttpHandler,
-    opts: Partial<ResultErrorOpts> = {}): T {
+    opts: Partial<ResultErrorOpts> = {}): ApiFor<TRoutes> {
 
     return Object.entries(routes)
         .reduce((acc, [key, route]) => {
-                const K = key as keyof T;
-                acc[K] = routeClient(key, route as RouteFor<T[typeof K]>, http, opts) as any;
+                const K = key as keyof ApiFor<TRoutes>;
+                acc[K] = routeClient(key, route, http, opts) as any;
                 return acc;
             },
-            {} as T);
+            {} as Mutable<ApiFor<TRoutes>>);
 }

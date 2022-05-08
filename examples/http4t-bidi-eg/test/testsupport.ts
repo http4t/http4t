@@ -6,8 +6,8 @@ import {Closeable} from "@http4t/core/server";
 import {ClientHandler} from "@http4t/node/client";
 import {NodeServer} from "@http4t/node/server";
 import {isFailure} from "@http4t/result";
-import {Unsecured} from "@http4t/bidi/auth";
 import {PoolConfig} from "pg";
+import {Unsecured} from "@http4t/bidi/auth";
 
 export type CloseableHttpHandler = HttpHandler & Closeable;
 

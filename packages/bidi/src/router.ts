@@ -2,8 +2,8 @@ import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {responseOf} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
 import {RequestLens, ROUTE_FAILED, RouteFailed, WRONG_ROUTE, WrongRoute} from "./lenses";
-import {CheckValidApi, Route, Routes} from "./routes";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
+import {ApiFor, Route, Routes} from "./routes";
 
 
 export interface RequestLifecycle {
@@ -60,11 +60,11 @@ export interface RequestLifecycle {
     serverError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, error: any): Promise<HttpResponse>
 }
 
-export class Router<T> implements HttpHandler {
-    private readonly alphaOrderedRoutes : [ keyof T & string,Route][]
+export class Router<TRoutes extends Routes> implements HttpHandler {
+    private readonly alphaOrderedRoutes: [keyof TRoutes & string, Route][]
 
-    constructor(private readonly routes: Routes<T>,
-                private readonly routeBehaviours: CheckValidApi<T>,
+    constructor(private readonly routes: TRoutes,
+                private readonly routeBehaviours: ApiFor<TRoutes>,
                 private readonly lifecycle: RequestLifecycle
     ) {
         /*  JS does not provided guarantees on Object.entries ordering.
@@ -76,14 +76,14 @@ export class Router<T> implements HttpHandler {
 
         To fix this, we alpha-order the routes to provide arbitrary but at least deterministic behaviour.
          */
-        this.alphaOrderedRoutes = Object.entries(this.routes).sort(([k1], [k2])=>k1.localeCompare(k2)) as [ keyof T & string,Route][];
+        this.alphaOrderedRoutes = Object.entries(this.routes).sort(([k1], [k2]) => k1.localeCompare(k2)) as [keyof TRoutes & string, Route][];
     }
 
     async handle(originalRequest: HttpRequest): Promise<HttpResponse> {
         try {
             const request = await this.lifecycle.begin(originalRequest);
 
-            for (const [routeName,route] of this.alphaOrderedRoutes) {
+            for (const [routeName, route] of this.alphaOrderedRoutes) {
                 try {
                     const requestMappingResult = await (route.request as RequestLens<any>).get(request);
 
@@ -112,9 +112,9 @@ export class Router<T> implements HttpHandler {
     }
 }
 
-export function buildRouter<T>(
-    routes: Routes<T>,
-    handlers: CheckValidApi<T>,
+export function buildRouter<TRoutes extends Routes>(
+    routes: TRoutes,
+    handlers: ApiFor<TRoutes>,
     lifecycle: RequestLifecycle = PROD_LIFECYCLE): HttpHandler {
     return new Router(routes, handlers, lifecycle);
 }

@@ -16,8 +16,8 @@ class AlwaysFailLens<TMessage extends HttpMessage, TGet = never, TSet = TGet> im
     }
 }
 
-export function fail<TMessage extends HttpMessage = HttpMessage, TGet = never, TSet = TGet>(error: RoutingError): MessageLens<TMessage, TGet, TSet>;
-export function fail<TMessage extends HttpMessage = HttpMessage, TGet = never,TSet = TGet>(error: (message: TMessage) => RoutingError): MessageLens<TMessage, TGet, TSet>;
-export function fail<TMessage extends HttpMessage = HttpMessage, TGet = never,TSet = TGet>(error: RoutingError | ((message: TMessage) => RoutingError)): MessageLens<TMessage, TGet, TSet> {
+export function fail<TMessage extends HttpMessage = HttpMessage, TGet = undefined, TSet = TGet>(error: RoutingError): MessageLens<TMessage, TGet, TSet>;
+export function fail<TMessage extends HttpMessage = HttpMessage, TGet = undefined,TSet = TGet>(error: (message: TMessage) => RoutingError): MessageLens<TMessage, TGet, TSet>;
+export function fail<TMessage extends HttpMessage = HttpMessage, TGet = undefined,TSet = TGet>(error: RoutingError | ((message: TMessage) => RoutingError)): MessageLens<TMessage, TGet, TSet> {
     return new AlwaysFailLens<TMessage, TGet, TSet>(typeof error === "function" ? error : () => error);
 }
