@@ -14,11 +14,11 @@ export class TextLens<TMessage extends HttpMessage> implements MessageLens<TMess
         return success(await bufferText(message.body));
     }
 
-    async set(into: TMessage, value: string): Promise<TMessage> {
+    async set<SetInto extends TMessage>(into: SetInto, value: string): Promise<SetInto> {
         return {
             ...into,
             headers: [...into.headers, header('Content-Type', 'text/plain')],
-            value
+            body: value
         };
     }
 }

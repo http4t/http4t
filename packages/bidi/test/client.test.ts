@@ -6,7 +6,7 @@ import {v, VariablePaths} from "@http4t/bidi/paths/variables";
 import {request} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
 import {route, Routes} from "@http4t/bidi/routes";
-import {HttpHandler, HttpRequest} from "@http4t/core/contract";
+import {HttpHandler} from "@http4t/core/contract";
 import {handler} from "@http4t/core/handlers";
 import {responseOf} from "@http4t/core/responses";
 import {JsonPathError} from "@http4t/result/JsonPathError";
@@ -90,7 +90,7 @@ describe('buildClient()', () => {
                 request(
                     'POST',
                     path({username: v.segment}, v => ["accounts/", v.username]),
-                    named({account: json<Account, HttpRequest>()})),
+                    named({account: json<Account>()})),
 
                 json<Account>()
             )
@@ -154,7 +154,7 @@ describe('buildClient()', () => {
     });
 
     it('throws ResultError on response lens failure', async () => {
-        const routes = {
+        const routes: Routes<{ example: () => Promise<any> }> = {
             example: route(
                 request('GET', "/some/path"),
                 json<any>()
@@ -168,7 +168,7 @@ describe('buildClient()', () => {
 
         const c = buildClient(routes, brokenServer);
 
-        const e: JsonPathError = await catchError(() => c.example({}));
+        const e: JsonPathError = await catchError(() => c.example());
         expect(e).deep.contains({
             problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"])],
             actual: {response: responseOf(200, "not json}{")}

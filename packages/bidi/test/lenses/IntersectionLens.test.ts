@@ -3,14 +3,14 @@ import {success} from "@http4t/result";
 import {expect} from 'chai';
 import {headers} from "@http4t/bidi/lenses/HeaderLens";
 import {IntersectionLens} from "@http4t/bidi/lenses/IntersectionLens";
-import {MethodLens} from "@http4t/bidi/lenses/MethodLens";
+import {expectMethod} from "@http4t/bidi/lenses/MethodLens";
 import {json} from "@http4t/bidi/lenses/JsonLens";
 
 describe("IntersectionLens", () => {
 
     it("intersects lenses", async () => {
         const message = requestOf("GET", "/path", JSON.stringify({some: "value"}), ["X-Name", "tom"], ["X-Age", "young"]);
-        const methodLens = new MethodLens("GET");
+        const methodLens = expectMethod("GET");
 
         const jsonLens = json<{ some: "value" }>();
 

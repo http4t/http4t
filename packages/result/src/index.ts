@@ -87,6 +87,22 @@ export function get<T>(result: Result<T, T>): T {
 }
 
 /**
+ * Throws an Error if result is not a success, otherwise returns value
+ */
+export function expectSuccess<T>(result: Result<any, T>): T {
+    if(isSuccess(result)) return result.value ;
+    throw new Error(`Expected success but got failure of ${result.error}`)
+}
+
+/**
+ * Throws an Error if result is not a success, otherwise returns value
+ */
+export function expectFailure<E>(result: Result<E, any>): E {
+    if(isFailure(result)) return result.error ;
+    throw new Error(`Expected failure but got success of ${result.value}`)
+}
+
+/**
  * Unwrap a Result, by returning the success value or throwing the result of block on failure to abort
  * from the current function.
  */

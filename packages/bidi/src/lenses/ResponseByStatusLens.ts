@@ -1,33 +1,37 @@
-import {HttpResponse} from "@http4t/core/contract";
-import {isSuccess, success} from "@http4t/result";
-import {ResponseLens, routeFailed, RoutingResult} from "../lenses";
+import {HttpMessage, HttpResponse} from "@http4t/core/contract";
+import {BaseResponseLens, MessageLens, ResponseLens, routeFailed, RoutingResult} from "../lenses";
 
-export type ByStatus = { [k: number]: any };
-export type ResponsesByStatus<T extends ByStatus> = { [K in keyof T]: ResponseLens<T[K]> }
-export type MatchedResponse<T extends ByStatus, K extends keyof T = keyof T> = { status: K, value: T[K] };
+export type LensesByStatus<TGet, TSet> = { [k: number]: MessageLens<HttpMessage, TGet, TSet> };
 
-export class ResponseByStatusLens<T extends ByStatus> implements ResponseLens<MatchedResponse<T>> {
-    constructor(private readonly statuses: ResponsesByStatus<T>) {
+export class ResponseByStatusLens<TGet, TStatuses extends LensesByStatus<TGet, TSet>, TSet = TGet> extends BaseResponseLens<TGet, TSet> {
+    private readonly allStatuses: number[];
+
+    constructor(private readonly statuses: TStatuses,
+                private readonly getStatus: (request: TSet) => keyof TStatuses) {
+        super();
+        this.allStatuses = Object.keys(this.statuses) as any;
     }
 
-    async get(message: HttpResponse): Promise<RoutingResult<MatchedResponse<T>>> {
+    async get(message: HttpResponse): Promise<RoutingResult<TGet>> {
         if (!this.statuses.hasOwnProperty(message.status))
-            return routeFailed(`Status was not in ${Object.keys(this.statuses)}`, ["status"]);
+            return routeFailed(this.allStatuses.length === 1
+                ? `Status was not ${this.allStatuses[0]}`
+                : `Status was not in ${this.allStatuses.join(", ")}`,
+                ["status"]);
 
-        const result = await this.statuses[message.status].get(message);
-        return isSuccess(result)
-            ? success({status: message.status, value: result.value})
-            : result;
+        const lens = this.statuses[message.status];
+        return await lens.get(message);
     }
 
-    async set(into: HttpResponse, value: MatchedResponse<T>): Promise<HttpResponse> {
-        if (!this.statuses.hasOwnProperty(into.status))
-            throw new Error(`No lens for status ${value.status}`);
 
-        return this.statuses[value.status].set({...into, status: value.status as number}, value.value);
+    async setResponse(into: HttpResponse, value: TSet): Promise<HttpResponse> {
+        const status = this.getStatus(value);
+        const lens: ResponseLens<TSet> = this.statuses[status] as any;
+        if (!lens) throw new Error(`No lens provided for status ${status}`);
+        return lens.set({...into, status: status as number}, value);
     }
 }
 
-export function responses<T extends ByStatus>(byStatus: ResponsesByStatus<T>): ResponseByStatusLens<T> {
-    return new ResponseByStatusLens(byStatus);
+export function statuses<TGet, TStatuses extends LensesByStatus<TGet, TSet>, TSet = TGet>(statuses: TStatuses, getStatus: (value: TSet) => keyof TStatuses): ResponseLens<TGet, TSet> {
+    return new ResponseByStatusLens(statuses, getStatus);
 }

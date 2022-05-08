@@ -7,7 +7,7 @@ export class EmptyLens<TMessage extends HttpMessage> implements MessageLens<TMes
         return success(undefined);
     }
 
-    async set(into: TMessage, _value: undefined): Promise<TMessage> {
+    async set<SetInto extends TMessage>(into: SetInto, value: undefined): Promise<SetInto> {
         return into;
     }
 }

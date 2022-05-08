@@ -1,12 +1,28 @@
 import {NodeServer} from "@http4t/node/server";
-import {Pool} from "pg";
-import {startApp} from "./App";
-import {PostgresTransactionPool} from "./TransactionPool";
+import {startRouter} from "./router";
+
+function expectEnv(k: string): string {
+    const result = process.env[k];
+    if (typeof result === "undefined") throw new Error(`ENV ${k} was not set`);
+    return result;
+}
 
 (async function main() {
-    const router = await startApp(new PostgresTransactionPool(new Pool(
-        {database: "bidi-example", user: "bidi-example", password: "password"}
-    )));
+    const router = await startRouter({
+        auth: {
+            type: "secure",
+            publicKey: expectEnv('docstore.datastore.public_key'),
+            privateKey: expectEnv('docstore.datastore.private_key')
+        },
+        containsPii: (process.env['docstore.containspii'] || "true").toLowerCase() !== 'false',
+        dataStore: {
+            type: "postgres", config: {
+                database: expectEnv('docstore.datastore.database'),
+                user: expectEnv('docstore.datastore.user'),
+                password: expectEnv('docstore.datastore.password')
+            }
+        }
+    });
     const server = await NodeServer.start(router);
     console.log('Running on port', (await server.url()).authority);
 })();

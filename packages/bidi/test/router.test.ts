@@ -1,114 +1,110 @@
 import {bufferText} from "@http4t/core/bodies";
-import {get} from "@http4t/core/requests";
+import {get, toJSON} from "@http4t/core/requests";
 import {responseOf as responseOf} from "@http4t/core/responses";
 import {expect} from 'chai';
 import {routeFailedError, wrongRouteError} from "@http4t/bidi/lenses";
 import {fail} from "@http4t/bidi/lenses/AlwaysFailLens";
 import {empty} from "@http4t/bidi/lenses/EmptyLens";
-import {json} from "@http4t/bidi/lenses/JsonLens";
-import {request} from "@http4t/bidi/requests";
+import {intersect, request, text} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
-import {route} from "@http4t/bidi/routes";
+import {route, Routes} from "@http4t/bidi/routes";
+import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
 
-describe('Server', () => {
+describe('Router', () => {
+    interface Api {
+        helloWorld(): Promise<string>
+
+        routeFailed(): Promise<undefined>
+
+        wrongRoute(): Promise<undefined>
+
+        zzzLastRouteAlsoMatchesWrongRoute(): Promise<string>
+    }
+
+    const routes: Routes<Api> = {
+        helloWorld: route(
+            request('GET', "/some/path"),
+            text()
+        ),
+        routeFailed: route(
+            intersect(
+                request("GET", "/routeFailed"),
+                fail(routeFailedError("expected failure", [], responseOf(400, "routeFailed")))
+            ),
+            empty()
+        ),
+        wrongRoute: route(
+            intersect(
+                request("GET", "/wrongRoute"),
+                fail(wrongRouteError("expected failure", []))
+            ),
+            empty()
+        ),
+        zzzLastRouteAlsoMatchesWrongRoute: route(
+            request("GET", "/wrongRoute"),
+            text()
+        )
+    };
+    let lastRouteWasHit = false;
+    const router = buildRouter(
+        routes,
+        {
+            async helloWorld(): Promise<string> {
+                return "hello world";
+            },
+            async routeFailed(): Promise<undefined> {
+                return undefined;
+            },
+            async wrongRoute(): Promise<undefined> {
+                return undefined;
+            },
+            async zzzLastRouteAlsoMatchesWrongRoute(): Promise<string> {
+                lastRouteWasHit = true;
+                return "last route";
+            }
+        },
+        new DebugRequestLifecycle());
+
     it('matches route and calls handler', async () => {
-        const routes = {
-            example: route(
-                request('GET', "/some/path"),
-                json<string>()
-            )
-        };
+        const response = await router.handle(get("/some/path"));
 
-        async function example(): Promise<string> {
-            return "hello world"
-        }
+        expect(await toJSON(response)).deep.eq(
+            {
+                status: 200,
+                "headers": [
+                    [
+                        "Content-Type",
+                        "text/plain"
+                    ]
+                ],
+                body: "hello world"
+            });
+    });
 
-        const s = buildRouter(routes, {example});
-
-        const response = await s.handle(get('/'));
+    it('returns 404 when no route found', async () => {
+        const response = await router.handle(get('/doesnotexist'));
 
         expect(response.status).eq(404);
     });
 
     it('ignores trailing slashes in url', async () => {
-        const routes = {
-            example: route(
-                request('GET', "/some/path"),
-                json<string>()
-            )
-        };
-
-        async function example(): Promise<string> {
-            return "hello world"
-        }
-
-        const s = buildRouter(routes, {example});
-
-        const response = await s.handle(get('/some/path/'));
+        const response = await router.handle(get('/some/path/'));
 
         expect(response.status).eq(200);
-    });
-
-    it('404 on match failure', async () => {
-        const routes = {
-            example: route(
-                request('GET', "/some/path"),
-                json<string>()
-            )
-        };
-
-        async function example(): Promise<string> {
-            return "hello world"
-        }
-
-        const s = buildRouter(routes, {example});
-
-        const response = await s.handle(get('/'));
-
-        expect(response.status).eq(404);
     });
 
     it('short circuits if route fails with routeFailed("reason")', async () => {
-        const routes = {
-            fails: route(
-                fail(routeFailedError("expected failure", [], responseOf(400))),
-                empty()
-            ),
-            doesNotGetHit: route(empty(), empty())
-        };
-
-        let wasHit = false;
-        const behaviourDoesNotGetHit = {
-            doesNotGetHit: () => {
-                wasHit = true;
-            }
-        } as any;
-        const s = buildRouter(routes, behaviourDoesNotGetHit);
-
-        const response = await s.handle(get('/'));
+        const response = await router.handle(get('/routeFailed'));
 
         expect(response.status).eq(400);
-        expect(wasHit).eq(false);
+        expect(lastRouteWasHit).eq(false);
     });
 
     it('does not short circuit if a route fails with wrongRoute("reason")', async () => {
-        const routes = {
-            fails: route(
-                fail(wrongRouteError("expected failure", [])),
-                empty()
-            ),
-            getsHit: route(empty(), json<string>())
-        };
-
-        const onlyGetsHitIsUsed = {
-            getsHit: () => "ok"
-        } as any;
-        const s = buildRouter(routes, onlyGetsHitIsUsed);
-
-        const response = await s.handle(get('/'));
+        const response = await router.handle(get('/wrongRoute'));
 
         expect(response.status).eq(200);
-        expect(await bufferText(response.body)).eq("\"ok\"");
+        expect(await bufferText(response.body)).eq("last route");
     });
 });
 

@@ -19,7 +19,7 @@ export class NodeServer implements Server {
         const uri = await new Promise<ParsedUri>((resolve) => {
             server.on('listening', () => {
                 const address: string | any = server.address();
-                resolve(Uri.parse(`http://localhost:${typeof address === 'string' ? fixedOpts.port : address.port}/`))
+                resolve(Uri.parse(`http://localhost:${typeof address === 'string' ? fixedOpts.port : address.port}`))
             })
         });
         return new NodeServer(server, uri);
@@ -38,6 +38,10 @@ export class NodeServer implements Server {
     }
 }
 
+/**
+ * TODO: allow injecting logging etc.
+ * @param handler
+ */
 export function adapter(handler: HttpHandler) {
     return (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
         try {
@@ -47,6 +51,8 @@ export function adapter(handler: HttpHandler) {
                     const response = await handler.handle(req);
                     await responseHttp4tToNode(response, nodeResponse);
                 } catch (e) {
+                    nodeResponse.statusCode = 500;
+                    console.error(e);
                     nodeResponse.end()
                 }
             })();

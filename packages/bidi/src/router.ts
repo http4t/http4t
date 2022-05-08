@@ -2,7 +2,7 @@ import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {responseOf} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
 import {RequestLens, ROUTE_FAILED, RouteFailed, WRONG_ROUTE, WrongRoute} from "./lenses";
-import {Route, Routes, ValidApi} from "./routes";
+import {CheckValidApi, Route, Routes} from "./routes";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
 
 
@@ -60,37 +60,48 @@ export interface RequestLifecycle {
     serverError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, error: any): Promise<HttpResponse>
 }
 
-export class Router<T extends ValidApi> implements HttpHandler {
+export class Router<T> implements HttpHandler {
+    private readonly alphaOrderedRoutes : [ keyof T & string,Route][]
+
     constructor(private readonly routes: Routes<T>,
-                private readonly routeBehaviours: T,
+                private readonly routeBehaviours: CheckValidApi<T>,
                 private readonly lifecycle: RequestLifecycle
     ) {
+        /*  JS does not provided guarantees on Object.entries ordering.
+
+        If we consider routes for matching in the order that Object.entries(routes) would return them, and two routes
+        could potentially match the same request, then we might unexpectedly see the same request match a different route
+        if anything changed the ordering of Object.entries. One example might be adding a new, unrelated route to the
+        API, in which case it would be very surprising for it to surface a bug related to some other routes.
+
+        To fix this, we alpha-order the routes to provide arbitrary but at least deterministic behaviour.
+         */
+        this.alphaOrderedRoutes = Object.entries(this.routes).sort(([k1], [k2])=>k1.localeCompare(k2)) as [ keyof T & string,Route][];
     }
 
     async handle(originalRequest: HttpRequest): Promise<HttpResponse> {
         try {
             const request = await this.lifecycle.begin(originalRequest);
-            for (const routeEntry of Object.entries(this.routes)) {
-                const key = routeEntry[0];
-                const route: Route<unknown, unknown> = routeEntry[1];
+
+            for (const [routeName,route] of this.alphaOrderedRoutes) {
                 try {
                     const requestMappingResult = await (route.request as RequestLens<any>).get(request);
 
                     if (isFailure(requestMappingResult)) {
                         switch (requestMappingResult.error.type) {
                             case WRONG_ROUTE:
-                                await this.lifecycle.mismatch(request, key, route, requestMappingResult.error);
+                                await this.lifecycle.mismatch(request, routeName, route, requestMappingResult.error);
                                 continue;
                             case ROUTE_FAILED:
-                                return this.lifecycle.clientError(request, key, route, requestMappingResult.error);
+                                return this.lifecycle.clientError(request, routeName, route, requestMappingResult.error);
                         }
                     }
 
-                    const logicResult = await this.routeBehaviours[key](requestMappingResult.value);
+                    const logicResult = await this.routeBehaviours[routeName](requestMappingResult.value);
                     const response = await route.response.set(responseOf(200), logicResult);
-                    return this.lifecycle.match(request, key, route, response);
+                    return this.lifecycle.match(request, routeName, route, response);
                 } catch (e) {
-                    await this.lifecycle.serverError(request, key, route, e);
+                    return await this.lifecycle.serverError(request, routeName, route, e);
                 }
             }
             return this.lifecycle.noMatchFound(request);
@@ -101,9 +112,9 @@ export class Router<T extends ValidApi> implements HttpHandler {
     }
 }
 
-export function buildRouter<T extends ValidApi>(
+export function buildRouter<T>(
     routes: Routes<T>,
-    handlers: T,
+    handlers: CheckValidApi<T>,
     lifecycle: RequestLifecycle = PROD_LIFECYCLE): HttpHandler {
     return new Router(routes, handlers, lifecycle);
 }

@@ -4,6 +4,9 @@ export interface Logger {
     flush(): void
 }
 
+/**
+ * Create one of these per request in order to keep logs for each request together in console.out
+ */
 export class CumulativeLogger implements Logger {
     constructor(private infos: string[] = []) {
     }
