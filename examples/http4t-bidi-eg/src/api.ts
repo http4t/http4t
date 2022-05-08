@@ -1,5 +1,5 @@
 import {header, json, result, text, value} from "@http4t/bidi/messages";
-import {empty, maybe, response} from "@http4t/bidi/responses";
+import {empty, orNotFound, response} from "@http4t/bidi/responses";
 import {path} from "@http4t/bidi/paths";
 import {v} from "@http4t/bidi/paths/variables";
 import {request} from "@http4t/bidi/requests";
@@ -85,11 +85,13 @@ export const unsecuredDocStoreRoutes: Routes<Unsecured<DocStore>> = {
     ),
     get: route(
         request('GET', path({id: v.segment}, p => ["store", p.id])),
-        authErrorOr(maybe(json<Doc>()))
+        authErrorOr(
+            orNotFound(json<Doc>()))
     ),
     storeDocThenFail: route(
         request("POST", '/test/store-then-throw', json<Doc>()),
-        authErrorOr(response(200, empty()))
+        authErrorOr(
+            response(200, empty()))
     )
 }
 
