@@ -7,6 +7,7 @@ import {toJSON} from "@http4t/core/messages";
 import {response} from "@http4t/bidi/responses";
 import {expectFailure, expectSuccess} from "@http4t/result";
 import {RoutingResult} from "@http4t/bidi/lenses";
+import {problem} from "@http4t/result/JsonPathResult";
 
 describe("Union lens", () => {
 
@@ -40,21 +41,11 @@ describe("Union lens", () => {
 
         expect(expectFailure(result)).to.deep.eq({
             "problems": [
-                {
-                    "message": "Expected valid json- \"Unexpected token n in JSON at position 1\"",
-                    "path": [
-                        "body"
-                    ]
-                },
-                {
-                    "message": "Status was not in 404",
-                    "path": [
-                        "status"
-                    ]
-                }
+                problem("Expected valid json- \"Unexpected token n in JSON at position 1\"", ["body"]),
+                problem("Status was not 404", ["status"])
             ],
             "response": {
-                "body": "Status was not in 404",
+                "body": "Status was not 404",
                 "headers": [],
                 "status": 400
             },

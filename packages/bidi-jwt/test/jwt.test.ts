@@ -23,19 +23,6 @@
 // }
 
 
-describe('injects jwt on the client side and reads it on the server side', function () {
-    it('should inject jwt on client side', function () {
-        // interface Api {
-        //     echo(message: string): Promise<string>
-        // }
-        //
-        // const routes: Routes<Api> = {
-        //     echo: route(
-        //         text(),
-        //         text()
-        //     )
-        // }
-        throw new Error("Implement me!")
+describe('JwtLens', function () {
 
-    });
 });

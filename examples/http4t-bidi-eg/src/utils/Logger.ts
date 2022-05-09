@@ -16,7 +16,7 @@ export class CumulativeLogger implements Logger {
     }
 
     flush(): void {
-        console.log(this.infos.join(' | '));
+        console.log(this.infos.join('\n'));
         this.infos = [];
     }
 }

@@ -72,10 +72,8 @@ describe('Router', () => {
             {
                 status: 200,
                 "headers": [
-                    [
-                        "Content-Type",
-                        "text/plain"
-                    ]
+                    ["Content-Type", "text/plain"],
+                    ["Matched-Route", "helloWorld"]
                 ],
                 body: "hello world"
             });

@@ -170,7 +170,7 @@ describe('buildClient()', () => {
 
         const e: JsonPathError = await catchError(() => c.example());
         expect(e).deep.contains({
-            problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"])],
+            problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"], "example")],
             actual: {response: responseOf(200, "not json}{")}
         });
     });
