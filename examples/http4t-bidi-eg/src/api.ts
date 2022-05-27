@@ -3,13 +3,13 @@ import {empty, orNotFound, response} from "@http4t/bidi/responses";
 import {path} from "@http4t/bidi/paths";
 import {v} from "@http4t/bidi/paths/variables";
 import {request} from "@http4t/bidi/requests";
-import {route, Routes} from "@http4t/bidi/routes";
+import {route, RoutesFor} from "@http4t/bidi/routes";
 import {HttpHandler} from "@http4t/core/contract";
 import {Doc} from "./docstore";
 import {Result, success} from "@http4t/result";
 import {Jwt, jwtBody, jwtSecuredRoutes, JwtStrategy} from "@http4t/bidi-jwt";
 import {buildClient} from "@http4t/bidi/client";
-import {AuthError, authErrorOr, provideToken, Unsecured, WithClaims} from "@http4t/bidi/auth";
+import {AuthError, authErrorOr, SecuredRoutesFor, tokenProvidedRoutes, Unsecured, WithClaims} from "@http4t/bidi/auth";
 import {clientJwt} from "@http4t/bidi-jwt/jose";
 import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 
@@ -17,11 +17,11 @@ export type User = {
     userName: string
 }
 
-export type Claims = {
+export type DocStoreClaims = {
     principal: { type: "user", userName: string }
 }
 
-export type WithOurClaims<T> = WithClaims<T, Claims>;
+export type WithOurClaims<T> = WithClaims<T, DocStoreClaims>;
 
 export type Creds = { userName: string, password: string };
 
@@ -32,9 +32,9 @@ export interface Auth {
 }
 
 export interface Health {
-    ready(): Promise<void>;
+    ready(): Promise<undefined>;
 
-    live(): Promise<void>;
+    live(): Promise<undefined>;
 }
 
 export interface DocStore {
@@ -48,7 +48,7 @@ export interface DocStore {
 export interface FullApi extends Health, Auth, DocStore {
 }
 
-export function authRoutes(opts: { jwt: JwtStrategy }): Routes<Auth> {
+export function authRoutes(opts: { jwt: JwtStrategy }): RoutesFor<Auth> {
     return {
         register: route(
             request("POST", "/register", json<Creds>()),
@@ -66,7 +66,7 @@ export function authRoutes(opts: { jwt: JwtStrategy }): Routes<Auth> {
     };
 }
 
-export const healthRoutes: Routes<Health> = {
+export const healthRoutes = {
     ready: route(
         request('GET', '/probe/ready'),
         response(200, value("*", header("Access-Control-Allow-Origin")))
@@ -77,7 +77,7 @@ export const healthRoutes: Routes<Health> = {
     ),
 }
 
-export const unsecuredDocStoreRoutes: Routes<Unsecured<DocStore>> = {
+export const unsecuredDocStoreRoutes = {
     post: route(
         request('POST', '/store', json<Doc>()),
         authErrorOr(
@@ -95,11 +95,11 @@ export const unsecuredDocStoreRoutes: Routes<Unsecured<DocStore>> = {
     )
 }
 
-export function docStoreRoutes(opts: { jwt: JwtStrategy }): Routes<DocStore> {
+export function docStoreRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typeof unsecuredDocStoreRoutes, Jwt, DocStoreClaims> {
     return jwtSecuredRoutes(
         unsecuredDocStoreRoutes,
         opts.jwt,
-        async (jwt: Jwt): Promise<RoutingResult<Claims>> => {
+        async (jwt: Jwt): Promise<RoutingResult<DocStoreClaims>> => {
             const userName = jwt.payload["userName"];
             if (!userName) return routeFailed("JWT did not contain 'userName'", ["headers", "Authorization"]);
             return success({
@@ -120,12 +120,16 @@ export function healthClient(httpClient: HttpHandler): Health {
 }
 
 export function docStoreClient(httpClient: HttpHandler, jwt: Jwt): Unsecured<DocStore> {
-    const securedClient: DocStore = buildClient(
-        docStoreRoutes({
-            jwt: clientJwt()
-        }),
+    const securedRoutes = docStoreRoutes({
+        jwt: clientJwt()
+    });
+
+    const routesWithJwtProvided = tokenProvidedRoutes(
+        securedRoutes,
+        jwt);
+
+    return buildClient(
+        routesWithJwtProvided,
         httpClient,
         {leakActualValuesInError: true});
-
-    return provideToken(securedClient, jwt);
 }

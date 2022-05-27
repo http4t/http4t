@@ -7,7 +7,7 @@ import {rollbackOnExceptionOr500} from "./utils/filters/rollbackOnExceptionOr500
 import {httpInfoLogger} from "./utils/HttpInfoLogger";
 import {CumulativeLogger} from "./utils/Logger";
 import {migrate} from "./db/migrations";
-import {DocStore} from "./docstore";
+import {DocRepository} from "./docstore";
 import {PostgresTransactionPool} from "./utils/transactions/TransactionPool";
 import {withFilters} from "@http4t/core/Filter";
 import {routes} from "@http4t/bidi/routes";
@@ -24,10 +24,13 @@ import {PostgresStore} from "./docstore/PostgresStore";
 import {InMemoryCredStore} from "./auth/InMemoryCredStore";
 import {TotallyInsecureServerJwtStrategy} from "@http4t/bidi-jwt/testing";
 
-export type RouterOpts = { creds: CredStore, store: DocStore, logger: CumulativeLogger, jwt: JwtStrategy, lifecycle?: RequestLifecycle };
+export type RouterOpts = { creds: CredStore, store: DocRepository, logger: CumulativeLogger, jwt: JwtStrategy, lifecycle?: RequestLifecycle };
 
 export function router(opts: RouterOpts): HttpHandler {
-    return buildRouter(routes(healthRoutes, authRoutes(opts), docStoreRoutes(opts)), businessLogic(opts), opts.lifecycle || PROD_LIFECYCLE);
+    return buildRouter(
+        routes(healthRoutes, authRoutes(opts), docStoreRoutes(opts)),
+        businessLogic(opts),
+        opts.lifecycle || PROD_LIFECYCLE);
 }
 
 export type PostgresConfig = { type: "postgres", config: PoolConfig };

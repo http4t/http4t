@@ -55,7 +55,9 @@ export function packageFiles(dir: string = "."): string[] {
 }
 
 export function packages(dir: string = "."): Packages {
-    return packageFiles(dir)
+    const files = packageFiles(dir);
+    // console.log(`Found package files in ${dir}:\n   ${files.join("\n   ")}`)
+    return files
         .reduce(
             (acc, path) => {
                 const pack = readPackage(path);

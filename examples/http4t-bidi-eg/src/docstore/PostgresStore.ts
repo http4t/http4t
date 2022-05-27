@@ -1,7 +1,7 @@
 import {Transaction} from "../utils/transactions/TransactionPool";
-import {DocAndMetaData, DocStore} from "./index";
+import {DocAndMetaData, DocRepository} from "./index";
 
-export class PostgresStore implements DocStore {
+export class PostgresStore implements DocRepository {
     constructor(private transaction: Transaction) {
     }
 

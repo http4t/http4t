@@ -6,7 +6,7 @@ import {spawn} from "child_process";
  * Resolves or rejects promise on completion
  */
 export function spawnPromise(command: string, args: string[], cwd: string=".") {
-    console.log(`${command} ${args.join(" ")}`);
+    console.log(`\x1b[32m${cwd} \x1b[34m${command} ${args.join(" ")}\x1b[0m`);
     const test = spawn(command, args, {cwd});
     test.stderr.pipe(process.stderr);
     test.stdout.pipe(process.stdout);

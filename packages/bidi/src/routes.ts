@@ -1,6 +1,6 @@
 import {RequestLens, ResponseLens} from "./lenses";
 
-export type Route<InGet=unknown, OutGet=unknown, InSet = InGet, OutSet = OutGet> = {
+export type Route<InGet = unknown, OutGet = unknown, InSet = InGet, OutSet = OutGet> = {
     readonly request: RequestLens<InGet, InSet>;
     readonly response: ResponseLens<OutGet, OutSet>;
 }
@@ -19,36 +19,38 @@ export type HandlerFn0<Out = any> = () => Promise<Out>;
 export type HandlerFn1<In = any, Out = any> = (arg: In) => Promise<Out>;
 export type HandlerFn = HandlerFn0 | HandlerFn1
 
-export type CheckHandlerFn<T> =
-    T extends HandlerFn
-        ? T
-        : never;
-/**
- * bidi apis need to contain only zero-or-1 arity functions that return promises, because each function needs a lens
- * to serialize/deserialize the request, and lenses only take one parameter
- */
-export type CheckValidApi<T> = { readonly [K in keyof T]: CheckHandlerFn<T[K]> };
+export type Routes = { readonly [k: string]: Route };
 
-export type RouteFor<T> =
-    T extends HandlerFn1<infer In, infer Out>
+export type RouteFor<THandler> =
+    THandler extends HandlerFn1<infer In, infer Out>
         ? Route<In, Out>
-        : T extends HandlerFn0<infer Out>
+        : THandler extends HandlerFn0<infer Out>
         ? Route<undefined, Out>
         : never;
 /**
- * A collection of named http routes, which form an api.
+ * Check that provided routes are compatible with TApi
+ *
+ * TODO: can we delete this?
  */
-export type Routes<T> = { readonly [K in keyof T]: RouteFor<T[K]> };
+export type RoutesFor<TApi> = { readonly [K in keyof TApi]: RouteFor<TApi[K]> };
 
-export function routes<A, B>(a: Routes<A>, b: Routes<B>): Routes<A & B>;
-export function routes<A, B, C>(a: Routes<A>, b: Routes<B>, c: Routes<C>): Routes<A & B & C>;
-export function routes<A, B, C, D>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>): Routes<A & B & C & D>;
-export function routes<A, B, C, D, E>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>, e: Routes<E>): Routes<A & B & C & D & E>;
-export function routes<A, B, C, D, E, F>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>, e: Routes<E>, f: Routes<F>): Routes<A & B & C & D & E & F>;
-export function routes<A, B, C, D, E, F, G>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>, e: Routes<E>, f: Routes<F>, g: Routes<G>): Routes<A & B & C & D & E & F & G>;
-export function routes<A, B, C, D, E, F, G, H>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>, e: Routes<E>, f: Routes<F>, g: Routes<G>, h: Routes<H>): Routes<A & B & C & D & E & F & G & H>;
-export function routes<A, B, C, D, E, F, G, H, I>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>, e: Routes<E>, f: Routes<F>, g: Routes<G>, h: Routes<H>, i: Routes<I>): Routes<A & B & C & D & E & F & G & H & I>;
-export function routes<A, B, C, D, E, F, G, H, I, J>(a: Routes<A>, b: Routes<B>, c: Routes<C>, d: Routes<D>, e: Routes<E>, f: Routes<F>, g: Routes<G>, h: Routes<H>, i: Routes<I>, j: Routes<J>): Routes<A & B & C & D & E & F & G & H & I & J>;
-export function routes(...routes: Routes<any>[]): Routes<any> {
+export type ApiFnFor<TRoute> = TRoute extends Route<infer In, infer Out, infer InSet, infer OutSet>
+    ? In extends undefined
+        ? HandlerFn0<Out>
+        : HandlerFn1<In, Out>
+    : never;
+export type ApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ApiFnFor<TRoutes[K]> };
+
+
+export function routes<A extends Routes, B extends Routes>(a: A, b: B): A & B;
+export function routes<A extends Routes, B extends Routes, C extends Routes>(a: A, b: B, c: C): A & B & C;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes>(a: A, b: B, c: C, d: D): A & B & C & D;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes, E extends Routes>(a: A, b: B, c: C, d: D, e: E): A & B & C & D & E;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes, E extends Routes, F extends Routes>(a: A, b: B, c: C, d: D, e: E, f: F): A & B & C & D & E & F;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes, E extends Routes, F extends Routes, G extends Routes>(a: A, b: B, c: C, d: D, e: E, f: F, g: G): A & B & C & D & E & F & G;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes, E extends Routes, F extends Routes, G extends Routes, H extends Routes>(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H): A & B & C & D & E & F & G & H;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes, E extends Routes, F extends Routes, G extends Routes, H extends Routes, I extends Routes>(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I): A & B & C & D & E & F & G & H & I;
+export function routes<A, B extends Routes, C extends Routes, D extends Routes, E extends Routes, F extends Routes, G extends Routes, H extends Routes, I extends Routes, J extends Routes>(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J): A & B & C & D & E & F & G & H & I & J;
+export function routes(...routes: Routes[]): Routes {
     return routes.reduce((previousValue, currentValue) => Object.assign({}, previousValue, currentValue));
 }

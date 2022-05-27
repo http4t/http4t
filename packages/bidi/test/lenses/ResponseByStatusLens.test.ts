@@ -1,7 +1,7 @@
 import {json, statuses} from "@http4t/bidi/responses";
-import {AuthError} from "@http4t/bidi/auth";
 import {ok, toJSON} from "@http4t/core/responses";
 import {expect} from "chai";
+import {AuthError} from "@http4t/bidi/auth";
 
 describe('ResponseByStatusLens', function () {
     const lens = statuses(

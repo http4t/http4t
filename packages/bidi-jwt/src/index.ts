@@ -4,9 +4,9 @@ import {isFailure} from "@http4t/result";
 import {text} from "@http4t/bidi/messages";
 import {bearerAuthHeader} from "@http4t/bidi/lenses/BearerAuthHeader";
 import {Routes} from "@http4t/bidi/routes";
-import {serverSecuredRoutes, Unsecured} from "@http4t/bidi/auth";
 import {mapped} from "@http4t/bidi/lenses/MapLens";
 import {responseOf} from "@http4t/core/responses";
+import {SecuredRoutesFor, serverSecuredRoutes} from "@http4t/bidi/auth";
 
 export type Jwt = {
     originalToken?: string
@@ -53,15 +53,18 @@ export function jwtBody(strategy: JwtStrategy): MessageLens<HttpMessage, Jwt> {
     return jwt(text(), strategy);
 }
 
-export function jwtSecuredRoutes<T, TClaims>(
-    unsecuredRoutes: Routes<Unsecured<T>>,
+export function jwtSecuredRoutes<TRoutes extends Routes, TClaims, TAuthError>(
+    unsecuredRoutes: TRoutes,
     jwtStrategy: JwtStrategy,
     tokenToClaims: (token: Jwt) => Promise<RoutingResult<TClaims>>
-): Routes<T> {
+): SecuredRoutesFor<TRoutes, Jwt, TClaims, TAuthError> {
+
+    const tokenLens: MessageLens<HttpMessage, TClaims, Jwt> = mapped<Jwt, TClaims, Jwt, Jwt>(
+        jwtAuthHeader(jwtStrategy),
+        tokenToClaims,
+        async jwt => jwt);
+
     return serverSecuredRoutes(
         unsecuredRoutes,
-        mapped<Jwt, TClaims, Jwt, Jwt>(
-            jwtAuthHeader(jwtStrategy),
-            tokenToClaims,
-            async jwt => jwt));
+        tokenLens);
 }
