@@ -1,12 +1,8 @@
-import CreateProperties = chrome.tabs.CreateProperties;
-import QueryInfo = chrome.tabs.QueryInfo;
-import Tab = chrome.tabs.Tab;
-import TabChangeInfo = chrome.tabs.TabChangeInfo;
 import {HttpRequest} from "@http4t/core/contract";
 import {Uri} from "@http4t/core/uri";
 import {resolveable} from "./ResolveablePromise";
 
-export function rootUrl(request: HttpRequest): CreateProperties {
+export function rootUrl(request: HttpRequest): chrome.tabs.CreateProperties {
     const requestUri = Uri.of(request.uri);
     const uri = Uri.of({
         scheme: requestUri.scheme,
@@ -19,7 +15,7 @@ export function rootUrl(request: HttpRequest): CreateProperties {
     };
 }
 
-export function sameHost(request: HttpRequest): QueryInfo {
+export function sameHost(request: HttpRequest): chrome.tabs.QueryInfo {
     const requestUri = Uri.of(request.uri);
     const uri = Uri.of({
         scheme: requestUri.scheme,
@@ -29,17 +25,20 @@ export function sameHost(request: HttpRequest): QueryInfo {
     return {url: uri.toString()};
 }
 
-export async function waitForTabState(tabId: number, predicate: (tab: Tab, changeInfo: TabChangeInfo | undefined) => boolean, timeoutMs: number): Promise<Tab> {
-    const matchingTab = resolveable<Tab>();
-    const timeout = resolveable<Tab>();
+export async function waitForTabState(tabId: number,
+                                      predicate: (tab: chrome.tabs.Tab, changeInfo: chrome.tabs.TabChangeInfo | undefined) => boolean,
+                                      timeoutMs: number)
+    : Promise<chrome.tabs.Tab> {
+    const matchingTab = resolveable<chrome.tabs.Tab>();
+    const timeout = resolveable<chrome.tabs.Tab>();
     const timeoutId = setTimeout(() => timeout.reject(new Error("Timed out while waiting for tab to change state")), timeoutMs);
-    const listener = function (_tabId: number, changeInfo: TabChangeInfo, tab: Tab) {
+    const listener = function (_tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
         if (tab.id === tabId && predicate(tab, changeInfo))
             matchingTab.resolve(tab);
     };
     chrome.tabs.onUpdated.addListener(listener);
     try {
-        const currentState = await new Promise<Tab>(resolve => chrome.tabs.get(tabId, resolve));
+        const currentState = await new Promise<chrome.tabs.Tab>(resolve => chrome.tabs.get(tabId, resolve));
         if (predicate(currentState, undefined))
             return currentState;
         return await Promise.race([matchingTab, timeout]);
@@ -49,8 +48,8 @@ export async function waitForTabState(tabId: number, predicate: (tab: Tab, chang
     }
 }
 
-function createTab(properties: CreateProperties) {
-    return new Promise<Tab>((resolve, reject) => {
+function createTab(properties: chrome.tabs.CreateProperties) {
+    return new Promise<chrome.tabs.Tab>((resolve, reject) => {
         chrome.tabs.create(properties, async (tab) => {
             if (!tab) {
                 reject({message: "Could not create tab", properties});
@@ -61,7 +60,7 @@ function createTab(properties: CreateProperties) {
     })
 }
 
-export function tabs(query: QueryInfo): Promise<Tab[]> {
+export function tabs(query: chrome.tabs.QueryInfo): Promise<chrome.tabs.Tab[]> {
     return new Promise(resolve => {
         chrome.tabs.query(query, (tabs) => {
             resolve(tabs || []);
@@ -74,9 +73,9 @@ export type CreateTabOpts = {
 }
 
 export async function findOrCreateTab(
-    queryInfo: QueryInfo,
-    properties: CreateProperties,
-    {waitForTabCreationTimeoutMs = 5000}: CreateTabOpts = {}): Promise<Tab> {
+    queryInfo: chrome.tabs.QueryInfo,
+    properties: chrome.tabs.CreateProperties,
+    {waitForTabCreationTimeoutMs = 5000}: CreateTabOpts = {}): Promise<chrome.tabs.Tab> {
     const existingTab = (await tabs(queryInfo))[0];
     if (existingTab) return existingTab;
     const newTab = await createTab(properties);
@@ -91,4 +90,4 @@ export const findTabByHost: TabFinder =
             sameHost(request),
             rootUrl(request));
     }
-export type TabFinder = (request: HttpRequest) => Promise<Tab>;
+export type TabFinder = (request: HttpRequest) => Promise<chrome.tabs.Tab>;

@@ -1,7 +1,6 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {badGateway, ErrorResponder} from "./util/ErrorResponder";
 import {fetchMessage} from "./FetchMessage";
-import MessageOptions = chrome.runtime.MessageOptions;
 
 /**
  * Routes a request to another tab which is also running this extension.
@@ -12,7 +11,7 @@ export class FetchViaBackgroundScript implements HttpHandler {
     constructor(
         private readonly extensionId: (request: HttpRequest) => any =
             () => chrome.runtime.id,
-        private readonly options: (request: HttpRequest) => MessageOptions =
+        private readonly options: (request: HttpRequest) => chrome.runtime.MessageOptions =
             () => ({}),
         private readonly onError: ErrorResponder =
             badGateway) {
