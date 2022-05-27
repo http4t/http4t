@@ -44,7 +44,7 @@ describe('buildClient()', () => {
         const routes = {
             example: route(
                 request('GET', "/"),
-                json()
+                text()
             )
         };
 
