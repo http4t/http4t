@@ -13,9 +13,8 @@ const patterns = [
     /\/mocha.html$/,
 ];
 const shouldBeCleaned = path => !!patterns.find(regex => regex.test(path));
-
-(async function clean() {
-    const targets = files(".", {
+export async function clean(dir:string=".") {
+    const targets = files(dir, {
         collect: shouldBeCleaned,
         skipDir: path => path.endsWith("/build") || path.endsWith("/node_modules")
     }).sort();
@@ -30,7 +29,8 @@ const shouldBeCleaned = path => !!patterns.find(regex => regex.test(path));
                 fs.unlinkSync(path);
             }
         });
-})().then(_result => {
+}
+clean().then(_result => {
     process.exit(0);
 }).catch(err => {
     console.error(err);
