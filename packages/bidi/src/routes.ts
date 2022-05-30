@@ -22,24 +22,35 @@ export type HandlerFn = HandlerFn0 | HandlerFn1
 export type Routes = { readonly [k: string]: Route };
 
 export type RouteFor<THandler> =
-    THandler extends HandlerFn1<infer In, infer Out>
-        ? Route<In, Out>
-        : THandler extends HandlerFn0<infer Out>
+    THandler extends HandlerFn0<infer Out>
         ? Route<undefined, Out>
+        : THandler extends HandlerFn1<infer In, infer Out>
+        ? Route<In, Out>
         : never;
 /**
- * Check that provided routes are compatible with TApi
- *
- * TODO: can we delete this?
+ * Use as a compile-time check that symmetrical routes are compatible with `TApi`
  */
 export type RoutesFor<TApi> = { readonly [K in keyof TApi]: RouteFor<TApi[K]> };
 
-export type ApiFnFor<TRoute> = TRoute extends Route<infer In, infer Out, infer InSet, infer OutSet>
-    ? In extends undefined
-        ? HandlerFn0<Out>
-        : HandlerFn1<In, Out>
+export type ServerApiFnFor<TRoute> = TRoute extends Route<infer InGet, infer OutGet, infer InSet, infer OutSet>
+    ? InGet extends undefined
+        ? HandlerFn0<OutSet>
+        : HandlerFn1<InGet, OutSet>
     : never;
-export type ApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ApiFnFor<TRoutes[K]> };
+/**
+ * Uses `InGet` for method parameter and `OutSet` for return value
+ */
+export type ServerApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ServerApiFnFor<TRoutes[K]> };
+
+export type ClientApiFnFor<TRoute> = TRoute extends Route<infer InGet, infer OutGet, infer InSet, infer OutSet>
+    ? InGet extends undefined
+        ? HandlerFn0<OutGet>
+        : HandlerFn1<InSet, OutGet>
+    : never;
+/**
+ * Uses `InSet` for method parameter and `OutGet` for return value
+ */
+export type ClientApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ClientApiFnFor<TRoutes[K]> };
 
 
 export function routes<A extends Routes, B extends Routes>(a: A, b: B): A & B;

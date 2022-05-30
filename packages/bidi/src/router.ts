@@ -3,7 +3,7 @@ import {responseOf} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
 import {RequestLens, ROUTE_FAILED, RouteFailed, WRONG_ROUTE, WrongRoute} from "./lenses";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
-import {ApiFor, Route, Routes} from "./routes";
+import {ServerApiFor, Route, Routes} from "./routes";
 
 
 export interface RequestLifecycle {
@@ -64,7 +64,7 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
     private readonly alphaOrderedRoutes: [keyof TRoutes & string, Route][]
 
     constructor(private readonly routes: TRoutes,
-                private readonly routeBehaviours: ApiFor<TRoutes>,
+                private readonly routeBehaviours: ServerApiFor<TRoutes>,
                 private readonly lifecycle: RequestLifecycle
     ) {
         /*  JS does not provided guarantees on Object.entries ordering.
@@ -114,7 +114,7 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
 
 export function buildRouter<TRoutes extends Routes>(
     routes: TRoutes,
-    handlers: ApiFor<TRoutes>,
+    handlers: ServerApiFor<TRoutes>,
     lifecycle: RequestLifecycle = PROD_LIFECYCLE): HttpHandler {
     return new Router(routes, handlers, lifecycle);
 }

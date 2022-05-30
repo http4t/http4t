@@ -4,7 +4,7 @@ import {CumulativeLogger} from "./utils/Logger";
 import {Jwt, JwtStrategy} from "@http4t/bidi-jwt";
 import {FullApi, User, WithOurClaims} from "./api";
 import {isFailure, Result, success} from "@http4t/result";
-import {AuthError} from "@http4t/bidi/auth";
+import {AuthError} from "@http4t/bidi/auth/authError";
 
 export type LogicOpts = { creds: CredStore, store: DocRepository, logger: CumulativeLogger, jwt: JwtStrategy };
 
@@ -36,23 +36,23 @@ export function businessLogic(opts: LogicOpts): FullApi {
             const result = await store.get(request.value.id);
             logger.info(`retrieved json: ${JSON.stringify(result)}`);
 
-            if(typeof result == "undefined") return success(result);
+            if (typeof result == "undefined") return success(result);
 
             const {doc, meta} = result;
-            if (meta.owner !== request.claims.principal.userName) return success(undefined);
+            if (meta.owner !== request.security.principal.userName) return success(undefined);
 
             return success(doc);
         },
         async post(request: WithOurClaims<Doc>): Promise<Result<AuthError, { id: string }>> {
             const doc = request.value;
             logger.info(`storing json: "${JSON.stringify(doc)}"`);
-            await store.save({doc, meta: {owner: request.claims.principal.userName}});
+            await store.save({doc, meta: {owner: request.security.principal.userName}});
             return success({id: doc.id});
         },
         async storeDocThenFail(request: WithOurClaims<Doc>): Promise<Result<AuthError, undefined>> {
             const doc = request.value;
             logger.info('throwing an exception');
-            await store.save({doc, meta: {owner: request.claims.principal.userName}});
+            await store.save({doc, meta: {owner: request.security.principal.userName}});
             throw new Error("Deliberate error");
         }
     };
