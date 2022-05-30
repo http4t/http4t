@@ -2,10 +2,10 @@ import {JsonPathError} from "@http4t/result/JsonPathError";
 import {problem} from "@http4t/result/JsonPathResult";
 import {expect} from "chai";
 import {CloseableHttpHandler, loggedInDocStore, startTestServer} from "./testsupport";
-import {DocStore} from "@http4t/bidi-eg/api";
 import {v4 as uuid} from "uuid";
 import {success} from "@http4t/result";
 import {Unsecured} from "@http4t/bidi/auth/withSecurity";
+import {DocStore} from "@http4t/bidi-eg/docstore/api";
 
 async function error(f: () => any): Promise<any> {
     try {

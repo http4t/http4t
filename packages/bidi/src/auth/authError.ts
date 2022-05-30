@@ -5,7 +5,7 @@ import {Result} from "@http4t/result";
 import {result} from "../lenses/ResultLens";
 
 /**
- * A default type for TAuthError, if you don't want to roll your own
+ * A default type for `TAuthError`, if you don't want to roll your own
  */
 export type AuthError = {
     reason: 'unauthorized' | 'forbidden'
@@ -28,6 +28,10 @@ export function authError(): ResponseLens<AuthError> {
     })
 }
 
+/**
+ * {@param successLens} will be matched first, so it'll be able to handle more specific `401` and `403` responses
+ * before returning {@link AuthError}, although this is a little confusing, and not recommended
+ */
 export function authErrorOr<T>(successLens: ResponseLens<T>): ResponseLens<Result<AuthError, T>> {
     return result(
         authError(),

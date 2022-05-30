@@ -1,6 +1,6 @@
-import {Creds} from "../api";
 import {failure, Result, success} from "@http4t/result";
-import {CredStore} from "./index";
+import {CredStore} from "./CredStore";
+import {Creds} from "../api";
 
 export class InMemoryCredStore implements CredStore {
     private readonly creds: { [userName: string]: Creds } = {};
