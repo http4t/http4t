@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "start": "node index.js"
+    "start": "node main.js"
   },
   "dependencies": {
     "@http4t/bidi": "1.0.0",

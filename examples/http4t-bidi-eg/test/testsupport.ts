@@ -1,4 +1,3 @@
-import {authClient, DocStore, docStoreClient} from "@http4t/bidi-eg/api";
 import {RouterConfig, startRouter} from "@http4t/bidi-eg/router";
 import {HttpHandler} from "@http4t/core/contract";
 import {filterRequest, withFilters} from "@http4t/core/Filter";
@@ -8,6 +7,8 @@ import {NodeServer} from "@http4t/node/server";
 import {isFailure} from "@http4t/result";
 import {PoolConfig} from "pg";
 import {Unsecured} from "@http4t/bidi/auth/withSecurity";
+import {authClient} from "@http4t/bidi-eg/auth/api";
+import {DocStore, docStoreClient} from "@http4t/bidi-eg/docstore/api";
 
 export type CloseableHttpHandler = HttpHandler & Closeable;
 

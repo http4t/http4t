@@ -63,6 +63,8 @@ export function serverSecuredRoute<In, Out, TToken, TClaims, TAuthError>(
 }
 
 /**
+ *
+ *
  * See `@http4t/bidi-jwt/jwtSecuredRoutes` for example usage
  *
  * @param unsecuredRoutes routes to be wrapped in {@link SecuredRoutesFor}

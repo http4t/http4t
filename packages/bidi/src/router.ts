@@ -60,6 +60,7 @@ export interface RequestLifecycle {
     serverError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, error: any): Promise<HttpResponse>
 }
 
+
 export class Router<TRoutes extends Routes> implements HttpHandler {
     private readonly alphaOrderedRoutes: [keyof TRoutes & string, Route][]
 
