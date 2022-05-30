@@ -1,5 +1,5 @@
 import {route, Route, Routes} from "../routes";
-import {WithClaims} from "./index";
+import {WithSecurity} from "./withSecurity";
 import {Failure, isFailure, Result, Success, success} from "@http4t/result";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
@@ -7,7 +7,7 @@ import {Mutable} from "../util/mutable";
 
 
 export class ClientSecuredRequestLens<T, TToken, TClaims> extends BaseRequestLens<T> {
-    constructor(private readonly serverLens: RequestLens<WithClaims<T, TClaims>, WithClaims<T, TToken>>,
+    constructor(private readonly serverLens: RequestLens<WithSecurity<T, TClaims>, WithSecurity<T, TToken>>,
                 private readonly token: TToken) {
         super();
     }
@@ -22,14 +22,14 @@ export class ClientSecuredRequestLens<T, TToken, TClaims> extends BaseRequestLen
     }
 
     async setRequest(into: HttpRequest, value: T): Promise<HttpRequest> {
-        return this.serverLens.set(into, {value, claims: this.token});
+        return this.serverLens.set(into, {value, security: this.token});
     }
 }
 
 export type UnsecuredRouteFor<TRoute> =
-    TRoute extends Route<WithClaims<infer InGet, infer TClaims>,
+    TRoute extends Route<WithSecurity<infer InGet, infer TClaims>,
             Result<infer TAuthError, infer Out>,
-            WithClaims<infer InSet, infer TToken>>
+            WithSecurity<infer InSet, infer TToken>>
 
         ? Route<InGet,
             Result<TAuthError, Out>,
@@ -37,17 +37,17 @@ export type UnsecuredRouteFor<TRoute> =
 
         : never;
 /**
- * Maps `TRoutes`, lifting `InGet` out of `WithClaims<InGet, TClaims>` and `InSet` out of `WithClaims<InSet, TClaims>`
+ * Maps `TRoutes`, lifting `InGet` out of `WithSecurity<InGet, TClaims>` and `InSet` out of `WithSecurity<InSet, TClaims>`
  *
  * The inverse of {@link SecuredRoutesFor}
  */
 export type UnsecuredRoutesFor<TRoutes extends Routes> = { readonly [K in keyof TRoutes]: UnsecuredRouteFor<TRoutes[K]> }
 
-export type SecuredRoute<TToken, TClaims, TAuthError> = Route<WithClaims<any, TClaims>, Result<TAuthError, any>, WithClaims<any, TToken>>;
+export type SecuredRoute<TToken, TClaims, TAuthError> = Route<WithSecurity<any, TClaims>, Result<TAuthError, any>, WithSecurity<any, TToken>>;
 /**
  * Routes where:
  *
- * 1. All request lenses have `InGet` of `WithClaims<T,TClaims>` and `InSet` of `WithClaims<T,TToken>`
+ * 1. All request lenses have `InGet` of `WithSecurity<T,TClaims>` and `InSet` of `WithSecurity<T,TToken>`
  *    (because the server, which `get`s from the request lens will want to deal with `TClaims` and the client, which
  *    `set`s the request lens will want to pass `TToken`)
  * 2. All response lenses have `InGet` and `InSet` returning `Result<TAuthError, T`
@@ -55,7 +55,7 @@ export type SecuredRoute<TToken, TClaims, TAuthError> = Route<WithClaims<any, TC
 export type SecuredRoutes<TToken, TClaims, TAuthError> =
     { readonly [k: string]: SecuredRoute<TToken, TClaims, TAuthError> }
 
-export function tokenProvidedRoute<TRoute extends Route<WithClaims<any, any>, Result<any, any>, WithClaims<any, TToken>>, TToken>(
+export function tokenProvidedRoute<TRoute extends Route<WithSecurity<any, any>, Result<any, any>, WithSecurity<any, TToken>>, TToken>(
     serverRoute: TRoute,
     token: TToken)
 
@@ -74,8 +74,8 @@ export function tokenProvidedRoutes<TRoutes extends SecuredRoutes<TToken, TClaim
     return Object.entries(serverRoutes)
         .reduce(
             (acc, [k, route]) => {
-                const secured: Route<WithClaims<unknown, TClaims>, Success<unknown> | Failure<TAuthError>, WithClaims<unknown, TToken>> extends Route<WithClaims<infer InGet, infer TClaims>, Result<infer TAuthError, infer Out>, WithClaims<infer InSet, infer TToken>> ? Route<InGet, Result<TAuthError, Out>, InSet> : never = tokenProvidedRoute(
-                    route as Route<WithClaims<unknown, TClaims>, Result<TAuthError, unknown>, WithClaims<unknown, TToken>>,
+                const secured: Route<WithSecurity<unknown, TClaims>, Success<unknown> | Failure<TAuthError>, WithSecurity<unknown, TToken>> extends Route<WithSecurity<infer InGet, infer TClaims>, Result<infer TAuthError, infer Out>, WithSecurity<infer InSet, infer TToken>> ? Route<InGet, Result<TAuthError, Out>, InSet> : never = tokenProvidedRoute(
+                    route as Route<WithSecurity<unknown, TClaims>, Result<TAuthError, unknown>, WithSecurity<unknown, TToken>>,
                     token);
                 acc[k as keyof UnsecuredRoutesFor<TRoutes>] = secured as any;
                 return acc;

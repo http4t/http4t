@@ -6,7 +6,7 @@ import {bearerAuthHeader} from "@http4t/bidi/lenses/BearerAuthHeader";
 import {Routes} from "@http4t/bidi/routes";
 import {mapped} from "@http4t/bidi/lenses/MapLens";
 import {responseOf} from "@http4t/core/responses";
-import {SecuredRoutesFor, serverSecuredRoutes} from "@http4t/bidi/auth";
+import {SecuredRoutesFor, serverSecuredRoutes} from "@http4t/bidi/auth/server";
 
 export type Jwt = {
     originalToken?: string

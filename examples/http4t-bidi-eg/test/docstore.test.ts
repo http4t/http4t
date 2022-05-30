@@ -5,7 +5,7 @@ import {CloseableHttpHandler, loggedInDocStore, startTestServer} from "./testsup
 import {DocStore} from "@http4t/bidi-eg/api";
 import {v4 as uuid} from "uuid";
 import {success} from "@http4t/result";
-import {Unsecured} from "@http4t/bidi/auth";
+import {Unsecured} from "@http4t/bidi/auth/withSecurity";
 
 async function error(f: () => any): Promise<any> {
     try {

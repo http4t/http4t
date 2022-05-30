@@ -9,9 +9,13 @@ import {Doc} from "./docstore";
 import {Result, success} from "@http4t/result";
 import {Jwt, jwtBody, jwtSecuredRoutes, JwtStrategy} from "@http4t/bidi-jwt";
 import {buildClient} from "@http4t/bidi/client";
-import {AuthError, authErrorOr, SecuredRoutesFor, tokenProvidedRoutes, Unsecured, WithClaims} from "@http4t/bidi/auth";
+import {SecuredRoutesFor} from "@http4t/bidi/auth/server";
+import {tokenProvidedRoutes} from "@http4t/bidi/auth/client";
+
 import {clientJwt} from "@http4t/bidi-jwt/jose";
 import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
+import {Unsecured, WithSecurity} from "@http4t/bidi/auth/withSecurity";
+import {AuthError, authErrorOr} from "@http4t/bidi/auth/authError";
 
 export type User = {
     userName: string
@@ -21,7 +25,7 @@ export type DocStoreClaims = {
     principal: { type: "user", userName: string }
 }
 
-export type WithOurClaims<T> = WithClaims<T, DocStoreClaims>;
+export type WithOurClaims<T> = WithSecurity<T, DocStoreClaims>;
 
 export type Creds = { userName: string, password: string };
 
@@ -66,7 +70,7 @@ export function authRoutes(opts: { jwt: JwtStrategy }): RoutesFor<Auth> {
     };
 }
 
-export const healthRoutes = {
+export const healthRoutes: RoutesFor<Health> = {
     ready: route(
         request('GET', '/probe/ready'),
         response(200, value("*", header("Access-Control-Allow-Origin")))
@@ -77,7 +81,7 @@ export const healthRoutes = {
     ),
 }
 
-export const unsecuredDocStoreRoutes = {
+export const unsecuredDocStoreRoutes: RoutesFor<Unsecured<DocStore>> = {
     post: route(
         request('POST', '/store', json<Doc>()),
         authErrorOr(
