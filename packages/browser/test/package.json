@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --build",
     "test": "echo tests do not run outside browser",
     "test:browser": "muppeteer"
   },

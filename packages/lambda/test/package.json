@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --build",
     "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
     "test:browser": "echo no browser tests"
   },
