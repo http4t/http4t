@@ -1,6 +1,7 @@
 import {requestOf} from "@http4t/core/requests";
 import {success} from "@http4t/result";
-import {expect} from 'chai';
+import chai from "chai";
+const { expect } = chai;
 import {headers} from "@http4t/bidi/lenses/HeaderLens";
 import {IntersectionLens} from "@http4t/bidi/lenses/IntersectionLens";
 import {expectMethod} from "@http4t/bidi/lenses/MethodLens";

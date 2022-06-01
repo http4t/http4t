@@ -50,13 +50,13 @@ export function adapter(handler: HttpHandler) {
                 try {
                     const response = await handler.handle(req);
                     await responseHttp4tToNode(response, nodeResponse);
-                } catch (e) {
+                } catch (e: any) {
                     nodeResponse.statusCode = 500;
                     console.error(e);
                     nodeResponse.end()
                 }
             })();
-        } catch (e) {
+        } catch (e: any) {
             nodeResponse.end();
         }
     };

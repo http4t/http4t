@@ -101,12 +101,12 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
                     const logicResult = await this.routeBehaviours[routeName](requestMappingResult.value);
                     const response = await route.response.set(responseOf(200), logicResult);
                     return this.lifecycle.match(request, routeName, route, response);
-                } catch (e) {
+                } catch (e: any) {
                     return await this.lifecycle.serverError(request, routeName, route, e);
                 }
             }
             return this.lifecycle.noMatchFound(request);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             return responseOf(500)
         }

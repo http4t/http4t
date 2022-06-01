@@ -97,7 +97,7 @@ Note `name: "@http4t/my-module-test"`
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "test": "NODE_ENV=development mocha --require ts-node/register --extensions ts,tsx --colors --exit  '**/*.test.ts'",
+    "test": "NODE_ENV=development mocha --experimental-specifier-resolution=node --loader=ts-node/esm --extensions ts,tsx --colors --exit  '**/*.test.ts'",
     "test:browser": "muppeteer"
   },
   "dependencies": {

@@ -1,7 +1,8 @@
 import {requestOf} from "@http4t/core/requests";
 import {failure} from "@http4t/result";
 import {problem} from "@http4t/result/JsonPathResult";
-import {expect} from 'chai';
+import chai from "chai";
+const { expect } = chai;
 import {RoutingError, WRONG_ROUTE} from "@http4t/bidi/lenses";
 import {fail} from "@http4t/bidi/lenses/AlwaysFailLens";
 

@@ -15,7 +15,7 @@ export class JsonLens<T> implements MessageLens<HttpMessage, T> {
         try {
             const value = await bodyJson<T>(message.body);
             return success(value);
-        } catch (e) {
+        } catch (e: any) {
             return routeFailed(`Expected valid json${e.message ? `- "${e.message}"` : ""}`, ["body"])
         }
     }

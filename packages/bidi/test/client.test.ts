@@ -11,12 +11,13 @@ import {handler} from "@http4t/core/handlers";
 import {responseOf} from "@http4t/core/responses";
 import {JsonPathError} from "@http4t/result/JsonPathError";
 import {problem} from "@http4t/result/JsonPathResult";
-import {expect} from 'chai';
+import chai from "chai";
+const { expect } = chai;
 
 async function catchError(fn: () => any): Promise<any> {
     try {
         await fn();
-    } catch (e) {
+    } catch (e: any) {
         return e;
     }
 }

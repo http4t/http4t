@@ -1,4 +1,5 @@
-import {expect} from "chai";
+import chai from "chai";
+const { expect } = chai;
 import {bufferBinary, bufferText, streamBinary, streamText} from "@http4t/core/bodies";
 import {textEncoder} from "@http4t/core/util/textencoding";
 

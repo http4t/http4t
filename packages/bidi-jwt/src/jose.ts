@@ -29,7 +29,7 @@ export class JoseServerJwtStrategy implements JwtStrategy {
         try {
             const joseResult = await jwtVerify(token, this.keys.publicKey);
             return success({payload: joseResult.payload, token});
-        } catch (e) {
+        } catch (e: any) {
             return routeFailed(`Could not decrypt jwt: ${e}`, ["headers", "Authentication"], responseOf(403))
         }
     }
@@ -37,8 +37,7 @@ export class JoseServerJwtStrategy implements JwtStrategy {
     async sign(jwt: Jwt): Promise<string> {
         if (typeof this.keys.privateKey === "undefined") throw new Error("No private key provided for signing jwts");
         const signer = new SignJWT(jwt.payload);
-        const token = await this.configure(signer).sign(this.keys.privateKey);
-        return token;
+        return await this.configure(signer).sign(this.keys.privateKey);
     }
 }
 

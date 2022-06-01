@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+import chai from "chai";
 import {json} from "@http4t/bidi/lenses/JsonLens";
 import {HttpMessage} from "@http4t/core/contract";
 import {ok, responseOf} from "@http4t/core/responses";
@@ -8,6 +8,8 @@ import {response} from "@http4t/bidi/responses";
 import {expectFailure, expectSuccess} from "@http4t/result";
 import {RoutingResult} from "@http4t/bidi/lenses";
 import {problem} from "@http4t/result/JsonPathResult";
+
+const {expect} = chai;
 
 describe("Union lens", () => {
 

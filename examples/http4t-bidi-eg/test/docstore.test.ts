@@ -1,17 +1,20 @@
 import {JsonPathError} from "@http4t/result/JsonPathError";
 import {problem} from "@http4t/result/JsonPathResult";
-import {expect} from "chai";
+import chai from "chai";
 import {CloseableHttpHandler, loggedInDocStore, startTestServer} from "./testsupport";
-import {v4 as uuid} from "uuid";
+import uuidPkg from "uuid";
 import {success} from "@http4t/result";
 import {Unsecured} from "@http4t/bidi/auth/withSecurity";
 import {DocStore} from "@http4t/bidi-eg/docstore/api";
+
+const {expect} = chai;
+const {v4: uuid} = uuidPkg;
 
 async function error(f: () => any): Promise<any> {
     try {
         await f();
         return undefined
-    } catch (e) {
+    } catch (e: any) {
         return e;
     }
 }

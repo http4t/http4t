@@ -1,4 +1,5 @@
-import {expect} from "chai";
+import chai from "chai";
+const { expect } = chai;
 import {get, uri, uriString} from "@http4t/core/requests";
 import {Uri} from "@http4t/core/uri";
 

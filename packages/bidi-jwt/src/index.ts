@@ -29,7 +29,7 @@ export class JwtLens<TMessage extends HttpMessage = HttpMessage> implements Mess
         if (isFailure(result)) return result;
         try {
             return await this.strategy.verify(result.value);
-        } catch (e) {
+        } catch (e: any) {
             return routeFailed(`Invalid jwt: '${e}'`, [], responseOf(401))
         }
     }

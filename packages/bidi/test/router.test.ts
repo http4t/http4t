@@ -1,7 +1,7 @@
 import {bufferText} from "@http4t/core/bodies";
 import {get, toJSON} from "@http4t/core/requests";
 import {responseOf as responseOf} from "@http4t/core/responses";
-import {expect} from 'chai';
+import chai from "chai";
 import {routeFailedError, wrongRouteError} from "@http4t/bidi/lenses";
 import {fail} from "@http4t/bidi/lenses/AlwaysFailLens";
 import {empty} from "@http4t/bidi/lenses/EmptyLens";
@@ -9,6 +9,8 @@ import {intersect, request, text} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
 import {route} from "@http4t/bidi/routes";
 import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
+
+const {expect} = chai;
 
 describe('Router', () => {
     const routes = {

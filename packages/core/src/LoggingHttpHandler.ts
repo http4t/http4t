@@ -23,7 +23,7 @@ export class LoggingHttpHandler implements HttpHandler {
             const bufferedResponse = await bufferText(response);
             console.log("http", {request: bufferedRequest, response: bufferedResponse});
             return bufferedResponse;
-        } catch (e) {
+        } catch (e: any) {
             console.error("http", {request: bufferedRequest, error: e});
             throw e;
         }

@@ -9,7 +9,7 @@
             "es2019.array",
             "es2020.string"
         ],
-        "module": "commonjs",
+        "module": "ES2020",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "experimentalDecorators": true,

@@ -8,7 +8,7 @@ export function timeout<T>(f: ((() => T) | (() => Promise<T>)), timeout?: number
         setTimeout(async () => {
             try {
                 resolve(await f());
-            } catch (e) {
+            } catch (e: any) {
                 reject(e);
             }
         }, timeout);
@@ -31,7 +31,7 @@ async function retry<T>(f: () => Promise<T>, count: number, sleepMs: number = 20
             await sleep(sleepMs)
         try {
             return await f();
-        } catch (e) {
+        } catch (e: any) {
             error = e;
         }
     }
@@ -51,7 +51,7 @@ export class DockerPgTransactionPool implements TransactionPool {
     async getTransaction(): Promise<Transaction> {
         try {
             return await this.decorated.getTransaction();
-        } catch (e) {
+        } catch (e: any) {
             if (e.code !== "ECONNREFUSED") {
                 throw e;
             }

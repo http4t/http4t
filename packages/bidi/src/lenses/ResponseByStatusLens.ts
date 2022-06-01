@@ -27,7 +27,7 @@ export class ResponseByStatusLens<TGet, TStatuses extends LensesByStatus<TGet, T
     async setResponse(into: HttpResponse, value: TSet): Promise<HttpResponse> {
         const status = this.getStatus(value);
         const lens: ResponseLens<TSet> = this.statuses[status] as any;
-        if (!lens) throw new Error(`No lens provided for status ${status}`);
+        if (!lens) throw new Error(`No lens provided for status ${String(status)}`);
         return lens.set({...into, status: status as number}, value);
     }
 }

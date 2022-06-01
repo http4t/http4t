@@ -1,4 +1,5 @@
-import {expect} from 'chai';
+import chai from "chai";
+const { expect } = chai;
 import {DecodedPair, decodePairs, encodePairs} from "@http4t/core/urlEncoding";
 
 function checkParsing(value: string, expected: DecodedPair[]) {

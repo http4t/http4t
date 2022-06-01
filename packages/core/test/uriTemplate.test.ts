@@ -1,5 +1,7 @@
-import {expect} from "chai";
+import chai from "chai";
 import {UriTemplate} from "@http4t/core/UriTemplate";
+
+const {expect} = chai;
 
 describe('UriTemplate', () => {
     it('matches uris or not', () => {

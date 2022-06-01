@@ -29,7 +29,7 @@ export class FetchViaBackgroundScript implements HttpHandler {
                         : this.onError(request, {message: "No response from background script"})
                 );
 
-            } catch (e) {
+            } catch (e: any) {
                 resolve(this.onError(request, e))
             }
         })

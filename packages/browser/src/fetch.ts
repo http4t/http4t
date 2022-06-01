@@ -42,7 +42,7 @@ export function readableStream(body: HttpBody): ReadableStream<Uint8Array> {
                 for await(const chunk of streamBinary(body)) {
                     controller.enqueue(chunk);
                 }
-            } catch (e) {
+            } catch (e: any) {
                 controller.error(e);
             } finally {
                 controller.close();

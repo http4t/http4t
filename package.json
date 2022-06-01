@@ -11,7 +11,7 @@
   "scripts": {
     "build": "ts-node build/build",
     "clean": "ts-node build/clean",
-    "test": "ts-node build/clean && ts-node build/build && ts-node build/test node,browser packages examples",
+    "test": "ts-node build/clean && ts-node build/test node,browser packages examples",
     "test:nobuild": "ts-node build/test node,browser packages examples",
     "test:packages:node": "ts-node build/clean && ts-node build/test node packages",
     "test:packages:browser": "ts-node build/clean && ts-node build/test browser packages",
@@ -22,8 +22,8 @@
   "devDependencies": {
     "@actions/github": "^4.0.0",
     "@types/node": "^10",
-    "ts-node": "9.1.1",
-    "typescript": "4.1.2"
+    "ts-node": "10.8.0",
+    "typescript": "4.7.2"
   },
   "resolutions": {
     "browserslist": "4.16.5",

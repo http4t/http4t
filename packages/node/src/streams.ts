@@ -13,7 +13,7 @@ export async function bodyToStream(body: HttpBody, stream: Writable): Promise<vo
             stream.write(buffer);
         }
         stream.end();
-    } catch (e) {
+    } catch (e: any) {
         // TODO: check this is sensible behaviour
         stream.emit('error', e);
         stream.end();
