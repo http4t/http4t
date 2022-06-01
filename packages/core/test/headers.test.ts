@@ -1,7 +1,9 @@
-import {expect} from 'chai';
+import chai from "chai";
 import {header} from "@http4t/core/headers";
 import {appendHeader, removeHeaders, selectHeaders, setHeader, updateHeaders} from "@http4t/core/messages";
 import {requestOf} from "@http4t/core/requests";
+
+const {expect} = chai;
 
 describe("header()", () => {
     it("formats HeaderValueLike values for you", () => {

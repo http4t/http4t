@@ -16,7 +16,7 @@ export class HttpInfoLogger implements HttpHandler {
             const response = await this.handler.handle(request);
             this.logger.info(`Responded ${response.status} \n`);
             return response;
-        } catch (e) {
+        } catch (e: any) {
             this.logger.info(`Threw error ${e} \n`);
             throw e;
         } finally {

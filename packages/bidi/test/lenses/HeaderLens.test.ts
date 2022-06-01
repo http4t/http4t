@@ -3,7 +3,9 @@ import {HeaderLens} from "@http4t/bidi/lenses/HeaderLens";
 import {requestOf} from "@http4t/core/requests";
 import {responseOf} from "@http4t/core/responses";
 import {success} from "@http4t/result";
-import {expect} from 'chai';
+import chai from "chai";
+
+const {expect} = chai;
 
 describe("HeaderLens", () => {
 

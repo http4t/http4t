@@ -1,9 +1,11 @@
 import {header, value} from "@http4t/bidi/messages";
 import {header as headerOf} from "@http4t/core/headers";
 import {ok, responseOf} from "@http4t/core/responses";
-import {expect} from "chai";
+import chai from "chai";
 import {expectFailure, expectSuccess} from "@http4t/result";
 import {routeFailed} from "@http4t/bidi/lenses";
+
+const {expect} = chai;
 
 describe('StaticValueLens', function () {
     const headerLens = header('Access-Control-Allow-Origin');

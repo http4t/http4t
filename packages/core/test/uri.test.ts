@@ -1,6 +1,9 @@
 import {ParsedAuthority} from "@http4t/core/contract";
 import {Authority, Uri} from "@http4t/core/uri";
-import {assert} from 'chai';
+import chai from "chai";
+
+const {assert} = chai;
+
 
 describe('Uri', function () {
     describe('implements RFC 3986 https://tools.ietf.org/html/rfc3986', function () {

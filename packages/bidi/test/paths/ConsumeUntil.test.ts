@@ -1,5 +1,6 @@
 import {failure, success} from "@http4t/result";
-import {expect} from 'chai';
+import chai from "chai";
+const { expect } = chai;
 import {ConsumeUntil} from "@http4t/bidi/paths/ConsumeUntil";
 
 describe('ConsumeUntil', () => {

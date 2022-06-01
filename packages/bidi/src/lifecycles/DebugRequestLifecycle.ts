@@ -5,10 +5,12 @@ import * as lenses from "../lenses";
 import {WrongRoute} from "../lenses";
 import {Route} from "../routes";
 import {getHeaderValue, uriString} from "@http4t/core/requests";
-import {v4 as uuid} from "uuid";
+import uuidPkg from "uuid";
 import {responseOf} from "@http4t/core/responses";
 import {jsonBody} from "@http4t/core/json";
 import {pathToString} from "@http4t/result/JsonPathResult";
+
+const {v4: uuid} = uuidPkg;
 
 const RESET = "\u001B[0m"
 const BLACK = "\u001B[30m"

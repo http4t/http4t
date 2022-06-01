@@ -3,7 +3,10 @@ import {HttpHandler} from "@http4t/core/contract";
 import {HttpHandlerFn} from "@http4t/core/handlers";
 import {header} from "@http4t/core/headers";
 import {delete_, get, patch, post, put} from "@http4t/core/requests";
-import {assert} from 'chai';
+import chai from "chai";
+
+const {assert} = chai;
+
 
 export function handlerContract(httpHandler: (HttpHandler | Promise<HttpHandler>)) {
     const handle: HttpHandlerFn = async request => {

@@ -1,6 +1,8 @@
 import {failure, success} from "@http4t/result";
-import {expect} from 'chai';
+import chai from "chai";
 import {v, variablesPath} from "@http4t/bidi/paths/variables";
+
+const {expect} = chai;
 
 const componentVars = {
     first: v.segment,

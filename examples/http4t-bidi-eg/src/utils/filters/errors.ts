@@ -9,7 +9,7 @@ export function handleError(log: Logger): Filter {
         return handler(async (request: HttpRequest): Promise<HttpResponse> => {
             try {
                 return await decorated.handle(request);
-            } catch (e) {
+            } catch (e: any) {
                 const message = e.message || `${e}`;
                 log.info(`Unhandled HttpHandler exception ${message}`);
                 return responseOf(500, JSON.stringify({message}));

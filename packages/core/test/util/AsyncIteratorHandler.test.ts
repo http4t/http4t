@@ -1,4 +1,5 @@
-import {expect} from "chai";
+import chai from "chai";
+const { expect } = chai;
 import {AsyncIteratorHandler} from "../../src/util/AsyncIteratorHandler";
 
 // TODO: can we simplify this test?

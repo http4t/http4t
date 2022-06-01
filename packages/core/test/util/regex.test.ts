@@ -1,4 +1,5 @@
-import {expect} from "chai";
+import chai from "chai";
+const { expect } = chai;
 import {Regex} from "../../src/util/regex";
 
 describe('Regex', () => {

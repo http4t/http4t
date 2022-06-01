@@ -1,7 +1,9 @@
-import {expect} from 'chai';
+import chai from "chai";
 import {EmptyLens} from "@http4t/bidi/lenses/EmptyLens";
 import {requestOf} from "@http4t/core/requests";
 import {success} from "@http4t/result";
+
+const {expect} = chai;
 
 describe("EmptyLens", () => {
 

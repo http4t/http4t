@@ -44,7 +44,7 @@ export class ClientHandler implements HttpHandler {
                     } else {
                         await bodyToStream(request.body, nodeRequest);
                     }
-                } catch (e) {
+                } catch (e: any) {
                     reject(e);
                 }
             }

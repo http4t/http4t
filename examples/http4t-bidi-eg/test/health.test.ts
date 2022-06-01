@@ -1,6 +1,8 @@
-import {expect} from "chai";
+import chai from "chai";
 import {CloseableHttpHandler, startTestServer} from "./testsupport";
 import {Health, healthClient} from "@http4t/bidi-eg/health/api";
+
+const {expect} = chai;
 
 describe('health', function () {
     this.timeout(30000);

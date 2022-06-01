@@ -17,7 +17,7 @@ export function rollbackOnExceptionOr500(transaction: Transaction): Filter {
                         await transaction.query('COMMIT');
                     }
                     return response;
-                } catch (e) {
+                } catch (e: any) {
                     await transaction.query('ROLLBACK');
                     throw e;
                 } finally {

@@ -7,7 +7,7 @@ export async function inTransaction<T>(transactionPool: TransactionPool, f: (t: 
         await transaction.query('BEGIN');
         await f(transaction);
         await transaction.query('COMMIT');
-    } catch (e) {
+    } catch (e: any) {
         await transaction.query('ROLLBACK');
         throw e;
     } finally {
