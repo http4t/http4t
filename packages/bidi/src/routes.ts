@@ -1,20 +1,20 @@
 import {RequestLens, ResponseLens} from "./lenses";
 
 /**
- * `InSet` is used to serialize the request on the client-side
- * `OutGet` is used to deserialize the response on the client-side
- * `InGet` is used to deserialize the request on the server-side
- * `OutSet` is used to serialize the response on the server-side
+ * `TRequestSet` is used to serialize the request on the client-side
+ * `TResponseGet` is used to deserialize the response on the client-side
+ * `TRequestGet` is used to deserialize the request on the server-side
+ * `TResponseSet` is used to serialize the response on the server-side
  */
-export type Route<InGet = unknown, OutGet = unknown, InSet = InGet, OutSet = OutGet> = {
-    readonly request: RequestLens<InGet, InSet>;
-    readonly response: ResponseLens<OutGet, OutSet>;
+export type Route<TRequestGet = unknown, TResponseGet = unknown, TRequestSet = TRequestGet, TResponseSet = TResponseGet> = {
+    readonly request: RequestLens<TRequestGet, TRequestSet>;
+    readonly response: ResponseLens<TResponseGet, TResponseSet>;
 }
 
 
-export function route<InGet, OutGet, InSet = InGet, OutSet = OutGet>(
-    request: RequestLens<InGet, InSet>,
-    response: ResponseLens<OutGet, OutSet>): Route<InGet, OutGet, InSet, OutSet> {
+export function route<TRequestGet, TResponseGet, TRequestSet = TRequestGet, TResponseSet = TResponseGet>(
+    request: RequestLens<TRequestGet, TRequestSet>,
+    response: ResponseLens<TResponseGet, TResponseSet>): Route<TRequestGet, TResponseGet, TRequestSet, TResponseSet> {
     return {
         request: request,
         response: response
@@ -38,23 +38,23 @@ export type RouteFor<THandler> =
  */
 export type RoutesFor<TApi> = { readonly [K in keyof TApi]: RouteFor<TApi[K]> };
 
-export type ServerApiFnFor<TRoute> = TRoute extends Route<infer InGet, infer OutGet, infer InSet, infer OutSet>
-    ? InGet extends undefined
-        ? HandlerFn0<OutSet>
-        : HandlerFn1<InGet, OutSet>
+export type ServerApiFnFor<TRoute> = TRoute extends Route<infer TRequestGet, infer TResponseGet, infer TRequestSet, infer TResponseSet>
+    ? TRequestGet extends undefined
+        ? HandlerFn0<TResponseSet>
+        : HandlerFn1<TRequestGet, TResponseSet>
     : never;
 /**
- * Uses `InGet` for method parameter and `OutSet` for return value
+ * Uses `TRequestGet` for method parameter and `TResponseSet` for return value
  */
 export type ServerApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ServerApiFnFor<TRoutes[K]> };
 
-export type ClientApiFnFor<TRoute> = TRoute extends Route<infer InGet, infer OutGet, infer InSet, infer OutSet>
-    ? InGet extends undefined
-        ? HandlerFn0<OutGet>
-        : HandlerFn1<InSet, OutGet>
+export type ClientApiFnFor<TRoute> = TRoute extends Route<infer TRequestGet, infer TResponseGet, infer TRequestSet, infer TResponseSet>
+    ? TRequestGet extends undefined
+        ? HandlerFn0<TResponseGet>
+        : HandlerFn1<TRequestSet, TResponseGet>
     : never;
 /**
- * Uses `InSet` for method parameter and `OutGet` for return value
+ * Uses `TRequestSet` for method parameter and `TResponseGet` for return value
  */
 export type ClientApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ClientApiFnFor<TRoutes[K]> };
 

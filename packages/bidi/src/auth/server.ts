@@ -6,14 +6,14 @@ import {HttpRequest} from "@http4t/core/contract";
 import {AuthError} from "./authError";
 
 export type SecuredRouteFor<TRoute, TToken, TClaims, TAuthError> =
-    TRoute extends Route<infer InGet, Result<TAuthError, infer Out>, infer InSet>
-        ? Route<WithSecurity<InGet, TClaims>,
+    TRoute extends Route<infer TRequestGet, Result<TAuthError, infer Out>, infer TRequestSet>
+        ? Route<WithSecurity<TRequestGet, TClaims>,
             Result<TAuthError, Out>,
-            WithSecurity<InSet, TToken>>
+            WithSecurity<TRequestSet, TToken>>
         : never;
 
 /**
- * Maps routes, wrapping request lenses' `InGet` in `WithSecurity<InGet,TClaims>` and `InSet` in `WithSecurity<InSet,TToken>`
+ * Maps routes, wrapping request lenses' `TRequestGet` in `WithSecurity<TRequestGet,TClaims>` and `TRequestSet` in `WithSecurity<TRequestSet,TToken>`
  *
  * Intuitively: the server will want to get `TClaims` so it can check them, and the client will want to set `TToken`
  * to authenticate itself to the server
