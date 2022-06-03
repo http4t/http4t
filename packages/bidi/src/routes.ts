@@ -1,5 +1,11 @@
 import {RequestLens, ResponseLens} from "./lenses";
 
+/**
+ * `InSet` is used to serialize the request on the client-side
+ * `OutGet` is used to deserialize the response on the client-side
+ * `InGet` is used to deserialize the request on the server-side
+ * `OutSet` is used to serialize the response on the server-side
+ */
 export type Route<InGet = unknown, OutGet = unknown, InSet = InGet, OutSet = OutGet> = {
     readonly request: RequestLens<InGet, InSet>;
     readonly response: ResponseLens<OutGet, OutSet>;
