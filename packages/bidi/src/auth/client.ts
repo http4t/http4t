@@ -27,17 +27,17 @@ export class ClientSecuredRequestLens<T, TToken> extends BaseRequestLens<T> {
 
 export type UnsecuredRouteFor<TRoute> =
     TRoute extends Route<
-            WithSecurity<infer InGet, infer TClaims>,
+            WithSecurity<infer TRequestGet, infer TClaims>,
             Result<infer TAuthError, infer Out>,
-            WithSecurity<infer InSet, infer TToken>>
+            WithSecurity<infer TRequestSet, infer TToken>>
 
-        ? Route<InGet,
+        ? Route<TRequestGet,
             Result<TAuthError, Out>,
-            InSet>
+            TRequestSet>
 
         : never;
 /**
- * Maps `TRoutes`, lifting `InGet` out of `WithSecurity<InGet, TClaims>` and `InSet` out of `WithSecurity<InSet, TClaims>`
+ * Maps `TRoutes`, lifting `TRequestGet` out of `WithSecurity<TRequestGet, TClaims>` and `TRequestSet` out of `WithSecurity<TRequestSet, TClaims>`
  *
  * The inverse of {@link SecuredRoutesFor}
  */
@@ -47,10 +47,10 @@ export type SecuredRoute<TToken, TClaims> = Route<WithSecurity<any, TClaims>, an
 /**
  * Routes where:
  *
- * 1. All request lenses have `InGet` of `WithSecurity<T,TClaims>` and `InSet` of `WithSecurity<T,TToken>`
+ * 1. All request lenses have `TRequestGet` of `WithSecurity<T,TClaims>` and `TRequestSet` of `WithSecurity<T,TToken>`
  *    (because the server, which `get`s from the request lens will want to deal with `TClaims` and the client, which
  *    `set`s the request lens will want to pass `TToken`)
- * 2. All response lenses have `InGet` and `InSet` returning `Result<TAuthError, T`
+ * 2. All response lenses have `TRequestGet` and `TRequestSet` returning `Result<TAuthError, T`
  */
 export type SecuredRoutes<TToken, TClaims> =
     { readonly [k: string]: SecuredRoute<TToken, TClaims> }
