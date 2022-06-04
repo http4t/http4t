@@ -3,8 +3,8 @@ import {responseOf} from "@http4t/core/responses";
 import {success} from "@http4t/result";
 import {BaseResponseLens, ResponseLens, routeFailed, RoutingResult} from "../lenses";
 
-export class OrNotFoundLens<T> extends BaseResponseLens<T | undefined> {
-    constructor(private readonly lens: ResponseLens<T>,
+export class OrNotFoundLens<TGet, TSet> extends BaseResponseLens<TGet | undefined, TSet | undefined> {
+    constructor(private readonly lens: ResponseLens<TGet, TSet>,
                 private readonly expectedStatus: number) {
         super();
         if (expectedStatus === 404) {
@@ -12,7 +12,7 @@ export class OrNotFoundLens<T> extends BaseResponseLens<T | undefined> {
         }
     }
 
-    async get(message: HttpResponse): Promise<RoutingResult<T | undefined>> {
+    async get(message: HttpResponse): Promise<RoutingResult<TGet | undefined>> {
         if (message.status === 404) {
             return success(undefined)
         } else if (message.status === this.expectedStatus) {
@@ -22,13 +22,13 @@ export class OrNotFoundLens<T> extends BaseResponseLens<T | undefined> {
         }
     }
 
-    async setResponse(into: HttpResponse, value: T): Promise<HttpResponse> {
+    async setResponse(into: HttpResponse, value: TSet | undefined): Promise<HttpResponse> {
         return typeof value === "undefined"
             ? {...into, status: 404}
             : await this.lens.set({...into, status: this.expectedStatus}, value);
     }
 }
 
-export function orNotFound<T>(lens: ResponseLens<T>, {expectedStatus = 200}: { expectedStatus?: number } = {}): OrNotFoundLens<T> {
+export function orNotFound<TGet, TSet>(lens: ResponseLens<TGet, TSet>, {expectedStatus = 200}: { expectedStatus?: number } = {}): ResponseLens<TGet | undefined, TSet | undefined> {
     return new OrNotFoundLens(lens, expectedStatus);
 }

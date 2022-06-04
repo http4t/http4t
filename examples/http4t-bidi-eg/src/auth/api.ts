@@ -1,5 +1,5 @@
 import {Result} from "@http4t/result";
-import {Jwt, jwtBody, JwtStrategy} from "@http4t/bidi-jwt";
+import {Jwt, jwtBody, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
 import {route, RoutesFor} from "@http4t/bidi/routes";
 import {json, request, result, text} from "@http4t/bidi/requests";
 import {response} from "@http4t/bidi/responses";
@@ -20,11 +20,17 @@ export type User = {
 
 export interface Auth {
     register(request: Creds): Promise<Result<string, User>>
+}
 
+export interface AuthServer extends Auth {
     login(request: Creds): Promise<Result<string, Jwt>>
 }
 
-export function authRoutes(opts: { jwt: JwtStrategy }): RoutesFor<Auth> {
+export interface AuthClient extends Auth {
+    login(request: Creds): Promise<Result<string, JwtString>>
+}
+
+export function authRoutes(opts: { jwt: JwtStrategy }): RoutesFor<AuthServer, AuthClient> {
     return {
         register: route(
             request("POST", "/register", json<Creds>()),
@@ -42,6 +48,6 @@ export function authRoutes(opts: { jwt: JwtStrategy }): RoutesFor<Auth> {
     };
 }
 
-export function authClient(httpClient: HttpHandler): Auth {
+export function authClient(httpClient: HttpHandler): AuthClient {
     return buildClient(authRoutes({jwt: clientJwt()}), httpClient, {leakActualValuesInError: true});
 }

@@ -5,7 +5,7 @@ import {isFailure} from "@http4t/result";
 import {JsonPathError, ResultErrorOpts} from "@http4t/result/JsonPathError";
 import {prefix, prefixProducedBy} from "@http4t/result/JsonPathResult";
 import {RequestLens, ResponseLens} from "./lenses";
-import {ServerApiFnFor, ServerApiFor, Route, Routes} from "./routes";
+import {ServerApiFnFor,  Route, Routes, ClientApiFor} from "./routes";
 import {Mutable} from "./util/mutable";
 
 /**
@@ -58,13 +58,13 @@ export function routeClient<TRoute extends Route>(
 export function buildClient<TRoutes extends Routes>(
     routes: TRoutes,
     http: HttpHandler,
-    opts: Partial<ResultErrorOpts> = {}): ServerApiFor<TRoutes> {
+    opts: Partial<ResultErrorOpts> = {}): ClientApiFor<TRoutes> {
 
     return Object.entries(routes)
         .reduce((acc, [key, route]) => {
-                const K = key as keyof ServerApiFor<TRoutes>;
+                const K = key as keyof ClientApiFor<TRoutes>;
                 acc[K] = routeClient(key, route, http, opts) as any;
                 return acc;
             },
-            {} as Mutable<ServerApiFor<TRoutes>>);
+            {} as Mutable<ClientApiFor<TRoutes>>);
 }
