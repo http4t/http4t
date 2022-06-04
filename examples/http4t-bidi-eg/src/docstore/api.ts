@@ -1,7 +1,6 @@
 import {HttpHandler} from "@http4t/core/contract";
-import {Jwt, jwtSecuredRoutes, JwtStrategy} from "@http4t/bidi-jwt";
+import {Jwt, jwtSecuredRoutes, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
 import {Unsecured} from "@http4t/bidi/auth/withSecurity";
-import {clientJwt} from "@http4t/bidi-jwt/jose";
 import {tokenProvidedRoutes} from "@http4t/bidi/auth/client";
 import {buildClient} from "@http4t/bidi/client";
 import {DocStoreClaims, WithOurClaims} from "../auth/api";
@@ -14,6 +13,7 @@ import {orNotFound, response} from "@http4t/bidi/responses";
 import {v} from "@http4t/bidi/paths/variables";
 import {SecuredRoutesFor} from "@http4t/bidi/auth/server";
 import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
+import {clientJwt} from "@http4t/bidi-jwt/jose";
 
 export interface DocStore {
     post(request: WithOurClaims<Doc>): Promise<Result<AuthError, { id: string }>>;
@@ -40,7 +40,7 @@ export const unsecuredDocStoreRoutes: RoutesFor<Unsecured<DocStore>> = {
             response(200, empty())))
 }
 
-export function docStoreRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typeof unsecuredDocStoreRoutes, Jwt, DocStoreClaims> {
+export function docStoreRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typeof unsecuredDocStoreRoutes, JwtString, DocStoreClaims> {
     return jwtSecuredRoutes(
         unsecuredDocStoreRoutes,
         opts.jwt,
@@ -56,13 +56,9 @@ export function docStoreRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typ
         });
 }
 
-export function docStoreClient(httpClient: HttpHandler, jwt: Jwt): Unsecured<DocStore> {
-    const securedRoutes = docStoreRoutes({
-        jwt: clientJwt()
-    });
-
+export function docStoreClient(httpClient: HttpHandler, jwt: JwtString): Unsecured<DocStore> {
     const routesWithJwtProvided = tokenProvidedRoutes(
-        securedRoutes,
+        docStoreRoutes({jwt: clientJwt()}),
         jwt);
 
     return buildClient(

@@ -5,16 +5,16 @@ import {prefixProducedBy} from "@http4t/result/JsonPathResult";
 import {responseOf} from "@http4t/core/responses";
 
 
-export class ResultLens<E, T> extends BaseResponseLens<Result<E, T>> {
-    constructor(private readonly failure: ResponseLens<E>,
-                private readonly success: ResponseLens<T>) {
+export class ResultLens<EServer, TServer, EClient = EServer, TClient = TServer> extends BaseResponseLens<Result<EClient, TClient>, Result<EServer, TServer>> {
+    constructor(private readonly failure: ResponseLens<EClient, EServer>,
+                private readonly success: ResponseLens<TClient, TServer>) {
         super();
     }
 
-    async get(from: HttpResponse): Promise<RoutingResult<Result<E, T>>> {
-        const s: RoutingResult<T> = await this.success.get(from);
+    async get(from: HttpResponse): Promise<RoutingResult<Result<EClient, TClient>>> {
+        const s: RoutingResult<TClient> = await this.success.get(from);
         if (isSuccess(s)) return success(s);
-        const f: RoutingResult<E> = await this.failure.get(from);
+        const f: RoutingResult<EClient> = await this.failure.get(from);
         if (isSuccess(f)) return success(failure(f.value))
 
         return failure({
@@ -26,7 +26,7 @@ export class ResultLens<E, T> extends BaseResponseLens<Result<E, T>> {
         });
     }
 
-    async setResponse(into: HttpResponse, value: Result<E, T>): Promise<HttpResponse> {
+    async setResponse(into: HttpResponse, value: Result<EServer, TServer>): Promise<HttpResponse> {
         return isSuccess(value)
             ? this.success.set(into, value.value)
             : this.failure.set(into, value.error);
@@ -34,8 +34,8 @@ export class ResultLens<E, T> extends BaseResponseLens<Result<E, T>> {
 
 }
 
-export function result<E, T>(
-    failure: ResponseLens<E>,
-    success: ResponseLens<T>): ResponseLens<Result<E, T>> {
+export function result<EServer, TServer, EClient = EServer, TClient = TServer>(
+    failure: ResponseLens<EClient, EServer>,
+    success: ResponseLens<TClient, TServer>): ResponseLens<Result<EClient, TClient>, Result<EServer, TServer>> {
     return new ResultLens(failure, success);
 }

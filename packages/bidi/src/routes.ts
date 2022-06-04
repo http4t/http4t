@@ -24,25 +24,43 @@ export function route<TRequestGet, TResponseGet, TRequestSet = TRequestGet, TRes
 export type HandlerFn0<Out = any> = () => Promise<Out>;
 export type HandlerFn1<In = any, Out = any> = (arg: In) => Promise<Out>;
 export type HandlerFn = HandlerFn0 | HandlerFn1
+/**
+ * An interface of only arity 1 or zero functions returning Promise
+ */
+export type RoutableApi<TServerApi extends { [K in keyof TServerApi]: HandlerFn }> = { [K in keyof TServerApi]: HandlerFn };
 
 export type Routes = { readonly [k: string]: Route };
 
-export type RouteFor<THandler> =
-    THandler extends HandlerFn0<infer Out>
-        ? Route<undefined, Out>
-        : THandler extends HandlerFn1<infer In, infer Out>
-        ? Route<In, Out>
+export type RouteFor<TServerHandler, TClientHandler = TServerHandler> =
+    TServerHandler extends HandlerFn0<infer TServerOut>
+        ? TClientHandler extends HandlerFn0<infer TClientOut>
+        ? Route<undefined, TClientOut, undefined, TServerOut>
+        : TClientHandler extends HandlerFn1<infer TClientIn, infer TClientOut>
+            ? Route<TClientIn, TClientOut, undefined, TServerOut>
+            : never
+        : TServerHandler extends HandlerFn1<infer TServerIn, infer TServerOut>
+        ? TClientHandler extends HandlerFn0<infer TClientOut>
+            ? Route<undefined, TClientOut, TServerIn, TServerOut>
+            : TClientHandler extends HandlerFn1<infer TClientIn, infer TClientOut>
+                ? Route<TClientIn, TClientOut, TServerIn, TServerOut>
+                : never
         : never;
+
 /**
  * Use as a compile-time check that symmetrical routes are compatible with `TApi`
  */
-export type RoutesFor<TApi> = { readonly [K in keyof TApi]: RouteFor<TApi[K]> };
+export type RoutesFor<
+    TServerApi extends RoutableApi<TServerApi>,
+    TClientApi extends RoutableApi<TServerApi> = TServerApi> =
+
+    { readonly [K in keyof TServerApi]: RouteFor<TServerApi[K], TClientApi[K]> };
 
 export type ServerApiFnFor<TRoute> = TRoute extends Route<infer TRequestGet, infer TResponseGet, infer TRequestSet, infer TResponseSet>
     ? TRequestGet extends undefined
         ? HandlerFn0<TResponseSet>
         : HandlerFn1<TRequestGet, TResponseSet>
     : never;
+
 /**
  * Uses `TRequestGet` for method parameter and `TResponseSet` for return value
  */
