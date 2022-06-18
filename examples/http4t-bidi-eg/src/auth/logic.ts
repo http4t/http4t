@@ -1,5 +1,5 @@
 import {isFailure, Result, success} from "@http4t/result";
-import {Jwt, JwtStrategy} from "@http4t/bidi-jwt";
+import {JwtPayload, JwtStrategy} from "@http4t/bidi-jwt";
 import {AuthServer, User} from "./api";
 import {CredStore} from "./impl/CredStore";
 
@@ -8,7 +8,7 @@ export type AuthOpts = { creds: CredStore, jwt: JwtStrategy };
 export function authLogic(opts: AuthOpts): AuthServer {
     const {creds, jwt} = opts;
     return {
-        async login(request: { userName: string; password: string }): Promise<Result<string, Jwt>> {
+        async login(request: { userName: string; password: string }): Promise<Result<string, JwtPayload>> {
             const result = await creds.check(request);
             if (isFailure(result)) return result;
             const userJwt = {payload: {userName: request.userName}};

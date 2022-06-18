@@ -4,7 +4,6 @@ import chai from "chai";
 import {CloseableHttpHandler, loggedInDocStore, startTestServer} from "./testsupport";
 import uuidPkg from "uuid";
 import {success} from "@http4t/result";
-import {Unsecured} from "@http4t/bidi/auth/withSecurity";
 import {DocStore} from "@http4t/bidi-eg/docstore/api";
 
 const {expect} = chai;
@@ -23,8 +22,8 @@ describe('store', function () {
     this.timeout(30000);
 
     let server: CloseableHttpHandler;
-    let alice: Unsecured<DocStore>;
-    let bob: Unsecured<DocStore>;
+    let alice: DocStore;
+    let bob: DocStore;
 
     before(async () => {
         server = await startTestServer();

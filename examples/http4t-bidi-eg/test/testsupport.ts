@@ -6,7 +6,6 @@ import {ClientHandler} from "@http4t/node/client";
 import {NodeServer} from "@http4t/node/server";
 import {isFailure} from "@http4t/result";
 import {PoolConfig} from "pg";
-import {Unsecured} from "@http4t/bidi/auth/withSecurity";
 import {authClient} from "@http4t/bidi-eg/auth/api";
 import {DocStore, docStoreClient} from "@http4t/bidi-eg/docstore/api";
 
@@ -52,7 +51,7 @@ export async function startTestServer(opts: RouterConfig = DEFAULT_CONFIG): Prom
     };
 }
 
-export async function loggedInDocStore(httpClient: HttpHandler, opts: { userName: string }): Promise<Unsecured<DocStore>> {
+export async function loggedInDocStore(httpClient: HttpHandler, opts: { userName: string }): Promise<DocStore> {
     const auth = authClient(httpClient);
 
     const creds = {userName: opts.userName, password: "password"};

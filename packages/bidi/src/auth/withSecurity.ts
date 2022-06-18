@@ -10,10 +10,10 @@ export type WithSecurity<T, TSecurity> = {
     value: T
 }
 
-export type UnsecuredFn<THandler> = THandler extends HandlerFn1<WithSecurity<infer In, infer TSecurity>,
-        infer Out>
+export type UnsecuredFn<THandler> = THandler extends HandlerFn1<WithSecurity<infer TRequest, infer TSecurity>,
+        infer TResponse>
 
-    ? (req: In) => Promise<Out>
+    ? (req: TRequest) => Promise<TResponse>
 
     : never;
 
@@ -38,4 +38,33 @@ export type UnsecuredFn<THandler> = THandler extends HandlerFn1<WithSecurity<inf
  * }
  * ```
  */
-export type Unsecured<TApi> = { [K in keyof TApi]: UnsecuredFn<TApi[K]> }
+export type UnsecuredApi<TApi> = { [K in keyof TApi]: UnsecuredFn<TApi[K]> }
+
+export type SecuredFn<THandler, TSecurity> = THandler extends HandlerFn1<infer TRequest,infer TResponse>
+
+    ? (req: WithSecurity<TRequest, TSecurity>) => Promise<TResponse>
+
+    : never;
+
+/**
+ * For `TApi` where each method takes a parameter of `T`, maps each function to take `WithSecurity<T, TSecurity>`
+ *
+ * ```typescript
+ * // For interface:
+ *
+ * interface MyUnsecuredApi {
+ *     post(request: Doc): Promise<Result<AuthError, { id: string }>>;
+ * }
+ *
+ * // We can say:
+ *
+ * type MySecuredApi = Secured<MySecuredApi, MyClaims>;
+ *
+ * // Which is equivalent to:
+ *
+ * interface MyUnsecuredApi {
+ *     post(request: WithSecurity<Doc, MyClaims>): Promise<Result<AuthError, { id: string }>>;
+ * }
+ * ```
+ */
+export type SecuredApi<TApi, TSecurity> = { [K in keyof TApi]: SecuredFn<TApi[K], TSecurity> }

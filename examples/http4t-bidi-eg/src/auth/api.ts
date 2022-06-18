@@ -1,5 +1,5 @@
 import {Result} from "@http4t/result";
-import {Jwt, jwtBody, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
+import {JwtPayload, jwtBody, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
 import {route, RoutesFor} from "@http4t/bidi/routes";
 import {json, request, result, text} from "@http4t/bidi/requests";
 import {response} from "@http4t/bidi/responses";
@@ -23,7 +23,7 @@ export interface Auth {
 }
 
 export interface AuthServer extends Auth {
-    login(request: Creds): Promise<Result<string, Jwt>>
+    login(request: Creds): Promise<Result<string, JwtPayload>>
 }
 
 export interface AuthClient extends Auth {
