@@ -1,13 +1,14 @@
 import {Result, success} from "@http4t/result";
-import {WithOurClaims} from "../auth/api";
 import {AuthError} from "@http4t/bidi/auth/authError";
+import {DocStoreClaims, WithOurClaims} from "../auth/api";
 import {Doc, DocRepository} from "./impl/DocRepository";
 import {CumulativeLogger} from "../utils/Logger";
 import {DocStore} from "./api";
+import {SecuredApi} from "@http4t/bidi/auth/withSecurity";
 
 export type DocStoreOpts = { store: DocRepository, logger: CumulativeLogger };
 
-export function docStoreLogic(opts: DocStoreOpts): DocStore {
+export function docStoreLogic(opts: DocStoreOpts): SecuredApi<DocStore, DocStoreClaims> {
     const {logger, store} = opts;
     return {
         async get(request: WithOurClaims<{ id: string }>): Promise<Result<AuthError, Doc | undefined>> {
@@ -21,12 +22,14 @@ export function docStoreLogic(opts: DocStoreOpts): DocStore {
 
             return success(doc);
         },
+
         async post(request: WithOurClaims<Doc>): Promise<Result<AuthError, { id: string }>> {
             const doc = request.value;
             logger.info(`storing json: "${JSON.stringify(doc)}"`);
             await store.save({doc, meta: {owner: request.security.principal.userName}});
             return success({id: doc.id});
         },
+
         async storeDocThenFail(request: WithOurClaims<Doc>): Promise<Result<AuthError, undefined>> {
             const doc = request.value;
             logger.info('throwing an exception');

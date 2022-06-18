@@ -1,9 +1,8 @@
 import {HttpHandler} from "@http4t/core/contract";
-import {Jwt, jwtSecuredRoutes, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
-import {Unsecured} from "@http4t/bidi/auth/withSecurity";
+import {JwtPayload, jwtSecuredRoutes, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
 import {tokenProvidedRoutes} from "@http4t/bidi/auth/client";
 import {buildClient} from "@http4t/bidi/client";
-import {DocStoreClaims, WithOurClaims} from "../auth/api";
+import {DocStoreClaims} from "../auth/api";
 import {Doc} from "./impl/DocRepository";
 import {Result, success} from "@http4t/result";
 import {AuthError, authErrorOr} from "@http4t/bidi/auth/authError";
@@ -16,14 +15,14 @@ import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 import {clientJwt} from "@http4t/bidi-jwt/jose";
 
 export interface DocStore {
-    post(request: WithOurClaims<Doc>): Promise<Result<AuthError, { id: string }>>;
+    post(request: Doc): Promise<Result<AuthError, { id: string }>>;
 
-    get(request: WithOurClaims<{ id: string }>): Promise<Result<AuthError, Doc | undefined>>;
+    get(request: { id: string }): Promise<Result<AuthError, Doc | undefined>>;
 
-    storeDocThenFail(request: WithOurClaims<Doc>): Promise<Result<AuthError, undefined>>;
+    storeDocThenFail(request: Doc): Promise<Result<AuthError, undefined>>;
 }
 
-export const unsecuredDocStoreRoutes: RoutesFor<Unsecured<DocStore>> = {
+export const unsecuredDocStoreRoutes: RoutesFor<DocStore> = {
     post: route(
         request('POST', '/store', json<Doc>()),
         authErrorOr(
@@ -40,23 +39,25 @@ export const unsecuredDocStoreRoutes: RoutesFor<Unsecured<DocStore>> = {
             response(200, empty())))
 }
 
+export async function jwtToOurClaims(jwt: JwtPayload): Promise<RoutingResult<DocStoreClaims>> {
+    const userName = jwt["userName"] as string;
+    if (!userName) return routeFailed("JWT did not contain 'userName'", ["headers", "Authorization"]);
+    return success({
+        principal: {
+            type: "user",
+            userName: userName
+        }
+    })
+}
+
 export function docStoreRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typeof unsecuredDocStoreRoutes, JwtString, DocStoreClaims> {
     return jwtSecuredRoutes(
         unsecuredDocStoreRoutes,
         opts.jwt,
-        async (jwt: Jwt): Promise<RoutingResult<DocStoreClaims>> => {
-            const userName = jwt.payload["userName"];
-            if (!userName) return routeFailed("JWT did not contain 'userName'", ["headers", "Authorization"]);
-            return success({
-                principal: {
-                    type: "user",
-                    userName: userName
-                }
-            })
-        });
+        jwtToOurClaims);
 }
 
-export function docStoreClient(httpClient: HttpHandler, jwt: JwtString): Unsecured<DocStore> {
+export function docStoreClient(httpClient: HttpHandler, jwt: JwtString): DocStore {
     const routesWithJwtProvided = tokenProvidedRoutes(
         docStoreRoutes({jwt: clientJwt()}),
         jwt);
