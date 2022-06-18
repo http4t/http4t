@@ -2,7 +2,6 @@ import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import * as responses from "@http4t/core/responses";
 import {failure, Failure, Result} from "@http4t/result";
 import {JsonPath, problem, Problem} from "@http4t/result/JsonPathResult";
-import {OpenAPIV3_1} from "./openapi";
 
 
 export const WRONG_ROUTE = "wrong-route";
@@ -64,44 +63,34 @@ export function routeFailed(message: string, path: JsonPath, response: HttpRespo
  * inject the header or body into the request, and on the server side to
  * read out the header, or deserialise the body.
  */
-export interface MessageLens<TMessage extends HttpMessage = HttpMessage, TGet = unknown, TSet = TGet> {
-    get(from: TMessage): Promise<RoutingResult<TGet>>;
+export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown> {
+    get(from: TMessage): Promise<RoutingResult<T>>;
 
-    set<SetInto extends TMessage>(into: SetInto, value: TSet): Promise<SetInto>;
+    set<SetInto extends TMessage>(into: SetInto, value: T): Promise<SetInto>;
 }
 
-export interface RequestLens<TGet = unknown, TSet = TGet> extends MessageLens<HttpRequest, TGet, TSet> {
+export interface RequestLens<T = unknown> extends MessageLens<HttpRequest, T> {
 }
 
-export abstract class BaseRequestLens<TGet = unknown, TSet = TGet> implements RequestLens<TGet, TSet> {
-    abstract get(from: HttpRequest): Promise<RoutingResult<TGet>>;
+export abstract class BaseRequestLens<T = unknown> implements RequestLens<T> {
+    abstract get(from: HttpRequest): Promise<RoutingResult<T>>;
 
-    set<SetInto extends HttpRequest>(into: SetInto, value: TSet): Promise<SetInto> {
+    set<SetInto extends HttpRequest>(into: SetInto, value: T): Promise<SetInto> {
         return this.setRequest(into, value) as Promise<SetInto>;
     }
 
-    abstract setRequest(into: HttpRequest, value: TSet): Promise<HttpRequest>;
+    abstract setRequest(into: HttpRequest, value: T): Promise<HttpRequest>;
 }
 
-export interface ResponseLens<TGet = unknown, TSet = TGet> extends MessageLens<HttpResponse, TGet, TSet> {
+export interface ResponseLens<T = unknown> extends MessageLens<HttpResponse, T> {
 }
 
-export abstract class BaseResponseLens<TGet = unknown, TSet = TGet> implements ResponseLens<TGet, TSet> {
-    abstract get(from: HttpResponse): Promise<RoutingResult<TGet>>;
+export abstract class BaseResponseLens<T = unknown> implements ResponseLens<T> {
+    abstract get(from: HttpResponse): Promise<RoutingResult<T>>;
 
-    set<SetInto extends HttpResponse>(into: SetInto, value: TSet): Promise<SetInto> {
+    set<SetInto extends HttpResponse>(into: SetInto, value: T): Promise<SetInto> {
         return this.setResponse(into, value) as Promise<SetInto>;
     }
 
-    abstract setResponse(into: HttpResponse, value: TSet): Promise<HttpResponse>;
-}
-
-export type CheckResponseCompatible<TLens> = TLens extends MessageLens<infer TMessage, infer TGet, infer TSet>
-    ? HttpResponse extends TMessage
-        ? TLens
-        : never
-    : never;
-
-export interface OpenApiLens<TMessage extends HttpMessage = HttpMessage, T = unknown> extends MessageLens<TMessage, T> {
-    document(doc: OpenAPIV3_1.Document): Promise<OpenAPIV3_1.Document>;
+    abstract setResponse(into: HttpResponse, value: T): Promise<HttpResponse>;
 }

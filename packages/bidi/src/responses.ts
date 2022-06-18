@@ -2,7 +2,7 @@ import {ResponseLens} from "./lenses";
 import {ResponseByStatusLens} from "./lenses/ResponseByStatusLens";
 
 
-export function response<TServer,TClient>(status: number, lens: ResponseLens<TClient,TServer>): ResponseLens<TClient,TServer> {
+export function response<T>(status: number, lens: ResponseLens<T>): ResponseLens<T> {
     return new ResponseByStatusLens({[status]: lens}, () => status);
 }
 

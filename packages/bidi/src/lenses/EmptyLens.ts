@@ -12,6 +12,6 @@ export class EmptyLens<TMessage extends HttpMessage> implements MessageLens<TMes
     }
 }
 
-export function empty<TMessage extends HttpMessage = HttpMessage>(): EmptyLens<TMessage> {
+export function empty<TMessage extends HttpMessage = HttpMessage>(): MessageLens<TMessage, undefined> {
     return new EmptyLens<TMessage>();
 }

@@ -2,22 +2,22 @@ import {HttpMessage} from "@http4t/core/contract";
 import {failure} from "@http4t/result";
 import {MessageLens, RoutingError, RoutingResult} from "../lenses";
 
-class AlwaysFailLens<TMessage extends HttpMessage, TGet = never, TSet = TGet> implements MessageLens<TMessage, TGet, TSet> {
+class AlwaysFailLens<TMessage extends HttpMessage, T = unknown> implements MessageLens<TMessage, T> {
     constructor(private readonly error: (message: TMessage) => RoutingError) {
 
     }
 
-    async get(message: TMessage): Promise<RoutingResult<TGet>> {
+    async get(message: TMessage): Promise<RoutingResult<T>> {
         return failure(this.error(message));
     }
 
-    async set<SetInto extends TMessage>(into: SetInto, value: TSet): Promise<SetInto> {
+    async set<SetInto extends TMessage>(into: SetInto, value: T): Promise<SetInto> {
         return into;
     }
 }
 
-export function fail<TMessage extends HttpMessage = HttpMessage, TGet = undefined, TSet = TGet>(error: RoutingError): MessageLens<TMessage, TGet, TSet>;
-export function fail<TMessage extends HttpMessage = HttpMessage, TGet = undefined,TSet = TGet>(error: (message: TMessage) => RoutingError): MessageLens<TMessage, TGet, TSet>;
-export function fail<TMessage extends HttpMessage = HttpMessage, TGet = undefined,TSet = TGet>(error: RoutingError | ((message: TMessage) => RoutingError)): MessageLens<TMessage, TGet, TSet> {
-    return new AlwaysFailLens<TMessage, TGet, TSet>(typeof error === "function" ? error : () => error);
+export function fail<TMessage extends HttpMessage = HttpMessage, T = undefined>(error: RoutingError): MessageLens<TMessage, T>;
+export function fail<TMessage extends HttpMessage = HttpMessage, T = undefined>(error: (message: TMessage) => RoutingError): MessageLens<TMessage, T>;
+export function fail<TMessage extends HttpMessage = HttpMessage, T = undefined>(error: RoutingError | ((message: TMessage) => RoutingError)): MessageLens<TMessage, T> {
+    return new AlwaysFailLens<TMessage, T>(typeof error === "function" ? error : () => error);
 }

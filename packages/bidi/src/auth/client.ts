@@ -6,7 +6,7 @@ import {HttpRequest} from "@http4t/core/contract";
 import {Mutable} from "../util/mutable";
 
 export class ClientSecuredRequestLens<T, TToken> extends BaseRequestLens<T> {
-    constructor(private readonly serverLens: RequestLens<any, WithSecurity<T, TToken>>,
+    constructor(private readonly serverLens: RequestLens<WithSecurity<T, TToken>>,
                 private readonly token: TToken) {
         super();
     }
@@ -26,14 +26,11 @@ export class ClientSecuredRequestLens<T, TToken> extends BaseRequestLens<T> {
 }
 
 export type UnsecuredRouteFor<TRoute> =
-    TRoute extends Route<
-            WithSecurity<infer TRequestGet, infer TClaims>,
-            Result<infer TAuthError, infer Out>,
-            WithSecurity<infer TRequestSet, infer TToken>>
+    TRoute extends Route<WithSecurity<infer TRequest, infer TClaims>,
+            Result<infer TAuthError, infer TReponse>>
 
-        ? Route<TRequestGet,
-            Result<TAuthError, Out>,
-            TRequestSet>
+        ? Route<TRequest,
+            Result<TAuthError, TReponse>>
 
         : never;
 /**
@@ -43,7 +40,7 @@ export type UnsecuredRouteFor<TRoute> =
  */
 export type UnsecuredRoutesFor<TRoutes extends Routes> = { readonly [K in keyof TRoutes]: UnsecuredRouteFor<TRoutes[K]> }
 
-export type SecuredRoute<TToken, TClaims> = Route<WithSecurity<any, TClaims>, any, WithSecurity<any, TToken>>;
+export type SecuredRoute<TSecurity> = Route<WithSecurity<any, TSecurity>, any>;
 /**
  * Routes where:
  *
@@ -52,10 +49,10 @@ export type SecuredRoute<TToken, TClaims> = Route<WithSecurity<any, TClaims>, an
  *    `set`s the request lens will want to pass `TToken`)
  * 2. All response lenses have `TRequestGet` and `TRequestSet` returning `Result<TAuthError, T`
  */
-export type SecuredRoutes<TToken, TClaims> =
-    { readonly [k: string]: SecuredRoute<TToken, TClaims> }
+export type SecuredRoutes<TSecurity> =
+    { readonly [k: string]: SecuredRoute<TSecurity> }
 
-export function tokenProvidedRoute<TRoute extends Route<any, any, WithSecurity<any, TToken>>, TToken>(
+export function tokenProvidedRoute<TRoute extends Route<WithSecurity<any, TToken>, any>, TToken>(
     serverRoute: TRoute,
     token: TToken)
 
@@ -66,19 +63,19 @@ export function tokenProvidedRoute<TRoute extends Route<any, any, WithSecurity<a
         serverRoute.response) as UnsecuredRouteFor<TRoute>;
 }
 
-export function tokenProvidedRoutes<TRoutes extends SecuredRoutes<TToken, any>, TToken>(
-    serverRoutes: TRoutes,
+export function tokenProvidedRoutes<TRoutes extends Routes, TToken>(
+    unsecuredRoutes: TRoutes,
     token: TToken)
-    : UnsecuredRoutesFor<TRoutes> {
+    : TRoutes {
 
-    return Object.entries(serverRoutes)
+    return Object.entries(unsecuredRoutes)
         .reduce(
             (acc, [k, route]) => {
                 const secured = tokenProvidedRoute(
-                    route as SecuredRoute<TToken, any>,
+                    route as SecuredRoute<TToken>,
                     token);
-                acc[k as keyof UnsecuredRoutesFor<TRoutes>] = secured as any;
+                acc[k as keyof TRoutes] = secured as any;
                 return acc;
             },
-            {} as Mutable<UnsecuredRoutesFor<TRoutes>>)
+            {} as Mutable<TRoutes>)
 }

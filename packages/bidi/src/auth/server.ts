@@ -5,11 +5,10 @@ import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
 import {AuthError} from "./authError";
 
-export type SecuredRouteFor<TRoute, TToken, TClaims, TAuthError> =
-    TRoute extends Route<infer TRequestGet, Result<TAuthError, infer Out>, infer TRequestSet>
-        ? Route<WithSecurity<TRequestGet, TClaims>,
-            Result<TAuthError, Out>,
-            WithSecurity<TRequestSet, TToken>>
+export type SecuredRouteFor<TRoute, TSecurity, TAuthError> =
+    TRoute extends Route<infer TRequest, Result<TAuthError, infer TResponse>>
+        ? Route<WithSecurity<TRequest, TSecurity>,
+            Result<TAuthError, TResponse>>
         : never;
 
 /**
@@ -21,23 +20,28 @@ export type SecuredRouteFor<TRoute, TToken, TClaims, TAuthError> =
  * The inverse of {@link UnsecuredRoutesFor}
  */
 export type SecuredRoutesFor<TRoutes extends Routes,
-    TToken,
-    TClaims,
+    TSecurity,
     TAuthError = AuthError> =
-    { readonly [K in keyof TRoutes]: SecuredRouteFor<TRoutes[K], TToken, TClaims, TAuthError> }
+    { readonly [K in keyof TRoutes]: SecuredRouteFor<TRoutes[K], TSecurity, TAuthError> }
 
-export class ServerSecuredRequestLens<T, TToken, TClaims> extends BaseRequestLens<WithSecurity<T, TClaims>, WithSecurity<T, TToken>> {
+export type TokenToClaims<TToken, TClaims> = (token: TToken) => Promise<RoutingResult<TClaims>> | RoutingResult<TClaims>;
+
+export class ServerSecuredRequestLens<T, TToken, TClaims> extends BaseRequestLens<WithSecurity<T, TClaims>> {
     constructor(private readonly unsecuredLens: RequestLens<T>,
-                private readonly tokenLens: RequestLens<TClaims, TToken>) {
+                private readonly tokenLens: RequestLens<TToken>,
+                private readonly tokenToClaims: TokenToClaims<TToken, TClaims>) {
         super();
     }
 
     async get(from: HttpRequest): Promise<RoutingResult<WithSecurity<T, TClaims>>> {
+        const tokenResult = await this.tokenLens.get(from);
+        if (isFailure(tokenResult)) return tokenResult;
+
+        const claimsResult = await this.tokenToClaims(tokenResult.value)
+        if (isFailure(claimsResult)) return claimsResult;
+
         const routeResult = await this.unsecuredLens.get(from);
         if (isFailure(routeResult)) return routeResult;
-
-        const claimsResult = await this.tokenLens.get(from);
-        if (isFailure(claimsResult)) return claimsResult;
 
         return success({
             security: claimsResult.value,
@@ -45,20 +49,20 @@ export class ServerSecuredRequestLens<T, TToken, TClaims> extends BaseRequestLen
         });
     }
 
-    async setRequest(into: HttpRequest, value: WithSecurity<T, TToken>): Promise<HttpRequest> {
-        const withToken = await this.tokenLens.set(into, value.security);
-        return this.unsecuredLens.set(withToken, value.value)
+    async setRequest(into: HttpRequest, value: WithSecurity<T, TClaims>): Promise<HttpRequest> {
+        throw new Error(ServerSecuredRequestLens.name + " should not be used client-side");
     }
 }
 
-export function serverSecuredRoute<In, Out, TToken, TClaims, TAuthError>(
-    unsecuredRoute: Route<In, Result<TAuthError, Out>>,
-    tokenLens: RequestLens<TClaims, TToken>)
+export function serverSecuredRoute<TRequest, TResponse, TToken, TClaims, TAuthError>(
+    unsecuredRoute: Route<TRequest, Result<TAuthError, TResponse>>,
+    tokenLens: RequestLens<TToken>,
+    tokenToClaims: TokenToClaims<TToken, TClaims>)
 
-    : Route<WithSecurity<In, TClaims>, Result<TAuthError, Out>, WithSecurity<In, TToken>> {
+    : Route<WithSecurity<TRequest, TClaims>, Result<TAuthError, TResponse>> {
 
     return route(
-        new ServerSecuredRequestLens(unsecuredRoute.request, tokenLens),
+        new ServerSecuredRequestLens(unsecuredRoute.request, tokenLens, tokenToClaims),
         unsecuredRoute.response);
 }
 
@@ -74,17 +78,19 @@ export function serverSecuredRoute<In, Out, TToken, TClaims, TAuthError>(
  */
 export function serverSecuredRoutes<TRoutes extends Routes, TToken, TClaims, TAuthError>(
     unsecuredRoutes: TRoutes,
-    tokenLens: RequestLens<TClaims, TToken>)
+    tokenLens: RequestLens<TToken>,
+    tokenToClaims: TokenToClaims<TToken, TClaims>)
 
-    : SecuredRoutesFor<TRoutes, TToken, TClaims, TAuthError> {
+    : SecuredRoutesFor<TRoutes, TClaims, TAuthError> {
 
     return Object.entries(unsecuredRoutes)
         .reduce(
             (previousValue, [k, route]) => {
                 const secured = serverSecuredRoute(
                     route as Route<unknown, Result<TAuthError, unknown>>,
-                    tokenLens);
+                    tokenLens,
+                    tokenToClaims);
                 return Object.assign({}, previousValue, {[k]: secured})
             },
-            {} as SecuredRoutesFor<TRoutes, TToken, TClaims, TAuthError>);
+            {} as SecuredRoutesFor<TRoutes, TClaims, TAuthError>);
 }

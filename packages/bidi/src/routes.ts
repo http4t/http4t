@@ -6,15 +6,15 @@ import {RequestLens, ResponseLens} from "./lenses";
  * `TRequestGet` is used to deserialize the request on the server-side
  * `TResponseSet` is used to serialize the response on the server-side
  */
-export type Route<TRequestGet = unknown, TResponseGet = unknown, TRequestSet = TRequestGet, TResponseSet = TResponseGet> = {
-    readonly request: RequestLens<TRequestGet, TRequestSet>;
-    readonly response: ResponseLens<TResponseGet, TResponseSet>;
+export type Route<TRequest = unknown, TResponse = unknown> = {
+    readonly request: RequestLens<TRequest>;
+    readonly response: ResponseLens<TResponse>;
 }
 
 
-export function route<TRequestGet, TResponseGet, TRequestSet = TRequestGet, TResponseSet = TResponseGet>(
-    request: RequestLens<TRequestGet, TRequestSet>,
-    response: ResponseLens<TResponseGet, TResponseSet>): Route<TRequestGet, TResponseGet, TRequestSet, TResponseSet> {
+export function route<TRequest = unknown, TResponse = unknown>(
+    request: RequestLens<TRequest>,
+    response: ResponseLens<TResponse>): Route<TRequest, TResponse> {
     return {
         request: request,
         response: response
@@ -31,50 +31,26 @@ export type RoutableApi<TServerApi extends { [K in keyof TServerApi]: HandlerFn 
 
 export type Routes = { readonly [k: string]: Route };
 
-export type RouteFor<TServerHandler, TClientHandler = TServerHandler> =
-    TServerHandler extends HandlerFn0<infer TServerOut>
-        ? TClientHandler extends HandlerFn0<infer TClientOut>
-        ? Route<undefined, TClientOut, undefined, TServerOut>
-        : TClientHandler extends HandlerFn1<infer TClientIn, infer TClientOut>
-            ? Route<TClientIn, TClientOut, undefined, TServerOut>
-            : never
-        : TServerHandler extends HandlerFn1<infer TServerIn, infer TServerOut>
-        ? TClientHandler extends HandlerFn0<infer TClientOut>
-            ? Route<undefined, TClientOut, TServerIn, TServerOut>
-            : TClientHandler extends HandlerFn1<infer TClientIn, infer TClientOut>
-                ? Route<TClientIn, TClientOut, TServerIn, TServerOut>
-                : never
+export type RouteFor<TApi> =
+    TApi extends HandlerFn0<infer TResponse>
+        ? Route<undefined, TResponse>
+        : TApi extends HandlerFn1<infer TRequest, infer TResponse>
+        ? Route<TRequest, TResponse>
         : never;
 
 /**
  * Use as a compile-time check that symmetrical routes are compatible with `TApi`
  */
-export type RoutesFor<
-    TServerApi extends RoutableApi<TServerApi>,
-    TClientApi extends RoutableApi<TServerApi> = TServerApi> =
+export type RoutesFor<TApi extends RoutableApi<TApi>> =
+    { readonly [K in keyof TApi]: RouteFor<TApi[K]> };
 
-    { readonly [K in keyof TServerApi]: RouteFor<TServerApi[K], TClientApi[K]> };
-
-export type ServerApiFnFor<TRoute> = TRoute extends Route<infer TRequestGet, infer TResponseGet, infer TRequestSet, infer TResponseSet>
-    ? TRequestGet extends undefined
-        ? HandlerFn0<TResponseSet>
-        : HandlerFn1<TRequestGet, TResponseSet>
+export type ApiFnFor<TRoute> = TRoute extends Route<infer TRequest, infer TResponse>
+    ? TRequest extends undefined
+        ? HandlerFn0<TResponse>
+        : HandlerFn1<TRequest, TResponse>
     : never;
 
-/**
- * Uses `TRequestGet` for method parameter and `TResponseSet` for return value
- */
-export type ServerApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ServerApiFnFor<TRoutes[K]> };
-
-export type ClientApiFnFor<TRoute> = TRoute extends Route<infer TRequestGet, infer TResponseGet, infer TRequestSet, infer TResponseSet>
-    ? TRequestGet extends undefined
-        ? HandlerFn0<TResponseGet>
-        : HandlerFn1<TRequestSet, TResponseGet>
-    : never;
-/**
- * Uses `TRequestSet` for method parameter and `TResponseGet` for return value
- */
-export type ClientApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ClientApiFnFor<TRoutes[K]> };
+export type ApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ApiFnFor<TRoutes[K]> };
 
 
 export function routes<A extends Routes, B extends Routes>(a: A, b: B): A & B;

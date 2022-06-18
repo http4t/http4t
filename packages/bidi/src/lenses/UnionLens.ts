@@ -2,21 +2,19 @@ import {HttpMessage} from "@http4t/core/contract";
 import {MessageLens, RoutingResult} from "../lenses";
 import {failure, isFailure, isSuccess} from "@http4t/result";
 
-export class UnionLens<AGet extends object | undefined,
-    BGet extends object | undefined,
-    ASet extends object | undefined = AGet,
-    BSet extends object | undefined = BGet,
+export class UnionLens<A extends object | undefined,
+    B extends object | undefined,
     TMessage extends HttpMessage = HttpMessage>
-    implements MessageLens<TMessage, AGet | BGet, ASet | BSet> {
+    implements MessageLens<TMessage, A | B> {
 
     constructor(
-        private a: MessageLens<TMessage, AGet, ASet>,
-        private b: MessageLens<TMessage, BGet, BSet>,
-        private isA: (value: ASet | BSet) => value is ASet
+        private a: MessageLens<TMessage, A>,
+        private b: MessageLens<TMessage, B>,
+        private isA: (value: A | B) => value is A
     ) {
     }
 
-    async get(from: TMessage): Promise<RoutingResult<AGet | BGet>> {
+    async get(from: TMessage): Promise<RoutingResult<A | B>> {
         const a = await this.a.get(from);
         if (isSuccess(a)) return a;
 
@@ -25,23 +23,21 @@ export class UnionLens<AGet extends object | undefined,
         return b;
     }
 
-    async set<SetInto extends TMessage>(into: SetInto, value: ASet | BSet): Promise<SetInto> {
+    async set<SetInto extends TMessage>(into: SetInto, value: A | B): Promise<SetInto> {
         if (this.isA(value)) return this.a.set(into, value)
         return this.b.set(into, value);
     }
 }
 
-export function union<AGet extends object | undefined,
-    BGet extends object | undefined,
-    ASet extends object | undefined = AGet,
-    BSet extends object | undefined = BGet,
+export function union<A extends object | undefined,
+    B extends object | undefined,
     TMessage extends HttpMessage = HttpMessage>
 (
-    a: MessageLens<TMessage, AGet, ASet>,
-    b: MessageLens<TMessage, BGet, BSet>,
-    isA: (value: ASet | BSet) => value is ASet)
+    a: MessageLens<TMessage, A>,
+    b: MessageLens<TMessage, B>,
+    isA: (value: A | B) => value is A)
 
-    : MessageLens<TMessage, AGet | BGet, ASet | BSet> {
+    : MessageLens<TMessage, A | B> {
 
     return new UnionLens(a, b, isA)
 }
