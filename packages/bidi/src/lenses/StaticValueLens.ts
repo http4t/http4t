@@ -3,24 +3,24 @@ import {failure, isFailure, success} from "@http4t/result";
 import {MessageLens, routeFailedError, RoutingError, RoutingResult} from "../lenses";
 import {responseOf} from "@http4t/core/responses";
 
-export type StaticValueOpts<TGet, TSet> = {
-    equality: (expected: TSet, actual: TGet) => boolean,
-    failure: (value: TGet) => RoutingError
+export type StaticValueOpts<T> = {
+    equality: (expected: T, actual: T) => boolean,
+    failure: (value: T) => RoutingError
 };
 
-function defaults<TGet, TSet=TGet>(value: TSet): StaticValueOpts<TGet, TSet> {
+function defaults<T>(value: T): StaticValueOpts<T> {
     return {
-        equality: (a: TSet, b: TGet) => a as any === b,
+        equality: (a: T, b: T) => a as any === b,
         failure: v => routeFailedError(`Expected: ${value}, but got: ${v}`, [], responseOf(400))
     };
 }
 
-export class StaticValueLens<TGet, TSet = TGet, TMessage extends HttpMessage = HttpMessage> implements MessageLens<TMessage, undefined> {
-    private readonly opts: StaticValueOpts<TGet, TSet>;
+export class StaticValueLens<T, TMessage extends HttpMessage = HttpMessage> implements MessageLens<TMessage, undefined> {
+    private readonly opts: StaticValueOpts<T>;
 
-    constructor(private readonly value: TSet,
-                private readonly lens: MessageLens<TMessage, TGet, TSet>,
-                opts: Partial<StaticValueOpts<TGet, TSet>>) {
+    constructor(private readonly value: T,
+                private readonly lens: MessageLens<TMessage, T>,
+                opts: Partial<StaticValueOpts<T>>) {
         this.opts = Object.assign({}, defaults(value), opts);
     }
 
@@ -38,9 +38,9 @@ export class StaticValueLens<TGet, TSet = TGet, TMessage extends HttpMessage = H
     }
 }
 
-export function value<TSet, TGet = TSet, TMessage extends HttpMessage = HttpMessage>(
-    value: TSet,
-    lens: MessageLens<TMessage, TGet, TSet>,
-    opts: Partial<StaticValueOpts<TGet, TSet>> = {}): MessageLens<TMessage, undefined> {
+export function value<T, TMessage extends HttpMessage = HttpMessage>(
+    value: T,
+    lens: MessageLens<TMessage, T>,
+    opts: Partial<StaticValueOpts<T>> = {}): MessageLens<TMessage, undefined> {
     return new StaticValueLens(value, lens, opts)
 }

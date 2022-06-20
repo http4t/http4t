@@ -1,13 +1,12 @@
 import {MessageLens, routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 import {HttpMessage} from "@http4t/core/contract";
-import {isFailure} from "@http4t/result";
 import {text} from "@http4t/bidi/messages";
 import {bearerAuthHeader} from "@http4t/bidi/lenses/BearerAuthHeader";
 import {Routes} from "@http4t/bidi/routes";
-import {mapped} from "@http4t/bidi/lenses/MapLens";
-import {responseOf} from "@http4t/core/responses";
-import {SecuredRoutesFor, serverSecuredRoutes} from "@http4t/bidi/auth/server";
+import {SecuredRoutesFor, serverSecuredRoutes, TokenToClaims} from "@http4t/bidi/auth/server";
 import {AuthError} from "@http4t/bidi/auth/authError";
+import {isFailure} from "@http4t/result";
+import {responseOf} from "@http4t/core/responses";
 
 export type JwtString = string;
 export type JwtPayload = {
@@ -59,7 +58,7 @@ export interface JwtStrategy {
  * Typically used to e.g. set a jwt string as a request header and have it verified with getting on the server-side.
  *
  */
-export class GetJwtLens<TMessage extends HttpMessage = HttpMessage> implements MessageLens<TMessage, JwtPayload, JwtString> {
+export class GetJwtLens<TMessage extends HttpMessage = HttpMessage> implements MessageLens<TMessage, JwtPayload> {
     /**
      * @param tokenLens typically {@link bearerAuthHeader}
      * @param strategy
@@ -78,50 +77,30 @@ export class GetJwtLens<TMessage extends HttpMessage = HttpMessage> implements M
         }
     }
 
-    async set<SetInto extends TMessage>(into: SetInto, value: JwtString): Promise<SetInto> {
-        return this.tokenLens.set(into, value)
-    }
-}
-
-/**
- * Typically used to e.g. send a jwt string back to the client in a response body.
- *
- * Server logic sets a Jwt without worrying about signing, client uses the returned string as an opaque token
- */
-export class SetJwtLens<TMessage extends HttpMessage = HttpMessage> implements MessageLens<TMessage, JwtString, JwtPayload> {
-    constructor(private readonly tokenLens: MessageLens<TMessage, JwtString>,
-                private readonly strategy: JwtStrategy) {
-    }
-
-    async get(from: TMessage): Promise<RoutingResult<JwtString>> {
-        return this.tokenLens.get(from);
-    }
-
     async set<SetInto extends TMessage>(into: SetInto, value: JwtPayload): Promise<SetInto> {
-        return this.tokenLens.set(into, await this.strategy.sign(value))
+        throw new Error(GetJwtLens.name + " should not be used client-side")
     }
 }
 
-export function jwtAuthHeader(strategy: JwtStrategy): MessageLens<HttpMessage, JwtPayload, JwtString> {
-    return new GetJwtLens(bearerAuthHeader(), strategy);
+export function verifyJwt<TMessage extends HttpMessage = HttpMessage>(
+    tokenLens: MessageLens<TMessage, JwtString>,
+    strategy: JwtStrategy
+): MessageLens<TMessage, JwtPayload> {
+    return new GetJwtLens(tokenLens, strategy);
 }
 
-export function jwtBody(strategy: JwtStrategy): MessageLens<HttpMessage, JwtString, JwtPayload> {
-    return new SetJwtLens(text(), strategy);
+export function jwtBody(): MessageLens<HttpMessage, JwtString> {
+    return text();
 }
 
 export function jwtSecuredRoutes<TRoutes extends Routes, TClaims = JwtPayload, TAuthError = AuthError>(
     unsecuredRoutes: TRoutes,
     jwtStrategy: JwtStrategy,
-    tokenToClaims: (token: JwtPayload) => Promise<RoutingResult<TClaims>>
-): SecuredRoutesFor<TRoutes, string, TClaims, TAuthError> {
-
-    const tokenLens: MessageLens<HttpMessage, TClaims, JwtString> = mapped<JwtPayload, TClaims, JwtString, JwtString>(
-        jwtAuthHeader(jwtStrategy),
-        tokenToClaims,
-        async jwt => jwt);
+    jwtToClaims: TokenToClaims<JwtPayload, TClaims>
+): SecuredRoutesFor<TRoutes, TClaims, TAuthError> {
 
     return serverSecuredRoutes(
         unsecuredRoutes,
-        tokenLens);
+        verifyJwt(bearerAuthHeader(), jwtStrategy),
+        jwtToClaims);
 }

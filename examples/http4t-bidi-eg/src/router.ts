@@ -20,7 +20,7 @@ import {CredStore} from "./auth/impl/CredStore";
 import {PostgresStore} from "./docstore/impl/PostgresStore";
 import {InMemoryCredStore} from "./auth/impl/InMemoryCredStore";
 import {authRoutes} from "./auth/api";
-import {docStoreRoutes} from "./docstore/api";
+import {docStoreServerRoutes} from "./docstore/api";
 import {healthLogic} from "./health/logic";
 import {authLogic} from "./auth/logic";
 import {docStoreLogic} from "./docstore/logic";
@@ -33,8 +33,8 @@ export function router(opts: RouterOpts): HttpHandler {
     return buildRouter(
         routes(
             healthRoutes,
-            authRoutes(opts),
-            docStoreRoutes(opts)),
+            authRoutes,
+            docStoreServerRoutes(opts)),
         intersection(
             healthLogic(opts),
             authLogic(opts),

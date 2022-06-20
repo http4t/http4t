@@ -4,19 +4,9 @@ import {responseOf} from "@http4t/core/responses";
 import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 import {success} from "@http4t/result";
 
-export class JoseClientJwtStrategy implements JwtStrategy {
-    async verify(token: string): Promise<RoutingResult<JwtPayload>> {
-        throw new Error(`Client should never verify JWTs`);
-    }
-
-    async sign(jwt: JwtPayload): Promise<string> {
-        throw new Error(`Client should never sign JWTs`);
-    }
-}
-
 export type ConfigureSigner = (signer: SignJWT) => SignJWT;
 
-export class JoseServerJwtStrategy implements JwtStrategy {
+export class JoseJwtStrategy implements JwtStrategy {
     constructor(private readonly keys: Keys,
                 private readonly configure: ConfigureSigner) {
 
@@ -38,16 +28,12 @@ export class JoseServerJwtStrategy implements JwtStrategy {
     }
 }
 
-export function clientJwt(): JwtStrategy {
-    return new JoseClientJwtStrategy();
-}
-
 export type Keys = {
     publicKey: KeyLike | Uint8Array,
     privateKey: KeyLike | Uint8Array | undefined
 };
 
-export function serverJwt(keys: Keys,
-                          configureJose: (encrypt: SignJWT) => SignJWT): JwtStrategy {
-    return new JoseServerJwtStrategy(keys, configureJose);
+export function joseJwt(keys: Keys,
+                        configureJose: (encrypt: SignJWT) => SignJWT): JwtStrategy {
+    return new JoseJwtStrategy(keys, configureJose);
 }
