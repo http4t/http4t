@@ -16,7 +16,7 @@ export class TotallyInsecureServerJwtStrategy implements JwtStrategy {
         if (token.split('.')[2] !== this.expectedSignature)
             return routeFailed(`Could not verify jwt`, ["headers", "Authentication"], responseOf(403))
         const decodedJwt = await decodeJwt(token);
-        return success({payload: decodedJwt, token});
+        return success(decodedJwt);
     }
 
     async sign(jwt: JwtPayload): Promise<string> {

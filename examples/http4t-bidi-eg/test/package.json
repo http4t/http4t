@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@http4t/bidi": "1.0.0",
-    "@http4t/bidi-eg": "1.0.0"
+    "@http4t/bidi-eg-client": "1.0.0",
+    "@http4t/bidi-eg-server": "1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

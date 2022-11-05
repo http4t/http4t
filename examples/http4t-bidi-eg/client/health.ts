@@ -1,9 +1,8 @@
-import {header, value} from "@http4t/bidi/messages";
-import {response} from "@http4t/bidi/responses";
-import {request} from "@http4t/bidi/requests";
-import {route, RoutesFor} from "@http4t/bidi/routes";
 import {HttpHandler} from "@http4t/core/contract";
 import {buildClient} from "@http4t/bidi/client";
+import {route, RoutesFor} from "@http4t/bidi/routes";
+import {header, request, value} from "@http4t/bidi/requests";
+import {response} from "@http4t/bidi/responses";
 
 export interface Health {
     ready(): Promise<undefined>;
@@ -25,4 +24,3 @@ export const healthRoutes: RoutesFor<Health> = {
 export function healthClient(httpClient: HttpHandler): Health {
     return buildClient(healthRoutes, httpClient, {leakActualValuesInError: true});
 }
-

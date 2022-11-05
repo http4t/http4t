@@ -1,5 +1,5 @@
 import {Result} from "@http4t/result";
-import {Creds} from "../api";
+import {Creds} from "@http4t/bidi-eg-client/auth";
 
 export interface CredStore {
     save(creds: Creds): Promise<Result<string, void>>;

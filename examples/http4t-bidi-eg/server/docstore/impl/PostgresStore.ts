@@ -1,5 +1,6 @@
 import {Transaction} from "../../utils/transactions/TransactionPool";
-import {DocAndMetaData, DocRepository} from "./DocRepository";
+import {DocRepository} from "./DocRepository";
+import {DocAndMetaData} from "@http4t/bidi-eg-client/docstore";
 
 export class PostgresStore implements DocRepository {
     constructor(private transaction: Transaction) {

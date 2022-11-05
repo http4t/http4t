@@ -6,6 +6,7 @@ export type Package = {
     version?: string,
     dependencies: Dependencies,
     devDependencies: Dependencies
+    scripts?:Record<string,string>
 };
 export type PackageFile = {
     path: string,

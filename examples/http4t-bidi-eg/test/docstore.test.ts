@@ -4,7 +4,7 @@ import chai from "chai";
 import {CloseableHttpHandler, loggedInDocStore, startTestServer} from "./testsupport";
 import uuidPkg from "uuid";
 import {success} from "@http4t/result";
-import {DocStore} from "@http4t/bidi-eg/docstore/api";
+import {DocStore} from "@http4t/bidi-eg-client/docstore";
 
 const {expect} = chai;
 const {v4: uuid} = uuidPkg;

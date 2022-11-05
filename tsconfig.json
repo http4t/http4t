@@ -14,7 +14,10 @@
       "path": "./packages/bidi-jwt/test"
     },
     {
-      "path": "./examples/http4t-bidi-eg/src"
+      "path": "./examples/http4t-bidi-eg/server"
+    },
+    {
+      "path": "./examples/http4t-bidi-eg/client"
     },
     {
       "path": "./examples/http4t-bidi-eg/test"

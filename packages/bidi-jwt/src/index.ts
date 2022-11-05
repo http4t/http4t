@@ -114,7 +114,7 @@ export function jwtSecuredRoutes<TRoutes extends Routes, TClaims = JwtPayload, T
     unsecuredRoutes: TRoutes,
     jwtStrategy: JwtStrategy,
     tokenToClaims: (token: JwtPayload) => Promise<RoutingResult<TClaims>>
-): SecuredRoutesFor<TRoutes, string, TClaims, TAuthError> {
+): SecuredRoutesFor<TRoutes, JwtString, TClaims, TAuthError> {
 
     const tokenLens: MessageLens<HttpMessage, TClaims, JwtString> = mapped<JwtPayload, TClaims, JwtString, JwtString>(
         jwtAuthHeader(jwtStrategy),

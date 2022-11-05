@@ -1,12 +1,5 @@
-export type Doc = {
-    id: string;
-    document: any;
-}
+import {DocAndMetaData} from "@http4t/bidi-eg-client/docstore";
 
-export type DocAndMetaData = {
-    doc:Doc,
-    meta: {owner:string}
-}
 export interface DocRepository {
     get(id: string): Promise<DocAndMetaData | undefined>;
 

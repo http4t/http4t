@@ -1,7 +1,14 @@
-import {Transaction, TransactionPool} from "@http4t/bidi-eg/utils/transactions/TransactionPool";
+import {Transaction, TransactionPool} from "@http4t/bidi-eg-server/utils/transactions/TransactionPool";
+import {promisify} from "util";
+import {exec} from "child_process";
 
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const execPromise = promisify(exec);
 
 export function timeout<T>(f: ((() => T) | (() => Promise<T>)), timeout?: number): Promise<T> {
     return new Promise<T>((resolve, reject) => {
@@ -56,7 +63,7 @@ export class DockerPgTransactionPool implements TransactionPool {
                 throw e;
             }
             console.log(`RUNNING ${__dirname}/startPostgres`);
-            await exec(`${__dirname}/startPostgres`);
+            await execPromise(`${__dirname}/startPostgres`);
             return retry(() => this.decorated.getTransaction(), 50, 100)
         }
     }
@@ -64,5 +71,4 @@ export class DockerPgTransactionPool implements TransactionPool {
     stop(): Promise<void> {
         return Promise.resolve(undefined);
     }
-
 }

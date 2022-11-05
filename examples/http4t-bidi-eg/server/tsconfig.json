@@ -5,13 +5,16 @@
       "path": "../client"
     },
     {
-      "path": "../server"
-    },
-    {
       "path": "../../../packages/bidi/src"
     },
     {
+      "path": "../../../packages/bidi-jwt/src"
+    },
+    {
       "path": "../../../packages/core/src"
+    },
+    {
+      "path": "../../../packages/node/src"
     },
     {
       "path": "../../../packages/result/src"

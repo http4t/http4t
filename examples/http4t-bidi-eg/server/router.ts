@@ -1,7 +1,6 @@
 import {buildRouter, RequestLifecycle} from "@http4t/bidi/router";
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {Closeable} from "@http4t/core/server";
-import {healthRoutes} from "./health/api";
 import {handleError} from "./utils/filters/errors";
 import {rollbackOnExceptionOr500} from "./utils/filters/rollbackOnExceptionOr500";
 import {httpInfoLogger} from "./utils/HttpInfoLogger";
@@ -13,19 +12,22 @@ import {withFilters} from "@http4t/core/Filter";
 import {routes} from "@http4t/bidi/routes";
 import {JwtStrategy} from "@http4t/bidi-jwt";
 import {PROD_LIFECYCLE} from "@http4t/bidi/lifecycles/ProductionRequestLifecycle";
-import {Pool, PoolConfig} from "pg";
 import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
-import {DockerPgTransactionPool} from "./utils/transactions/DockerPgTransactionPool";
 import {CredStore} from "./auth/impl/CredStore";
 import {PostgresStore} from "./docstore/impl/PostgresStore";
 import {InMemoryCredStore} from "./auth/impl/InMemoryCredStore";
-import {authRoutes} from "./auth/api";
-import {docStoreRoutes} from "./docstore/api";
 import {healthLogic} from "./health/logic";
 import {authLogic} from "./auth/logic";
 import {docStoreLogic} from "./docstore/logic";
 import {intersection} from "./utils/intersection";
 import {jwtStrategy} from "./auth/impl/jwtStrategies";
+import {healthRoutes} from "@http4t/bidi-eg-client/health";
+import {authRoutes} from "@http4t/bidi-eg-client/auth";
+import {docStoreServerRoutes} from "@http4t/bidi-eg-client/docstore";
+import {DockerPgTransactionPool} from "./utils/transactions/DockerPgTransactionPool";
+
+import pg, {PoolConfig} from 'pg';
+const { Pool } = pg;
 
 export type RouterOpts = { creds: CredStore, store: DocRepository, logger: CumulativeLogger, jwt: JwtStrategy, lifecycle?: RequestLifecycle };
 
@@ -33,8 +35,8 @@ export function router(opts: RouterOpts): HttpHandler {
     return buildRouter(
         routes(
             healthRoutes,
-            authRoutes(opts),
-            docStoreRoutes(opts)),
+            authRoutes(),
+            docStoreServerRoutes(opts)),
         intersection(
             healthLogic(opts),
             authLogic(opts),

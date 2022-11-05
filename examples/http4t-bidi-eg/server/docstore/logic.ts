@@ -1,10 +1,10 @@
 import {Result, success} from "@http4t/result";
 import {AuthError} from "@http4t/bidi/auth/authError";
-import {DocStoreClaims, WithOurClaims} from "../auth/api";
-import {Doc, DocRepository} from "./impl/DocRepository";
+import {DocRepository} from "./impl/DocRepository";
 import {CumulativeLogger} from "../utils/Logger";
-import {DocStore} from "./api";
 import {SecuredApi} from "@http4t/bidi/auth/withSecurity";
+import {Doc, DocStore} from "@http4t/bidi-eg-client/docstore";
+import {DocStoreClaims, WithOurClaims} from "@http4t/bidi-eg-client/auth";
 
 export type DocStoreOpts = { store: DocRepository, logger: CumulativeLogger };
 

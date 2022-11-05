@@ -3,7 +3,8 @@
   "version": "0.4.0",
   "private": true,
   "workspaces": [
-    "examples/*/src",
+    "examples/*/client",
+    "examples/*/server",
     "examples/*/test",
     "packages/*/src",
     "packages/*/test"
@@ -11,7 +12,7 @@
   "scripts": {
     "build": "ts-node build/build",
     "clean": "ts-node build/clean",
-    "test": "ts-node build/clean && ts-node build/test node,browser packages examples",
+    "test": "ts-node build/clean && ts-node build/test test,test:browser examples packages",
     "test:nobuild": "ts-node build/test node,browser packages examples",
     "test:packages:node": "ts-node build/clean && ts-node build/test node packages",
     "test:packages:browser": "ts-node build/clean && ts-node build/test browser packages",
@@ -33,5 +34,6 @@
     "node-forge": "0.10.0",
     "postcss": "8.2.10",
     "ws": "7.4.6"
-  }
+  },
+  "dependencies": {}
 }

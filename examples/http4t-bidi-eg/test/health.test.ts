@@ -1,6 +1,6 @@
 import chai from "chai";
 import {CloseableHttpHandler, startTestServer} from "./testsupport";
-import {Health, healthClient} from "@http4t/bidi-eg/health/api";
+import {Health, healthClient} from "@http4t/bidi-eg-client/health";
 
 const {expect} = chai;
 

@@ -1,18 +1,26 @@
-import {HttpHandler} from "@http4t/core/contract";
 import {JwtPayload, jwtSecuredRoutes, JwtStrategy, JwtString} from "@http4t/bidi-jwt";
-import {tokenProvidedRoutes} from "@http4t/bidi/auth/client";
-import {buildClient} from "@http4t/bidi/client";
-import {DocStoreClaims} from "../auth/api";
-import {Doc} from "./impl/DocRepository";
+import {SecuredRoutesFor} from "@http4t/bidi/auth/server";
+import {DocStoreClaims} from "./auth";
+import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 import {Result, success} from "@http4t/result";
-import {AuthError, authErrorOr} from "@http4t/bidi/auth/authError";
 import {route, RoutesFor} from "@http4t/bidi/routes";
 import {empty, json, path, request} from "@http4t/bidi/requests";
+import {AuthError, authErrorOr} from "@http4t/bidi/auth/authError";
 import {orNotFound, response} from "@http4t/bidi/responses";
 import {v} from "@http4t/bidi/paths/variables";
-import {SecuredRoutesFor} from "@http4t/bidi/auth/server";
-import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
+import {HttpHandler} from "@http4t/core/contract";
+import {tokenProvidedRoutes} from "@http4t/bidi/auth/client";
 import {clientJwt} from "@http4t/bidi-jwt/jose";
+import {buildClient} from "@http4t/bidi/client";
+
+export type Doc = {
+    id: string;
+    document: any;
+}
+export type DocAndMetaData = {
+    doc: Doc,
+    meta: { owner: string }
+}
 
 export interface DocStore {
     post(request: Doc): Promise<Result<AuthError, { id: string }>>;
@@ -50,16 +58,16 @@ export async function jwtToOurClaims(jwt: JwtPayload): Promise<RoutingResult<Doc
     })
 }
 
-export function docStoreRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typeof unsecuredDocStoreRoutes, JwtString, DocStoreClaims> {
+export function docStoreServerRoutes(opts: { jwt: JwtStrategy }): SecuredRoutesFor<typeof unsecuredDocStoreRoutes, JwtString, DocStoreClaims> {
     return jwtSecuredRoutes(
         unsecuredDocStoreRoutes,
         opts.jwt,
         jwtToOurClaims);
 }
 
-export function docStoreClient(httpClient: HttpHandler, jwt: JwtString): DocStore {
+export function docStoreClientRoutes(httpClient: HttpHandler, jwt: JwtString): DocStore {
     const routesWithJwtProvided = tokenProvidedRoutes(
-        docStoreRoutes({jwt: clientJwt()}),
+        docStoreServerRoutes({jwt: clientJwt()}),
         jwt);
 
     return buildClient(

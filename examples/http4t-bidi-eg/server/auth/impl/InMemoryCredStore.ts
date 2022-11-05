@@ -1,6 +1,6 @@
 import {failure, Result, success} from "@http4t/result";
 import {CredStore} from "./CredStore";
-import {Creds} from "../api";
+import {Creds} from "@http4t/bidi-eg-client/auth";
 
 export class InMemoryCredStore implements CredStore {
     private readonly creds: { [userName: string]: Creds } = {};
