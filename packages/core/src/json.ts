@@ -1,9 +1,9 @@
-import {bufferText} from "./bodies";
+import {bufferText, typeDescription} from "./bodies";
 import {Data, HttpBody, HttpMessage, HttpRequest, HttpResponse, isMessage} from "./contract";
 import {modify} from "./util/objects";
 
-async function* yieldStringify(data: object): AsyncIterable<Data> {
-    yield typeof data === 'undefined' ? "" : JSON.stringify(data)
+async function* yieldStringify(data: any): AsyncIterable<Data> {
+    yield JSON.stringify(data)
 }
 
 export class JsonBody<T = any> implements AsyncIterable<Data> {
@@ -12,6 +12,10 @@ export class JsonBody<T = any> implements AsyncIterable<Data> {
         "You probably forgot to call toJSON(message) on your HttpMessage, which would have called Symbol.asyncIterator on this body.";
 
     constructor(public readonly data: Readonly<T>) {
+        // noinspection SuspiciousTypeOfGuard
+        if (typeof data !== 'object' && typeof data !== 'string' && typeof data !== 'number') {
+            throw new Error(`Cannot serialize to json: ${data} (${typeDescription(data)})`);
+        }
     }
 
     [Symbol.asyncIterator](): AsyncIterator<Data> {

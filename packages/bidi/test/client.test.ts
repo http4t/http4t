@@ -12,7 +12,9 @@ import {responseOf} from "@http4t/core/responses";
 import {JsonPathError} from "@http4t/result/JsonPathError";
 import {problem} from "@http4t/result/JsonPathResult";
 import chai from "chai";
-const { expect } = chai;
+import {jsonParseError} from "./utils/json";
+
+const {expect} = chai;
 
 async function catchError(fn: () => any): Promise<any> {
     try {
@@ -146,8 +148,9 @@ describe('buildClient()', () => {
             )
         };
 
+        const notJson = "not json}{";
         const brokenServer: HttpHandler = handler(async () => {
-                return responseOf(200, "not json}{")
+                return responseOf(200, notJson)
             }
         );
 
@@ -155,8 +158,8 @@ describe('buildClient()', () => {
 
         const e: JsonPathError = await catchError(() => c.example());
         expect(e).deep.contains({
-            problems: [problem("Expected valid json- \"Unexpected token o in JSON at position 1\"", ["response", "body"], "example")],
-            actual: {response: responseOf(200, "not json}{")}
+            problems: [problem("Expected valid json- " + jsonParseError(notJson), ["response", "body"], "example")],
+            actual: {response: responseOf(200, notJson)}
         });
     });
 });

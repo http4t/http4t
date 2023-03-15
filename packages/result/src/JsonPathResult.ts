@@ -42,7 +42,7 @@ export class Problem {
     }
 
     toString(): string {
-        return `${this.producedBy ? `${this.producedBy} ` : ""}${pathToString(this.path)}: ${this.message}`
+        return `${this.producedBy ? `[${this.producedBy}] ` : ""}${pathToString(this.path)}: ${this.message}`
     }
 }
 

@@ -8,6 +8,7 @@ import {response} from "@http4t/bidi/responses";
 import {expectFailure, expectSuccess} from "@http4t/result";
 import {RoutingResult} from "@http4t/bidi/lenses";
 import {problem} from "@http4t/result/JsonPathResult";
+import {jsonParseError} from "../utils/json";
 
 const {expect} = chai;
 
@@ -39,11 +40,13 @@ describe("Union lens", () => {
     it("get() fails if neither lens matches and returns problems from both lenses", async () => {
         /* TODO: all the problems is better than just the problems from the first or second lens, but it would be
         *   better if they were grouped by lens somehow */
-        const result: RoutingResult<OkResponse | NotFoundResponse> = await union.get(ok("{notJson"))
+        const notJson = "{notJson";
+        const result: RoutingResult<OkResponse | NotFoundResponse> = await union.get(ok(notJson))
+        const expectedError = jsonParseError(notJson);
 
         expect(expectFailure(result)).to.deep.eq({
             "problems": [
-                problem("Expected valid json- \"Unexpected token n in JSON at position 1\"", ["body"]),
+                problem("Expected valid json- " + expectedError, ["body"]),
                 problem("Status was not 404", ["status"])
             ],
             "response": {

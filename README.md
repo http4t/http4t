@@ -102,12 +102,12 @@ Note `name: "@http4t/my-module-test"`
   },
   "dependencies": {
     "@http4t/core": "1.0.0",
-    "@http4t/muppeteer": "^0.0.17",
+    "@http4t/muppeteer": "0.0.24",
     "@http4t/my-module": "1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
+    "@types/mocha": "^10.0.1",
     "chai": "^4.1.7",
     "mocha": "^7.0.1"
   }

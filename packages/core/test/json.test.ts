@@ -52,8 +52,7 @@ describe('JsonBody', async () => {
         expect(await parseJson(parsed)).eq(parsed);
     });
 
-    it('handles undefined', async () => {
-        const body = jsonBody(undefined);
-        expect(await bodyJson(body)).eq(undefined);
+    it('does not accept undefined', async () => {
+        expect(()=>jsonBody(undefined)).throw("Cannot serialize to json");
     });
 });

@@ -6,6 +6,9 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/.parcel-cache" />
+      <excludePattern pattern=".cache" />
+      <excludePattern pattern="dist" />
+      <excludePattern pattern="node_modules" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
