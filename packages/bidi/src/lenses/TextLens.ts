@@ -2,7 +2,7 @@ import {HttpMessage} from "@http4t/core/contract";
 import {header} from "@http4t/core/headers";
 import {success} from "@http4t/result";
 import {MessageLens, RoutingResult} from "../lenses";
-import {bufferText} from "@http4t/core/bodies";
+import {bufferText, typeDescription} from "@http4t/core/bodies";
 
 /**
  * NB: does not _check_ `Content-Type` header when extracting, but does
@@ -15,6 +15,9 @@ export class TextLens<TMessage extends HttpMessage> implements MessageLens<TMess
     }
 
     async set<SetInto extends TMessage>(into: SetInto, value: string): Promise<SetInto> {
+        if (typeof value !== "string")
+            throw new Error(`Expected a string but got ${value} (${typeDescription(value)})`)
+
         return {
             ...into,
             headers: [...into.headers, header('Content-Type', 'text/plain')],

@@ -1,8 +1,9 @@
 import {BaseResponseLens, ResponseLens, ROUTE_FAILED, RoutingResult} from "../lenses";
-import {failure, isSuccess, Result, success} from "@http4t/result";
+import {failure, isFailure, isSuccess, Result, success} from "@http4t/result";
 import {HttpResponse} from "@http4t/core/contract";
 import {prefixProducedBy} from "@http4t/result/JsonPathResult";
 import {responseOf} from "@http4t/core/responses";
+import {typeDescription} from "@http4t/core/bodies";
 
 
 export class ResultLens<EServer, TServer, EClient = EServer, TClient = TServer> extends BaseResponseLens<Result<EClient, TClient>, Result<EServer, TServer>> {
@@ -27,9 +28,13 @@ export class ResultLens<EServer, TServer, EClient = EServer, TClient = TServer> 
     }
 
     async setResponse(into: HttpResponse, value: Result<EServer, TServer>): Promise<HttpResponse> {
-        return isSuccess(value)
-            ? this.success.set(into, value.value)
-            : this.failure.set(into, value.error);
+        if (isSuccess(value)) {
+            return this.success.set(into, value.value);
+        } else {
+            if (!isFailure(value))
+                throw new Error(`Expected a Result but got ${value} (${typeDescription(value)})`);
+            return this.failure.set(into, value.error);
+        }
     }
 
 }
