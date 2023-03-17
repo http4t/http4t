@@ -3,7 +3,7 @@ import {problem} from "@http4t/result/JsonPathResult";
 import chai from "chai";
 import {CloseableHttpHandler, loggedInDocStore, startTestServer} from "./testsupport";
 import uuidPkg from "uuid";
-import {success} from "@http4t/result";
+import {failure, success} from "@http4t/result";
 import {DocStore} from "@http4t/bidi-eg-client/docstore";
 
 const {expect} = chai;
@@ -77,9 +77,14 @@ describe('store', function () {
         expect(await alice.get({id: request.id})).deep.eq(success(undefined))
     });
 
-    it('cannot edit docs I do not own', async function () {
+    it('cannot view or edit docs I do not own', async function () {
         const aliceDocId = uuid();
         await alice.post({id: aliceDocId, document: {hello: "world"}})
+
         expect(await bob.get({id: aliceDocId})).deep.eq(success(undefined));
+        expect(await bob.post({id: aliceDocId, document: {}})).deep.eq(failure({
+            reason: "forbidden",
+            message: "You do not own this document"
+        }));
     });
 });
