@@ -2,7 +2,6 @@ import {HttpMessage, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import * as responses from "@http4t/core/responses";
 import {failure, Failure, Result} from "@http4t/result";
 import {JsonPath, problem, Problem} from "@http4t/result/JsonPathResult";
-import {OpenAPIV3_1} from "./openapi";
 
 
 export const WRONG_ROUTE = "wrong-route";
@@ -31,7 +30,7 @@ export type RouteFailed = {
 };
 
 export type RoutingError = WrongRoute | RouteFailed;
-export type RoutingResult<T> = Result<RoutingError, T>;
+export type RoutingResult<T = unknown> = Result<RoutingError, T>;
 
 export function wrongRouteError(message: string, path: (string | number)[] = []): WrongRoute {
     return {type: WRONG_ROUTE, problems: [problem(message, path)]};
@@ -101,7 +100,3 @@ export type CheckResponseCompatible<TLens> = TLens extends MessageLens<infer TMe
         ? TLens
         : never
     : never;
-
-export interface OpenApiLens<TMessage extends HttpMessage = HttpMessage, T = unknown> extends MessageLens<TMessage, T> {
-    document(doc: OpenAPIV3_1.Document): Promise<OpenAPIV3_1.Document>;
-}
