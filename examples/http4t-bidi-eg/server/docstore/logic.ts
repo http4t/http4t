@@ -1,4 +1,4 @@
-import {Result, success} from "@http4t/result";
+import {failure, Result, success} from "@http4t/result";
 import {AuthError} from "@http4t/bidi/auth/authError";
 import {DocRepository} from "./impl/DocRepository";
 import {CumulativeLogger} from "../utils/Logger";
@@ -24,6 +24,14 @@ export function docStoreLogic(opts: DocStoreOpts): SecuredApi<DocStore, DocStore
         },
 
         async post(request: WithOurClaims<Doc>): Promise<Result<AuthError, { id: string }>> {
+            const existing = await store.get(request.value.id);
+            if (existing !== undefined) {
+                const {meta} = existing;
+                if (meta.owner !== request.security.principal.userName) return failure({
+                    reason: "forbidden",
+                    message: "You do not own this document"
+                });
+            }
             const doc = request.value;
             logger.info(`storing json: "${JSON.stringify(doc)}"`);
             await store.save({doc, meta: {owner: request.security.principal.userName}});
