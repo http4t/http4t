@@ -1,5 +1,5 @@
 import {NodeServer} from "@http4t/node/server";
-import {startRouter} from "./router";
+import {startRouter} from "./docStoreRouter";
 
 function expectEnv(k: string): string {
     const result = process.env[k];

@@ -55,6 +55,9 @@ export type RoutesFor<
 
     { readonly [K in keyof TServerApi]: RouteFor<TServerApi[K], TClientApi[K]> };
 
+/**
+ * Uses `TRequestGet` for method parameter and `TResponseSet` for return value
+ */
 export type ServerApiFnFor<TRoute> = TRoute extends Route<infer TRequestGet, infer TResponseGet, infer TRequestSet, infer TResponseSet>
     ? TRequestGet extends undefined
         ? HandlerFn0<TResponseSet>

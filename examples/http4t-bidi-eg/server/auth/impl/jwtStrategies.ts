@@ -2,7 +2,7 @@ import {JwtStrategy} from "@http4t/bidi-jwt";
 import {TotallyInsecureServerJwtStrategy} from "@http4t/bidi-jwt/testing";
 import {ConfigureSigner, serverJwt} from "@http4t/bidi-jwt/jose";
 import {importPKCS8, importSPKI} from "jose";
-import {AuthConfig, SecureAuthConfig} from "../../router";
+import {AuthConfig, SecureAuthConfig} from "../../docStoreRouter";
 
 async function secureJwtStrategy(auth: SecureAuthConfig) {
     const configureJose: ConfigureSigner = enc => {

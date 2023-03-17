@@ -1,9 +1,9 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {responseOf} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
-import {RequestLens, ROUTE_FAILED, RouteFailed, WRONG_ROUTE, WrongRoute} from "./lenses";
+import {ROUTE_FAILED, RouteFailed, RoutingResult, WRONG_ROUTE, WrongRoute} from "./lenses";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
-import {ServerApiFor, Route, Routes} from "./routes";
+import {Route, Routes, ServerApiFor} from "./routes";
 
 
 export interface RequestLifecycle {
@@ -20,14 +20,14 @@ export interface RequestLifecycle {
      *
      * Router will continue looking for a matching route
      */
-    mismatch(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: WrongRoute): Promise<void>
+    mismatch(request: HttpRequest, routeKey: string, route: Route, reason: WrongRoute): Promise<void>
 
     /**
      * This route successfully handled the request and returned response.
      *
      * The Router will not consider any more routes, and will return the result of this function.
      */
-    match(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, response: HttpResponse): Promise<HttpResponse>
+    match(request: HttpRequest, routeKey: string, route: Route, response: HttpResponse): Promise<HttpResponse>
 
     /**
      * This was the right route to handle the request, but the request is not valid for this route (e.g. the body is
@@ -37,7 +37,7 @@ export interface RequestLifecycle {
      * be the response in the reason parameter. You might have a debug RequestLifecycle that adds reason.problems to the
      * body of the response, and a production handler that returns the unmodified `reason.response`.
      */
-    clientError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: RouteFailed): Promise<HttpResponse>
+    clientError(request: HttpRequest, routeKey: string, route: Route, reason: RouteFailed): Promise<HttpResponse>
 
     /**
      * Router has tried every available route, and none matched the request
@@ -57,15 +57,21 @@ export interface RequestLifecycle {
      *
      * *NB: If this method ever throws an exception the router will print stack trace and return an empty 500*
      */
-    serverError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, error: any): Promise<HttpResponse>
+    serverError(request: HttpRequest, routeKey: string, route: Route, error: any): Promise<HttpResponse>
 }
 
+
+export type RoutingContext<TRoutes extends Routes> = {
+    route: keyof ServerApiFor<TRoutes>
+}
+
+export type ApiBuilder<TRoutes extends Routes> = (request: HttpRequest, context: RoutingContext<TRoutes>) => Promise<ServerApiFor<TRoutes>>;
 
 export class Router<TRoutes extends Routes> implements HttpHandler {
     private readonly alphaOrderedRoutes: [keyof TRoutes & string, Route][]
 
     constructor(private readonly routes: TRoutes,
-                private readonly routeBehaviours: ServerApiFor<TRoutes>,
+                private readonly api: ApiBuilder<TRoutes>,
                 private readonly lifecycle: RequestLifecycle
     ) {
         /*  JS does not provided guarantees on Object.entries ordering.
@@ -86,21 +92,22 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
 
             for (const [routeName, route] of this.alphaOrderedRoutes) {
                 try {
-                    const requestMappingResult = await (route.request as RequestLens<any>).get(request);
+                    const routingResult: RoutingResult = await route.request.get(request);
 
-                    if (isFailure(requestMappingResult)) {
-                        switch (requestMappingResult.error.type) {
+                    if (isFailure(routingResult)) {
+                        switch (routingResult.error.type) {
                             case WRONG_ROUTE:
-                                await this.lifecycle.mismatch(request, routeName, route, requestMappingResult.error);
+                                await this.lifecycle.mismatch(request, routeName, route, routingResult.error);
                                 continue;
                             case ROUTE_FAILED:
-                                return this.lifecycle.clientError(request, routeName, route, requestMappingResult.error);
+                                return this.lifecycle.clientError(request, routeName, route, routingResult.error);
                         }
                     }
 
-                    const logicResult = await this.routeBehaviours[routeName](requestMappingResult.value);
-                    const response = await route.response.set(responseOf(200), logicResult);
-                    return this.lifecycle.match(request, routeName, route, response);
+                    const apiResult = await this.executeApiFn(request, routeName, routingResult.value);
+                    const httpResponse = await route.response.set(responseOf(200), apiResult);
+                    return this.lifecycle.match(request, routeName, route, httpResponse);
+
                 } catch (e: any) {
                     return await this.lifecycle.serverError(request, routeName, route, e);
                 }
@@ -111,11 +118,18 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
             return responseOf(500)
         }
     }
+
+    private async executeApiFn(request: HttpRequest, routeName: keyof TRoutes, arg: any) {
+        const api = await this.api(request, {route: routeName});
+        const apiFn = api[routeName];
+        const result = await apiFn(arg);
+        return result;
+    }
 }
 
 export function buildRouter<TRoutes extends Routes>(
     routes: TRoutes,
-    handlers: ServerApiFor<TRoutes>,
+    api: ServerApiFor<TRoutes> | ApiBuilder<TRoutes>,
     lifecycle: RequestLifecycle = PROD_LIFECYCLE): HttpHandler {
-    return new Router(routes, handlers, lifecycle);
+    return new Router(routes, typeof api === "function" ? api : async () => api, lifecycle);
 }
