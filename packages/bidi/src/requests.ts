@@ -1,15 +1,16 @@
-import {HttpMessage, Method} from "@http4t/core/contract";
+import {HttpMessage, HttpRequest, Method} from "@http4t/core/contract";
 import {MessageLens, RequestLens} from "./lenses";
-import {intersect, IntersectionLens} from "./lenses/IntersectionLens";
+import {intersect} from "./lenses/IntersectionLens";
 import {expectMethod} from "./lenses/MethodLens";
 import {PathLens} from "./lenses/PathLens";
 import {literal} from "./paths/Literal";
-import {isPathMatcher, PathMatcher} from "./paths/PathMatcher";
+import {PathMatcher} from "./paths/PathMatcher";
+import {named} from "./messages";
 
-export type PathLike<TPath = undefined> = RequestLens<TPath> | PathMatcher<TPath> | string
+export type PathLike<TPath = undefined> = PathMatcher<TPath> | string;
 
-export function request<TPath>(method: Method, path: RequestLens<TPath> | PathMatcher<TPath>): RequestLens<TPath>;
 export function request(method: Method, path: string): RequestLens<undefined>;
+export function request<TPath>(method: Method, path: PathMatcher<TPath>): RequestLens<TPath>;
 
 export function request<TBody = unknown>(
     method: Method,
@@ -19,27 +20,31 @@ export function request<TBody = unknown>(
 export function request<TPath, TBody = unknown>(
     method: Method,
     path: PathLike<TPath>,
-    body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<TPath & TBody>;
+    body: RequestLens<TBody> | MessageLens<HttpMessage, TBody>): RequestLens<{ path: TPath, body: TBody }>;
+
 
 export function request<TPath extends object, TBody extends object>(
     method: Method,
     pathLike: PathLike<TPath>,
     body?: RequestLens<TBody> | MessageLens<HttpMessage, TBody>
-): RequestLens<TPath> | RequestLens<TPath & TBody> {
+): RequestLens<TPath> | RequestLens<TBody> | RequestLens<{ path: TPath, body: TBody }> {
 
     const path: RequestLens<TPath> =
         typeof pathLike === 'string'
             ? new PathLens(literal(pathLike)) as any as PathLens<TPath>
-            : isPathMatcher(pathLike)
-            ? new PathLens(pathLike)
-            : pathLike;
+            : new PathLens(pathLike);
 
-    const methodAndPath = new IntersectionLens(
+    const methodAndPath: MessageLens<HttpRequest, TPath, TPath> = intersect(
         expectMethod(method),
         path);
 
     return body
-        ? intersect(methodAndPath, body as RequestLens<TBody>)
+        ? typeof pathLike === 'string'
+            ? intersect(methodAndPath as any as RequestLens<undefined>, body) as RequestLens<TBody>
+            : named({
+                path: methodAndPath,
+                body
+            })
         : methodAndPath;
 }
 

@@ -93,10 +93,15 @@ describe('buildClient()', () => {
             return {accounts: accounts[request.username] || []};
         }
 
-        async function createAccount(request: { username: string, account: Account }): Promise<Account> {
-            if (!accounts[request.username]) accounts[request.username] = [];
-            accounts[request.username].push(request.account)
-            return request.account;
+        async function createAccount(request: { path: { username: string }, body: { account: Account } }): Promise<Account> {
+            const username = request.path.username;
+            const account = request.body.account;
+
+            if (!accounts[username]) accounts[username] = [];
+
+            accounts[username].push(account)
+
+            return account;
         }
 
         const server = buildRouter(routes, {userAccounts, createAccount});
@@ -106,8 +111,8 @@ describe('buildClient()', () => {
 
         const createdAccount = {name: "bob's awesome account"};
         expect(await client.createAccount({
-            username: "bob",
-            account: createdAccount
+            path: {username: "bob"},
+            body: {account: createdAccount}
         })).deep.eq(createdAccount);
 
         expect(await client.userAccounts({username: "bob"}))
