@@ -3,20 +3,18 @@ import {isFailure, success} from "@http4t/result";
 import {MessageLens, RoutingResult} from "../lenses";
 
 export class IntersectionLens<TMessage extends HttpMessage,
-    AGet extends object | undefined,
-    BGet extends object | undefined,
-    ASet extends object | undefined = AGet,
-    BSet extends object | undefined = BGet>
-    implements MessageLens<TMessage, AGet & BGet, ASet & BSet> {
+    A extends object | undefined,
+    B extends object | undefined>
+    implements MessageLens<TMessage, A & B> {
 
-    constructor(private readonly a: MessageLens<TMessage, AGet, ASet>,
-                private readonly b: MessageLens<TMessage, BGet, BSet>,
-                private readonly unintersectA: (intersected: ASet & BSet) => Promise<ASet> | ASet,
-                private readonly unintersectB: (intersected: ASet & BSet) => Promise<BSet> | BSet
+    constructor(private readonly a: MessageLens<TMessage, A>,
+                private readonly b: MessageLens<TMessage, B>,
+                private readonly unintersectA: (intersected: A & B) => Promise<A> | A,
+                private readonly unintersectB: (intersected: A & B) => Promise<B> | B
     ) {
     }
 
-    async get(message: TMessage): Promise<RoutingResult<AGet & BGet>> {
+    async get(message: TMessage): Promise<RoutingResult<A & B>> {
         const aResult = await this.a.get(message);
 
         if (isFailure(aResult)) {
@@ -31,49 +29,43 @@ export class IntersectionLens<TMessage extends HttpMessage,
         return success(aResult.value === undefined && bResult.value === undefined ? undefined as any : {...aResult.value, ...bResult.value});
     }
 
-    async set<SetInto extends TMessage>(into: SetInto, value: ASet & BSet): Promise<SetInto> {
+    async set<SetInto extends TMessage>(into: SetInto, value: A & B): Promise<SetInto> {
         const a = await this.a.set(into, await this.unintersectA(value));
         return this.b.set(a, await this.unintersectB(value));
     }
 }
 
 export function intersect<TMessage extends HttpMessage,
-    AGet extends object | undefined,
-    ASet extends object | undefined = AGet>(
-    a: MessageLens<TMessage, AGet, ASet>,
-    b: MessageLens<TMessage, undefined, undefined>): MessageLens<TMessage, AGet, ASet>;
+    A extends object | undefined>(
+    a: MessageLens<TMessage, A>,
+    b: MessageLens<TMessage, undefined>): MessageLens<TMessage, A>;
 
 export function intersect<TMessage extends HttpMessage,
-    BGet extends object | undefined,
-    BSet extends object | undefined = BGet>(
-    a: MessageLens<TMessage, undefined, undefined>,
-    b: MessageLens<TMessage, BGet, BSet>): MessageLens<TMessage, BGet, BSet>;
+    B extends object | undefined>(
+    a: MessageLens<TMessage, undefined>,
+    b: MessageLens<TMessage, B>): MessageLens<TMessage, B>;
 
 export function intersect<TMessage extends HttpMessage,
-    AGet extends object | undefined,
-    BGet extends object | undefined,
-    ASet extends object | undefined = AGet,
-    BSet extends object | undefined = BGet>(
-    a: MessageLens<TMessage, AGet, ASet>,
-    b: MessageLens<TMessage, BGet, BSet>,
-    unintersectA: (intersected: ASet & BSet) => Promise<ASet> | ASet,
-    unintersectB: (intersected: ASet & BSet) => Promise<BSet> | BSet): MessageLens<TMessage, AGet & BGet, ASet & BSet>;
+    A extends object | undefined,
+    B extends object | undefined>(
+    a: MessageLens<TMessage, A>,
+    b: MessageLens<TMessage, B>,
+    unintersectA: (intersected: A & B) => Promise<A> | A,
+    unintersectB: (intersected: A & B) => Promise<B> | B): MessageLens<TMessage, A & B>;
 
 export function intersect<TMessage extends HttpMessage,
-    AGet extends object | undefined,
-    BGet extends object | undefined,
-    ASet extends object | undefined = AGet,
-    BSet extends object | undefined = BGet>(
-    a: MessageLens<TMessage, AGet, ASet>,
-    b: MessageLens<TMessage, BGet, BSet>,
-    unintersectA?: (intersected: ASet & BSet) => Promise<ASet> | ASet,
-    unintersectB?: (intersected: ASet & BSet) => Promise<BSet> | BSet): MessageLens<TMessage, AGet & BGet, ASet & BSet> {
+    A extends object | undefined,
+    B extends object | undefined>(
+    a: MessageLens<TMessage, A>,
+    b: MessageLens<TMessage, B>,
+    unintersectA?: (intersected: A & B) => Promise<A> | A,
+    unintersectB?: (intersected: A & B) => Promise<B> | B): MessageLens<TMessage, A & B> {
 
     const unintersectA1 = unintersectA
-        || (async (_) => undefined) as (intersected: ASet & BSet) => Promise<ASet>;
+        || (async (_) => undefined) as (intersected: A & B) => Promise<A>;
 
     const unintersectB1 = unintersectB
-        || (async (ab) => ab) as (intersected: ASet & BSet) => Promise<BSet>;
+        || (async (ab) => ab) as (intersected: A & B) => Promise<B>;
 
-    return new IntersectionLens<TMessage, AGet, BGet, ASet, BSet>(a, b, unintersectA1 as any, unintersectB1 as any);
+    return new IntersectionLens<TMessage, A, B>(a, b, unintersectA1 as any, unintersectB1 as any);
 }

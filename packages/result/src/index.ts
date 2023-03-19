@@ -113,7 +113,7 @@ export function onFailure<E, T>(result: Result<E, T>, block: (error: E) => any =
 
 
 /**
- * Unwrap a Result by returning the success value or calling errorToValue to mapping the failure reason to a plain value.
+ * Unwrap a Result by returning the success value or calling errorToValue to map the failure reason to a plain value.
  */
 export function recover<S, T extends S, U extends S, E>(result: Result<E, T>, errorToValue: (error: E) => U): S {
     return get(mapFailure(result, errorToValue) as Result<S, S>);

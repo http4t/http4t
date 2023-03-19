@@ -6,7 +6,7 @@ import {NodeServer} from "@http4t/node/server";
 import {isFailure} from "@http4t/result";
 import {PoolConfig} from 'pg';
 import {authClient} from "@http4t/bidi-eg-client/auth";
-import {DocStore, docStoreClientRoutes} from "@http4t/bidi-eg-client/docstore";
+import {DocStore, docStoreClient} from "@http4t/bidi-eg-client/docstore";
 import {RouterConfig, startRouter} from "@http4t/bidi-eg-server/docStoreRouter";
 
 export type CloseableHttpHandler = HttpHandler & Closeable;
@@ -63,5 +63,5 @@ export async function loggedInDocStore(httpClient: HttpHandler, opts: { userName
     const jwt = await auth.login(creds);
     if (isFailure(jwt)) throw new Error(jwt.error);
 
-    return docStoreClientRoutes(httpClient, jwt.value);
+    return docStoreClient(httpClient, jwt.value);
 }

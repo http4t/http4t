@@ -5,20 +5,18 @@ import {handleError} from "./utils/filters/errors";
 import {httpInfoLogger} from "./utils/HttpInfoLogger";
 import {CumulativeLogger} from "./utils/Logger";
 import {migrate} from "./migrations";
-import {DocRepository} from "./docstore/impl/DocRepository";
 import {PostgresTransactionPool, Transaction} from "./utils/transactions/TransactionPool";
 import {withFilters} from "@http4t/core/Filter";
 import {routes} from "@http4t/bidi/routes";
-import {JwtStrategy} from "@http4t/bidi-jwt";
+import {JwtPayload, JwtStrategy, serverSideJwtRoutes} from "@http4t/bidi-jwt";
 import {PROD_LIFECYCLE} from "@http4t/bidi/lifecycles/ProductionRequestLifecycle";
 import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
-import {CredStore} from "./auth/impl/CredStore";
 import {PostgresStore} from "./docstore/impl/PostgresStore";
 import {InMemoryCredStore} from "./auth/impl/InMemoryCredStore";
 import {jwtStrategy} from "./auth/impl/jwtStrategies";
 import {Health, healthRoutes} from "@http4t/bidi-eg-client/health";
 import {Auth, authRoutes, DocStoreClaims} from "@http4t/bidi-eg-client/auth";
-import {DocStore, docStoreServerRoutes} from "@http4t/bidi-eg-client/docstore";
+import {DocStore, docStoreRoutes} from "@http4t/bidi-eg-client/docstore";
 import {DockerPgTransactionPool} from "./utils/transactions/DockerPgTransactionPool";
 
 import pg, {PoolConfig} from 'pg';
@@ -28,14 +26,30 @@ import {healthLogic} from "./health/logic";
 import {authLogic} from "./auth/logic";
 import {docStoreLogic} from "./docstore/logic";
 import {decorate} from "./utils/decorate";
+import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
+import {success} from "@http4t/result";
+import {SecuredRoutes} from "@http4t/bidi/auth/clientserver";
 
 const {Pool} = pg;
 
 export type RouterOpts = { jwt: JwtStrategy, lifecycle?: RequestLifecycle };
-export type Deps = {
-    creds: CredStore,
-    store: DocRepository,
-    logger: CumulativeLogger
+
+export async function jwtToOurClaims(jwt: JwtPayload): Promise<RoutingResult<DocStoreClaims>> {
+    const userName = jwt["userName"] as string;
+    if (!userName) return routeFailed("JWT did not contain 'userName'", ["headers", "Authorization"]);
+    return success({
+        principal: {
+            type: "user",
+            userName: userName
+        }
+    })
+}
+
+export function docStoreServerRoutes(opts: { jwt: JwtStrategy }): SecuredRoutes<typeof docStoreRoutes, DocStoreClaims> {
+    return serverSideJwtRoutes(
+        docStoreRoutes,
+        opts.jwt,
+        jwtToOurClaims);
 }
 
 export function docStoreRouter(opts: RouterOpts, apiBuilder: () => Promise<FullApi>): HttpHandler {

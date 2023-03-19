@@ -34,7 +34,7 @@ export function request<TPath extends object, TBody extends object>(
             ? new PathLens(literal(pathLike)) as any as PathLens<TPath>
             : new PathLens(pathLike);
 
-    const methodAndPath: MessageLens<HttpRequest, TPath, TPath> = intersect(
+    const methodAndPath: MessageLens<HttpRequest, TPath> = intersect(
         expectMethod(method),
         path);
 

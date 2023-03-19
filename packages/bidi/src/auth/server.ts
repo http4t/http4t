@@ -1,90 +1,60 @@
-import {route, Route, Routes} from "../routes";
+import {route, Route} from "../routes";
 import {WithSecurity} from "./withSecurity";
 import {isFailure, Result, success} from "@http4t/result";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
+import {SecuredRoutes} from "./clientserver";
 import {AuthError} from "./authError";
 
-export type SecuredRouteFor<TRoute, TToken, TClaims, TAuthError> =
-    TRoute extends Route<infer TRequestGet, Result<TAuthError, infer Out>, infer TRequestSet>
-        ? Route<WithSecurity<TRequestGet, TClaims>,
-            Result<TAuthError, Out>,
-            WithSecurity<TRequestSet, TToken>>
-        : never;
-
-/**
- * Maps routes, wrapping request lenses' `TRequestGet` in `WithSecurity<TRequestGet,TClaims>` and `TRequestSet` in `WithSecurity<TRequestSet,TToken>`
- *
- * Intuitively: the server will want to get `TClaims` so it can check them, and the client will want to set `TToken`
- * to authenticate itself to the server
- *
- * The inverse of {@link UnsecuredRoutesFor}
- */
-export type SecuredRoutesFor<TRoutes extends Routes,
-    TToken,
-    TClaims,
-    TAuthError = AuthError> =
-    { readonly [K in keyof TRoutes]: SecuredRouteFor<TRoutes[K], TToken, TClaims, TAuthError> }
-
-export class ServerSecuredRequestLens<T, TToken, TClaims> extends BaseRequestLens<WithSecurity<T, TClaims>, WithSecurity<T, TToken>> {
-    constructor(private readonly unsecuredLens: RequestLens<T>,
-                private readonly tokenLens: RequestLens<TClaims, TToken>) {
+export class TokenToClaimsLens<T, TToken, TClaims> extends BaseRequestLens<WithSecurity<T, TClaims>> {
+    constructor(private readonly clientSideLens: RequestLens<WithSecurity<T, TToken>>,
+                private readonly tokenToClaims: (token: TToken) => Promise<RoutingResult<TClaims>>) {
         super();
     }
 
     async get(from: HttpRequest): Promise<RoutingResult<WithSecurity<T, TClaims>>> {
-        const routeResult = await this.unsecuredLens.get(from);
-        if (isFailure(routeResult)) return routeResult;
+        const tokenResult = await this.clientSideLens.get(from);
+        if (isFailure(tokenResult)) return tokenResult;
 
-        const claimsResult = await this.tokenLens.get(from);
+        const claimsResult = await this.tokenToClaims(tokenResult.value.security);
         if (isFailure(claimsResult)) return claimsResult;
 
         return success({
             security: claimsResult.value,
-            value: routeResult.value
+            value: tokenResult.value.value
         });
     }
 
-    async setRequest(into: HttpRequest, value: WithSecurity<T, TToken>): Promise<HttpRequest> {
-        const withToken = await this.tokenLens.set(into, value.security);
-        return this.unsecuredLens.set(withToken, value.value)
+    async setRequest(into: HttpRequest, value: WithSecurity<T, TClaims>): Promise<HttpRequest> {
+        throw new Error(`${Object.getPrototypeOf(this).name} is not intended to be used by clients, only on the server`)
     }
 }
 
-export function serverSecuredRoute<In, Out, TToken, TClaims, TAuthError>(
-    unsecuredRoute: Route<In, Result<TAuthError, Out>>,
-    tokenLens: RequestLens<TClaims, TToken>)
+export function tokenToClaimsRoute<In, Out, TToken, TClaims, TAuthError>(
+    unsecuredRoute: Route<WithSecurity<In, TToken>, Result<TAuthError, Out>>,
+    tokenToClaims: (token: TToken) => Promise<RoutingResult<TClaims>>)
 
-    : Route<WithSecurity<In, TClaims>, Result<TAuthError, Out>, WithSecurity<In, TToken>> {
+    : Route<WithSecurity<In, TClaims>, Result<TAuthError, Out>> {
 
     return route(
-        new ServerSecuredRequestLens(unsecuredRoute.request, tokenLens),
+        new TokenToClaimsLens(unsecuredRoute.request, tokenToClaims),
         unsecuredRoute.response);
 }
 
-/**
- *
- *
- * See `@http4t/bidi-jwt/jwtSecuredRoutes` for example usage
- *
- * @param unsecuredRoutes routes to be wrapped in {@link SecuredRoutesFor}
- * @param tokenLens will typically (on the server) `get` and validate `TToken` from the request and then map it to
- *                  `TClaims`, and (on the client) `set` a static `TToken` on the request that the client has obtained
- *                  from the server
- */
-export function serverSecuredRoutes<TRoutes extends Routes, TToken, TClaims, TAuthError>(
-    unsecuredRoutes: TRoutes,
-    tokenLens: RequestLens<TClaims, TToken>)
+export function tokenToClaimsRoutes<TRoutes extends SecuredRoutes<TRoutes, TToken, TAuthError>, TToken, TClaims, TAuthError = AuthError>(
+    tokenSecuredRoutes: TRoutes,
+    tokenToClaims: (token: TToken) => Promise<RoutingResult<TClaims>>)
 
-    : SecuredRoutesFor<TRoutes, TToken, TClaims, TAuthError> {
+    : SecuredRoutes<TRoutes, TClaims, TAuthError> {
 
-    return Object.entries(unsecuredRoutes)
+    return Object.entries(tokenSecuredRoutes)
         .reduce(
-            (previousValue, [k, route]) => {
-                const secured = serverSecuredRoute(
-                    route as Route<unknown, Result<TAuthError, unknown>>,
-                    tokenLens);
+            (previousValue, [k, r]) => {
+                const secured = tokenToClaimsRoute(
+                    r as Route<WithSecurity<any, TToken>, Result<TAuthError, any>>,
+                    tokenToClaims);
                 return Object.assign({}, previousValue, {[k]: secured})
             },
-            {} as SecuredRoutesFor<TRoutes, TToken, TClaims, TAuthError>);
+            {} as SecuredRoutes<TRoutes, TClaims, TAuthError>);
 }
+

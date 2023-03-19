@@ -6,16 +6,16 @@ import {responseOf} from "@http4t/core/responses";
 import {typeDescription} from "@http4t/core/bodies";
 
 
-export class ResultLens<EServer, TServer, EClient = EServer, TClient = TServer> extends BaseResponseLens<Result<EClient, TClient>, Result<EServer, TServer>> {
-    constructor(private readonly failure: ResponseLens<EClient, EServer>,
-                private readonly success: ResponseLens<TClient, TServer>) {
+export class ResultLens<E = unknown, T = unknown> extends BaseResponseLens<Result<E, T>> {
+    constructor(private readonly failure: ResponseLens<E>,
+                private readonly success: ResponseLens<T>) {
         super();
     }
 
-    async get(from: HttpResponse): Promise<RoutingResult<Result<EClient, TClient>>> {
-        const s: RoutingResult<TClient> = await this.success.get(from);
+    async get(from: HttpResponse): Promise<RoutingResult<Result<E, T>>> {
+        const s: RoutingResult<T> = await this.success.get(from);
         if (isSuccess(s)) return success(s);
-        const f: RoutingResult<EClient> = await this.failure.get(from);
+        const f: RoutingResult<E> = await this.failure.get(from);
         if (isSuccess(f)) return success(failure(f.value))
 
         return failure({
@@ -27,7 +27,7 @@ export class ResultLens<EServer, TServer, EClient = EServer, TClient = TServer> 
         });
     }
 
-    async setResponse(into: HttpResponse, value: Result<EServer, TServer>): Promise<HttpResponse> {
+    async setResponse(into: HttpResponse, value: Result<E, T>): Promise<HttpResponse> {
         if (isSuccess(value)) {
             return this.success.set(into, value.value);
         } else {
@@ -39,8 +39,8 @@ export class ResultLens<EServer, TServer, EClient = EServer, TClient = TServer> 
 
 }
 
-export function result<EServer, TServer, EClient = EServer, TClient = TServer>(
-    failure: ResponseLens<EClient, EServer>,
-    success: ResponseLens<TClient, TServer>): ResponseLens<Result<EClient, TClient>, Result<EServer, TServer>> {
+export function result<E = unknown, T = unknown>(
+    failure: ResponseLens<E>,
+    success: ResponseLens<T>): ResponseLens<Result<E, T>> {
     return new ResultLens(failure, success);
 }

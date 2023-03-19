@@ -35,11 +35,6 @@ export type UnsecuredRouteFor<TRoute> =
 
         : never;
 
-/**
- * Maps `TRoutes`, lifting `TRequestGet` out of `WithSecurity<TRequestGet, TClaims>` and `TRequestSet` out of `WithSecurity<TRequestSet, TClaims>`
- *
- * The inverse of {@link SecuredRoutesFor}
- */
 export type UnsecuredRoutesFor<TRoutes extends Routes> = { readonly [K in keyof TRoutes]: UnsecuredRouteFor<TRoutes[K]> }
 
 export function tokenProvidedRoute<TRoute extends Route<WithSecurity<any, TToken>, any>, TToken>(

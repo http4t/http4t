@@ -6,8 +6,6 @@ import {spawnPromise} from "./util/processes";
         packages("examples"),
         packages("packages"));
     for (const pkg of Object.values(allPackages)) {
-        if (pkg.path.endsWith("/test"))
-            continue;
         console.log(`Building ${pkg.path}`);
         await spawnPromise("yarn", ["run", "build"], pkg.path);
     }
