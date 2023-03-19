@@ -11,8 +11,8 @@ import {routes} from "@http4t/bidi/routes";
 import {JwtPayload, JwtStrategy, serverSideJwtRoutes} from "@http4t/bidi-jwt";
 import {PROD_LIFECYCLE} from "@http4t/bidi/lifecycles/ProductionRequestLifecycle";
 import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
-import {PostgresStore} from "./docstore/impl/PostgresStore";
-import {InMemoryCredStore} from "./auth/impl/InMemoryCredStore";
+import {PostgresDocRepository} from "./docstore/impl/PostgresDocRepository";
+import {InMemoryCredentialRepository} from "./auth/impl/InMemoryCredentialRepository";
 import {jwtStrategy} from "./auth/impl/jwtStrategies";
 import {Health, healthRoutes} from "@http4t/bidi-eg-client/health";
 import {Auth, authRoutes, DocStoreClaims} from "@http4t/bidi-eg-client/auth";
@@ -102,7 +102,7 @@ export async function startRouter(opts: RouterConfig): Promise<HttpHandler & Clo
         : pgTransactionPool;
 
 
-    const credStore = new InMemoryCredStore();
+    const credStore = new InMemoryCredentialRepository();
 
     await migrate(transactionPool);
 
@@ -111,7 +111,7 @@ export async function startRouter(opts: RouterConfig): Promise<HttpHandler & Clo
 
         const deps = {
             creds: credStore,
-            store: new PostgresStore(transaction),
+            store: new PostgresDocRepository(transaction),
             logger,
         };
         const api = intersection(

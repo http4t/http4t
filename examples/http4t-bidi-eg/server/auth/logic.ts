@@ -1,9 +1,9 @@
 import {isFailure, Result, success} from "@http4t/result";
 import {JwtStrategy, JwtString} from "@http4t/bidi-jwt";
-import {CredStore} from "./impl/CredStore";
+import {CredentialRepository} from "./impl/CredentialRepository";
 import {Auth, User} from "@http4t/bidi-eg-client/auth";
 
-export type AuthOpts = { creds: CredStore, jwt: JwtStrategy };
+export type AuthOpts = { creds: CredentialRepository, jwt: JwtStrategy };
 
 export function authLogic(opts: AuthOpts): Auth {
     const {creds, jwt} = opts;

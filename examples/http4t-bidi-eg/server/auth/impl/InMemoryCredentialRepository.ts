@@ -1,11 +1,11 @@
 import {failure, Result, success} from "@http4t/result";
-import {CredStore} from "./CredStore";
-import {Creds} from "@http4t/bidi-eg-client/auth";
+import {CredentialRepository} from "./CredentialRepository";
+import {Credentials} from "@http4t/bidi-eg-client/auth";
 
-export class InMemoryCredStore implements CredStore {
-    private readonly creds: { [userName: string]: Creds } = {};
+export class InMemoryCredentialRepository implements CredentialRepository {
+    private readonly creds: { [userName: string]: Credentials } = {};
 
-    async check(creds: Creds): Promise<Result<string, void>> {
+    async check(creds: Credentials): Promise<Result<string, void>> {
         const {userName, password} = creds;
         const existingCreds = this.creds[userName];
         if (!existingCreds) return failure(`User '${userName}' does not exist`)
@@ -14,7 +14,7 @@ export class InMemoryCredStore implements CredStore {
 
     }
 
-    async save(creds: Creds): Promise<Result<string, void>> {
+    async save(creds: Credentials): Promise<Result<string, void>> {
         const {userName} = creds;
         const existingCreds = this.creds[userName];
         if (existingCreds) return failure(`User '${userName}' already exists`)

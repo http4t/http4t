@@ -4,14 +4,14 @@ import {DocRepository} from "./impl/DocRepository";
 import {CumulativeLogger} from "../utils/Logger";
 import {SecuredApi} from "@http4t/bidi/auth/withSecurity";
 import {Doc, DocStore} from "@http4t/bidi-eg-client/docstore";
-import {DocStoreClaims, WithOurClaims} from "@http4t/bidi-eg-client/auth";
+import {DocStoreClaims, WithDocStoreClaims} from "@http4t/bidi-eg-client/auth";
 
 export type DocStoreOpts = { store: DocRepository, logger: CumulativeLogger };
 
 export function docStoreLogic(opts: DocStoreOpts): SecuredApi<DocStore, DocStoreClaims> {
     const {logger, store} = opts;
     return {
-        async get(request: WithOurClaims<{ id: string }>): Promise<Result<AuthError, Doc | undefined>> {
+        async get(request: WithDocStoreClaims<{ id: string }>): Promise<Result<AuthError, Doc | undefined>> {
             const result = await store.get(request.value.id);
             logger.info(`retrieved json: ${JSON.stringify(result)}`);
 
@@ -23,7 +23,7 @@ export function docStoreLogic(opts: DocStoreOpts): SecuredApi<DocStore, DocStore
             return success(doc);
         },
 
-        async post(request: WithOurClaims<Doc>): Promise<Result<AuthError, { id: string }>> {
+        async post(request: WithDocStoreClaims<Doc>): Promise<Result<AuthError, { id: string }>> {
             const existing = await store.get(request.value.id);
             if (existing !== undefined) {
                 const {meta} = existing;
@@ -38,7 +38,7 @@ export function docStoreLogic(opts: DocStoreOpts): SecuredApi<DocStore, DocStore
             return success({id: doc.id});
         },
 
-        async storeDocThenFail(request: WithOurClaims<Doc>): Promise<Result<AuthError, undefined>> {
+        async storeDocThenFail(request: WithDocStoreClaims<Doc>): Promise<Result<AuthError, undefined>> {
             const doc = request.value;
             logger.info('throwing an exception');
             await store.save({doc, meta: {owner: request.security.principal.userName}});

@@ -10,29 +10,29 @@ import {response} from "@http4t/bidi/responses";
 export type DocStoreClaims = {
     principal: { type: "user", userName: string }
 }
-export type WithOurClaims<T> = WithSecurity<T, DocStoreClaims>;
-export type Creds = { userName: string, password: string };
+export type WithDocStoreClaims<T> = WithSecurity<T, DocStoreClaims>;
+export type Credentials = { userName: string, password: string };
 export type User = {
     userName: string
 }
 
 export interface Auth {
-    register(request: Creds): Promise<Result<string, User>>
+    register(request: Credentials): Promise<Result<string, User>>
 
-    login(request: Creds): Promise<Result<string, JwtString>>
+    login(request: Credentials): Promise<Result<string, JwtString>>
 }
 
 export function authRoutes(): RoutesFor<Auth> {
     return {
         register: route(
-            request("POST", "/register", json<Creds>()),
+            request("POST", "/register", json<Credentials>()),
             result(
                 response(400, text()),
                 response(200, json<User>())
             )
         ),
         login: route(
-            request("POST", "/login", json<Creds>()),
+            request("POST", "/login", json<Credentials>()),
             result(
                 response(403, text()),
                 response(200, text()))
