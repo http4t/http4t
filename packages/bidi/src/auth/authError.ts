@@ -3,6 +3,7 @@ import {statuses} from "../lenses/ResponseByStatusLens";
 import {json} from "../lenses/JsonLens";
 import {Result} from "@http4t/result";
 import {result} from "../lenses/ResultLens";
+import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 /**
  * A default type for `TAuthError`, if you don't want to roll your own
@@ -17,13 +18,14 @@ export function authError(): ResponseLens<AuthError> {
         401: json<AuthError>(),
         403: json<AuthError>()
     }, value => {
-        switch (value.reason) {
+        const reason = value.reason;
+        switch (reason) {
             case "unauthorized":
                 return 401;
             case "forbidden":
                 return 403;
             default:
-                return "exhaustive check" as never;
+                return assertExhaustive(reason);
         }
     })
 }

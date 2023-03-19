@@ -4,6 +4,7 @@ import * as https from "https";
 import {RequestOptions} from "https";
 import {requestHttp4tToNode, responseNodeToHttp4t} from "./conversions";
 import {bodyToStream} from "./streams";
+import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 export type Handler = (options: RequestOptions, callback?: (res: http.IncomingMessage) => void) => http.ClientRequest;
 
@@ -14,17 +15,17 @@ function getStrategy(protocol: 'http:' | 'https:'): { request: Handler } {
         case 'https:':
             return https;
         default:
-            throw new Error(`unrecognised protocol: '${protocol}'`);
+            return assertExhaustive(protocol);
     }
 }
 
 
 export class ClientHandler implements HttpHandler {
-    static defaultTo(protocol: 'http' | 'https'): ClientHandler {
-        return new ClientHandler(protocol);
+    private constructor(private readonly defaultProtocol: "http" | "https") {
     }
 
-    private constructor(private readonly defaultProtocol: "http" | "https") {
+    static defaultTo(protocol: 'http' | 'https'): ClientHandler {
+        return new ClientHandler(protocol);
     }
 
     async handle(request: HttpRequest): Promise<HttpResponse> {

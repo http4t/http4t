@@ -2,6 +2,7 @@ import {json, statuses} from "@http4t/bidi/responses";
 import {ok, toJSON} from "@http4t/core/responses";
 import chai from "chai";
 import {AuthError} from "@http4t/bidi/auth/authError";
+import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 const {expect} = chai;
 
@@ -12,13 +13,14 @@ describe('ResponseByStatusLens', function () {
             403: json<AuthError>()
         },
         (value: AuthError) => {
-            switch (value.reason) {
+            const reason = value.reason;
+            switch (reason) {
                 case "unauthorized":
                     return 401;
                 case "forbidden":
                     return 403;
                 default:
-                    return "exhaustive check" as never;
+                    return assertExhaustive(reason);
             }
         });
 

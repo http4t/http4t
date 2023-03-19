@@ -4,6 +4,7 @@ import {isFailure} from "@http4t/result";
 import {ROUTE_FAILED, RouteFailed, RoutingResult, WRONG_ROUTE, WrongRoute} from "./lenses";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
 import {Route, Routes, ServerApiFor} from "./routes";
+import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 
 export interface RequestLifecycle {
@@ -95,12 +96,15 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
                     const routingResult: RoutingResult = await route.request.get(request);
 
                     if (isFailure(routingResult)) {
-                        switch (routingResult.error.type) {
+                        const errorType = routingResult.error.type;
+                        switch (errorType) {
                             case WRONG_ROUTE:
                                 await this.lifecycle.mismatch(request, routeName, route, routingResult.error);
                                 continue;
                             case ROUTE_FAILED:
                                 return this.lifecycle.clientError(request, routeName, route, routingResult.error);
+                            default:
+                                return assertExhaustive(errorType);
                         }
                     }
 

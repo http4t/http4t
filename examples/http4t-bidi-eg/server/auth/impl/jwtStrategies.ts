@@ -3,6 +3,7 @@ import {TotallyInsecureServerJwtStrategy} from "@http4t/bidi-jwt/testing";
 import {ConfigureSigner, serverJwt} from "@http4t/bidi-jwt/jose";
 import {importPKCS8, importSPKI} from "jose";
 import {AuthConfig, SecureAuthConfig} from "../../docStoreRouter";
+import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 async function secureJwtStrategy(auth: SecureAuthConfig) {
     const configureJose: ConfigureSigner = enc => {
@@ -20,12 +21,14 @@ async function secureJwtStrategy(auth: SecureAuthConfig) {
 }
 
 export async function jwtStrategy(auth: AuthConfig): Promise<JwtStrategy> {
-    switch (auth.type) {
+    const authType = auth.type;
+
+    switch (authType) {
         case "secure":
             return await secureJwtStrategy(auth);
         case "insecure":
             return new TotallyInsecureServerJwtStrategy(auth.expectedSignature)
         default:
-            return "exhaustive check" as never;
+            return assertExhaustive(authType);
     }
 }
