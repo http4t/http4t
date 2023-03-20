@@ -1,10 +1,9 @@
 import {route, Route} from "../routes";
 import {WithSecurity} from "./withSecurity";
-import {isFailure, Result, success} from "@http4t/result";
+import {isFailure, success} from "@http4t/result";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
 import {SecuredRoutes} from "./";
-import {AuthError} from "./authError";
 
 export class TokenToClaimsLens<T, TToken, TClaims> extends BaseRequestLens<WithSecurity<T, TClaims>> {
     constructor(private readonly clientSideLens: RequestLens<WithSecurity<T, TToken>>,
@@ -30,31 +29,31 @@ export class TokenToClaimsLens<T, TToken, TClaims> extends BaseRequestLens<WithS
     }
 }
 
-export function tokenToClaimsRoute<In, Out, TToken, TClaims, TAuthError>(
-    unsecuredRoute: Route<WithSecurity<In, TToken>, Result<TAuthError, Out>>,
+export function tokenToClaimsRoute<In, Out, TToken, TClaims>(
+    unsecuredRoute: Route<WithSecurity<In, TToken>, Out>,
     tokenToClaims: (token: TToken) => Promise<RoutingResult<TClaims>>)
 
-    : Route<WithSecurity<In, TClaims>, Result<TAuthError, Out>> {
+    : Route<WithSecurity<In, TClaims>, Out> {
 
     return route(
         new TokenToClaimsLens(unsecuredRoute.request, tokenToClaims),
         unsecuredRoute.response);
 }
 
-export function tokenToClaimsRoutes<TRoutes extends SecuredRoutes<TRoutes, TToken, TAuthError>, TToken, TClaims, TAuthError = AuthError>(
+export function tokenToClaimsRoutes<TRoutes extends SecuredRoutes<TRoutes, TToken>, TToken, TClaims>(
     tokenSecuredRoutes: TRoutes,
     tokenToClaims: (token: TToken) => Promise<RoutingResult<TClaims>>)
 
-    : SecuredRoutes<TRoutes, TClaims, TAuthError> {
+    : SecuredRoutes<TRoutes, TClaims> {
 
     return Object.entries(tokenSecuredRoutes)
         .reduce(
-            (previousValue, [k, r]) => {
-                const secured = tokenToClaimsRoute(
-                    r as Route<WithSecurity<any, TToken>, Result<TAuthError, any>>,
+            (routes, [k, r]) => {
+                routes[k as keyof TRoutes] = tokenToClaimsRoute(
+                    r as Route<WithSecurity<any, TToken>, any>,
                     tokenToClaims);
-                return Object.assign({}, previousValue, {[k]: secured})
+                return routes;
             },
-            {} as SecuredRoutes<TRoutes, TClaims, TAuthError>);
+            {} as SecuredRoutes<TRoutes, TClaims>);
 }
 

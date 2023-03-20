@@ -5,9 +5,6 @@ import {Result} from "@http4t/result";
 import {result} from "../lenses/ResultLens";
 import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
-/**
- * A default type for `TAuthError`, if you don't want to roll your own
- */
 export type AuthError = {
     reason: 'unauthorized' | 'forbidden'
     message: string

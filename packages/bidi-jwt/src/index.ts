@@ -1,9 +1,9 @@
 import {RoutingResult} from "@http4t/bidi/lenses";
 import {bearerAuthHeader} from "@http4t/bidi/lenses/BearerAuthHeader";
-import {AuthError} from "@http4t/bidi/auth/authError";
-import {AuthReportingRoutes, SecuredRoutes, securedRoutes} from "@http4t/bidi/auth";
+import {SecuredRoutes, securedRoutes} from "@http4t/bidi/auth";
 import {tokenToClaimsRoutes} from "@http4t/bidi/auth/server";
 import {isFailure} from "@http4t/result";
+import {Routes} from "@http4t/bidi/routes";
 
 export type JwtString = string;
 export type JwtPayload = {
@@ -51,19 +51,21 @@ export interface JwtStrategy {
     sign(jwt: JwtPayload): Promise<JwtString>
 }
 
-export function jwtRoutes<TRoutes extends AuthReportingRoutes<TRoutes, TAuthError>, TAuthError = AuthError>(
+export function jwtRoutes<TRoutes extends Routes>(
     unsecuredRoutes: TRoutes
-): SecuredRoutes<TRoutes, JwtString, TAuthError> {
+): SecuredRoutes<TRoutes, JwtString> {
     return securedRoutes(
         unsecuredRoutes,
         bearerAuthHeader());
 }
 
-export function serverSideJwtRoutes<TRoutes extends SecuredRoutes<TRoutes, JwtString, TAuthError>, TToken, TClaims = JwtPayload, TAuthError = AuthError>(
+export function serverSideJwtRoutes<TRoutes extends SecuredRoutes<TRoutes, JwtString>,
+    TToken,
+    TClaims = JwtPayload>(
     tokenSecuredRoutes: TRoutes,
     jwtStrategy: JwtStrategy,
     tokenToClaims: (token: JwtPayload) => Promise<RoutingResult<TClaims>>
-): SecuredRoutes<TRoutes, TClaims, TAuthError> {
+): SecuredRoutes<TRoutes, TClaims> {
 
     return tokenToClaimsRoutes(
         tokenSecuredRoutes,

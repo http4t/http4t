@@ -1,19 +1,14 @@
 import {route, Route, Routes} from "../routes";
 import {WithSecurity} from "./withSecurity";
-import {AuthError} from "./authError";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
-import {isFailure, Result, success} from "@http4t/result";
+import {isFailure, success} from "@http4t/result";
 import {HttpRequest} from "@http4t/core/contract";
 
-export type AuthReportingRoute<TAuthError = AuthError> = Route<any, Result<TAuthError, any>>;
-export type AuthReportingRoutes<TRoutes extends Routes, TAuthError = AuthError> =
-    { [K in keyof TRoutes]: AuthReportingRoute<TAuthError> };
+export type SecuredRoute<TRoute extends Route, TClaimsOrToken> =
+    Route<WithSecurity<any, TClaimsOrToken>, any>;
 
-export type SecuredRoute<TRoute extends AuthReportingRoute<TAuthError>, TClaimsOrToken, TAuthError = AuthError> =
-    Route<WithSecurity<any, TClaimsOrToken>, Result<TAuthError, any>>;
-
-export type SecuredRoutes<TRoutes extends AuthReportingRoutes<TRoutes, TAuthError>, TClaimsOrToken, TAuthError = AuthError> =
-    { [K in keyof TRoutes]: SecuredRoute<TRoutes[K], TClaimsOrToken, TAuthError> }
+export type SecuredRoutes<TRoutes extends Routes, TClaimsOrToken> =
+    { [K in keyof TRoutes]: SecuredRoute<TRoutes[K], TClaimsOrToken> }
 
 export class WithSecurityLens<T, TToken> extends BaseRequestLens<WithSecurity<T, TToken>> {
     constructor(private readonly unsecuredLens: RequestLens<T>,
@@ -40,11 +35,11 @@ export class WithSecurityLens<T, TToken> extends BaseRequestLens<WithSecurity<T,
     }
 }
 
-export function securedRoute<TRoute extends Route<any, Result<TAuthError, any>>, TToken, TAuthError = AuthError>(
+export function securedRoute<TRoute extends Route, TToken>(
     unsecuredRoute: TRoute,
     tokenLens: RequestLens<TToken>)
 
-    : SecuredRoute<TRoute, TToken, TAuthError> {
+    : SecuredRoute<TRoute, TToken> {
 
     return route(
         new WithSecurityLens(unsecuredRoute.request, tokenLens),
@@ -52,19 +47,19 @@ export function securedRoute<TRoute extends Route<any, Result<TAuthError, any>>,
     );
 }
 
-export function securedRoutes<TRoutes extends AuthReportingRoutes<TRoutes, TAuthError>, TToken, TAuthError = AuthError>(
+export function securedRoutes<TRoutes extends Routes, TToken>(
     unsecuredRoutes: TRoutes,
     tokenLens: RequestLens<TToken>)
 
-    : SecuredRoutes<TRoutes, TToken, TAuthError> {
+    : SecuredRoutes<TRoutes, TToken> {
 
     return Object.entries(unsecuredRoutes)
         .reduce(
-            (previousValue, [k, route]) => {
-                const secured = securedRoute<Route<any, Result<TAuthError, any>>, TToken, TAuthError>(
-                    route as Route<unknown, Result<TAuthError, unknown>>,
+            (routes, [k, route]) => {
+                routes[k as keyof TRoutes] = securedRoute(
+                    route as Route,
                     tokenLens);
-                return Object.assign({}, previousValue, {[k]: secured})
+                return routes;
             },
-            {} as SecuredRoutes<TRoutes, TToken, TAuthError>);
+            {} as SecuredRoutes<TRoutes, TToken>);
 }

@@ -28,7 +28,7 @@ import {docStoreLogic} from "./docstore/logic";
 import {decorate} from "./utils/decorate";
 import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 import {success} from "@http4t/result";
-import {SecuredRoutes} from "@http4t/bidi/auth/clientserver";
+import {SecuredRoutes} from "@http4t/bidi/auth";
 
 const {Pool} = pg;
 
@@ -133,8 +133,6 @@ export async function startRouter(opts: RouterConfig): Promise<HttpHandler & Clo
     );
     return {
         async handle(request: HttpRequest): Promise<HttpResponse> {
-
-
             return await handler.handle(request);
         },
         async close(): Promise<void> {

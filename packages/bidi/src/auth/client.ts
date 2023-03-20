@@ -1,10 +1,9 @@
 import {route, Route, Routes} from "../routes";
 import {WithSecurity} from "./withSecurity";
-import {isFailure, Result, success} from "@http4t/result";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
 import {Mutable} from "../util/mutable";
-import {AuthReportingRoute, SecuredRoute, SecuredRoutes} from "./";
+import {SecuredRoute, SecuredRoutes} from "./";
 
 export class ProvideSecurityTokenLens<T, TToken> extends BaseRequestLens<T> {
     constructor(private readonly securedLens: RequestLens<WithSecurity<T, TToken>>,
@@ -13,12 +12,7 @@ export class ProvideSecurityTokenLens<T, TToken> extends BaseRequestLens<T> {
     }
 
     async get(from: HttpRequest): Promise<RoutingResult<T>> {
-        const serverResult = await this.securedLens.get(from);
-
-        if (isFailure(serverResult)) {
-            return serverResult;
-        }
-        return success(serverResult.value.value);
+        throw new Error(`${Object.getPrototypeOf(this).name} is not intended to be used on the server, only in clients`)
     }
 
     async setRequest(into: HttpRequest, value: T): Promise<HttpRequest> {
@@ -28,10 +22,9 @@ export class ProvideSecurityTokenLens<T, TToken> extends BaseRequestLens<T> {
 
 export type UnsecuredRouteFor<TRoute> =
     TRoute extends Route<WithSecurity<infer TRequest, infer TSecurity>,
-            Result<infer TAuthError, infer TResponse>>
+            infer TResponse>
 
-        ? Route<TRequest,
-            Result<TAuthError, TResponse>>
+        ? Route<TRequest, TResponse>
 
         : never;
 
@@ -48,16 +41,19 @@ export function tokenProvidedRoute<TRoute extends Route<WithSecurity<any, TToken
         serverRoute.response) as UnsecuredRouteFor<TRoute>;
 }
 
+/**
+ * For a route taking a request of {@link WithSecurity<{something:string},TToken>}, turns
+ */
 export function tokenProvidedRoutes<TRoutes extends SecuredRoutes<TRoutes, TToken>, TToken>(
-    serverRoutes: TRoutes,
+    routesSecuredByTToken: TRoutes,
     token: TToken)
     : UnsecuredRoutesFor<TRoutes> {
 
-    return Object.entries(serverRoutes)
+    return Object.entries(routesSecuredByTToken)
         .reduce(
             (acc, [k, route]) => {
                 const secured = tokenProvidedRoute(
-                    route as SecuredRoute<AuthReportingRoute<any>, TToken>,
+                    route as SecuredRoute<any, TToken>,
                     token);
                 acc[k as keyof UnsecuredRoutesFor<TRoutes>] = secured as any;
                 return acc;
