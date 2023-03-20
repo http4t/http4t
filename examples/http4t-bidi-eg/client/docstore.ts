@@ -43,7 +43,7 @@ export const docStoreRoutes: RoutesFor<SecuredApi<DocStore, JwtString>> = jwtRou
 export function docStoreClient(httpClient: HttpHandler, jwt: JwtString): DocStore {
     const routesWithJwtProvided = tokenProvidedRoutes(
         docStoreRoutes,
-        jwt);
+        () => jwt);
 
     return buildClient(
         routesWithJwtProvided,

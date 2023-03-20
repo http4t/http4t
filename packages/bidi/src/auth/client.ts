@@ -7,7 +7,7 @@ import {SecuredRoute, SecuredRoutes} from "./";
 
 export class ProvideSecurityTokenLens<T, TToken> extends BaseRequestLens<T> {
     constructor(private readonly securedLens: RequestLens<WithSecurity<T, TToken>>,
-                private readonly token: TToken) {
+                private readonly token: () => Promise<TToken> | TToken) {
         super();
     }
 
@@ -16,7 +16,8 @@ export class ProvideSecurityTokenLens<T, TToken> extends BaseRequestLens<T> {
     }
 
     async setRequest(into: HttpRequest, value: T): Promise<HttpRequest> {
-        return this.securedLens.set(into, {value, security: this.token});
+        const token = await this.token();
+        return this.securedLens.set(into, {value, security: token});
     }
 }
 
@@ -32,7 +33,7 @@ export type UnsecuredRoutesFor<TRoutes extends Routes> = { readonly [K in keyof 
 
 export function tokenProvidedRoute<TRoute extends Route<WithSecurity<any, TToken>, any>, TToken>(
     serverRoute: TRoute,
-    token: TToken)
+    token: () => Promise<TToken> | TToken)
 
     : UnsecuredRouteFor<TRoute> {
 
@@ -46,7 +47,7 @@ export function tokenProvidedRoute<TRoute extends Route<WithSecurity<any, TToken
  */
 export function tokenProvidedRoutes<TRoutes extends SecuredRoutes<TRoutes, TToken>, TToken>(
     routesSecuredByTToken: TRoutes,
-    token: TToken)
+    token: () => Promise<TToken> | TToken)
     : UnsecuredRoutesFor<TRoutes> {
 
     return Object.entries(routesSecuredByTToken)
