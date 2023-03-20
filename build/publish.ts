@@ -56,4 +56,4 @@ import {spawnPromise} from "./util/processes";
 }).catch(err => {
     console.error(err);
     process.exit(1);
-});DockerPgTransactionPool
+});
