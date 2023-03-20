@@ -1,5 +1,4 @@
-import {Header, HeaderName, HeaderValue, HttpBody, HttpMessage, HttpRequest, Method, ParsedAuthority} from "./contract";
-import * as headers from "./headers";
+import {Header, HttpBody, HttpRequest, Method, ParsedAuthority} from "./contract";
 import {
     appendQueries as uriAppendQueries,
     appendQuery as uriAppendQuery,
@@ -13,6 +12,7 @@ import {
 } from "./queries";
 import {Authority, Uri, UriLike} from "./uri";
 import {modify} from "./util/objects";
+import {getHeaderValue} from "./messages";
 
 /*
 Create requests
@@ -54,20 +54,6 @@ export function query(message: HttpRequest, name: string): string | undefined {
 export function queries(message: HttpRequest, name: string): (string | undefined)[] {
     const query = message.uri.query;
     return uriQueries(query, name);
-}
-
-/**
- * Case insensitive on name
- */
-export function getHeaderValue(message: HttpMessage, name: HeaderName): HeaderValue | undefined {
-    return headers.getHeaderValue(message.headers, name);
-}
-
-/**
- * Case insensitive on name
- */
-export function getHeaderValues(message: HttpMessage, name: HeaderName): HeaderValue[] {
-    return headers.getHeaderValues(message.headers, name);
 }
 
 /*

@@ -1,5 +1,5 @@
 import {HttpHandler, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {responseOf} from "@http4t/core/responses";
+import {responseOf, setHeader} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
 import {ROUTE_FAILED, RouteFailed, RoutingResult, WRONG_ROUTE, WrongRoute} from "./lenses";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
@@ -68,6 +68,19 @@ export type RoutingContext<TRoutes extends Routes> = {
 
 export type ApiBuilder<TRoutes extends Routes> = (request: HttpRequest, context: RoutingContext<TRoutes>) => Promise<ServerApiFor<TRoutes>>;
 
+export const HTTP4T_ROUTE_RESULT = "Http4t-RouteResult";
+
+export enum Http4tRouteResult {
+    // The request was not valid- the request lenses were unable to parse it
+    CLIENT_ERROR = "ClientError",
+
+    // No matching route was found
+    NO_MATCH = "NoMatch",
+
+    // No matching route was found
+    SERVER_ERROR = "ServerError",
+}
+
 export class Router<TRoutes extends Routes> implements HttpHandler {
     private readonly alphaOrderedRoutes: [keyof TRoutes & string, Route][]
 
@@ -104,7 +117,9 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
                                 await this.lifecycle.mismatch(request, routeName, route, routingResult.error);
                                 continue;
                             case ROUTE_FAILED:
-                                return this.lifecycle.clientError(request, routeName, route, routingResult.error);
+                                return setHeader(
+                                    await this.lifecycle.clientError(request, routeName, route, routingResult.error),
+                                    HTTP4T_ROUTE_RESULT, Http4tRouteResult.CLIENT_ERROR);
                             default:
                                 return assertExhaustive(errorType);
                         }
@@ -115,10 +130,15 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
                     return this.lifecycle.match(request, routeName, route, httpResponse);
 
                 } catch (e: any) {
-                    return await this.lifecycle.serverError(request, routeName, route, e);
+                    return setHeader(
+                        await this.lifecycle.serverError(request, routeName, route, e),
+                        HTTP4T_ROUTE_RESULT, Http4tRouteResult.SERVER_ERROR);
                 }
             }
-            return this.lifecycle.noMatchFound(request);
+            return setHeader(
+                await this.lifecycle.noMatchFound(request),
+                HTTP4T_ROUTE_RESULT, Http4tRouteResult.NO_MATCH
+            );
         } catch (e: any) {
             console.error(e);
             return responseOf(500)

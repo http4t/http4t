@@ -1,5 +1,6 @@
 import {Header, HeaderName, HeaderValue, HttpBody, HttpMessage, HttpRequest, HttpResponse} from "./contract";
 import * as h from "./headers";
+import * as headers from "./headers";
 import {HeaderValueLike, isHeader, isHeaderValue} from "./headers";
 import * as b from "./bodies";
 import {modify} from "./util/objects";
@@ -19,6 +20,20 @@ export function setHeader<T extends HttpMessage>(message: T, headerOrName: Heade
         throw new Error(`Not a valid header value: ${maybeValue}`);
 }
 
+
+/**
+ * Case insensitive on name
+ */
+export function getHeaderValue(message: HttpMessage, name: HeaderName): HeaderValue | undefined {
+    return headers.getHeaderValue(message.headers, name);
+}
+
+/**
+ * Case insensitive on name
+ */
+export function getHeaderValues(message: HttpMessage, name: HeaderName): HeaderValue[] {
+    return headers.getHeaderValues(message.headers, name);
+}
 export function appendHeader<T extends HttpMessage>(message: T, name: HeaderName, value: HeaderValueLike): T ;
 export function appendHeader<T extends HttpMessage>(message: T, header: Header): T ;
 export function appendHeader<T extends HttpMessage>(message: T, headerOrName: Header | HeaderName, maybeValue?: HeaderValueLike): T {

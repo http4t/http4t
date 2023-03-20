@@ -14,22 +14,22 @@ export class ProductionRequestLifecycle implements RequestLifecycle {
         return request;
     }
 
-    async clientError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: RouteFailed): Promise<HttpResponse> {
+    async clientError(request: HttpRequest, routeKey: string, route: Route, reason: RouteFailed): Promise<HttpResponse> {
         return reason.response;
     }
 
-    async match(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, response: HttpResponse): Promise<HttpResponse> {
+    async match(request: HttpRequest, routeKey: string, route: Route, response: HttpResponse): Promise<HttpResponse> {
         return response;
     }
 
-    async mismatch(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: WrongRoute): Promise<void> {
+    async mismatch(request: HttpRequest, routeKey: string, route: Route, reason: WrongRoute): Promise<void> {
     }
 
     async noMatchFound(request: HttpRequest): Promise<HttpResponse> {
         return responseOf(404);
     }
 
-    async serverError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown> | null, error: any): Promise<HttpResponse> {
+    async serverError(request: HttpRequest, routeKey: string, route: Route | null, error: any): Promise<HttpResponse> {
         await this.reporter(request, error)
         return responseOf(500);
     }

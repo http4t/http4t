@@ -1,10 +1,10 @@
 import {RequestLifecycle} from "../router";
 import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {appendHeaders, bufferedText, bufferText, setHeader} from "@http4t/core/messages";
+import {appendHeaders, bufferedText, bufferText, getHeaderValue, setHeader} from "@http4t/core/messages";
 import * as lenses from "../lenses";
 import {WrongRoute} from "../lenses";
 import {Route} from "../routes";
-import {getHeaderValue, uriString} from "@http4t/core/requests";
+import {uriString} from "@http4t/core/requests";
 import uuidPkg from "uuid";
 import {responseOf} from "@http4t/core/responses";
 import {jsonBody} from "@http4t/core/json";
@@ -62,7 +62,7 @@ async function printResponse(response: HttpResponse): Promise<string[]> {
 
 type RequestMismatch = {
     key: string
-    route: Route<unknown, unknown>
+    route: Route
     reason: WrongRoute
 }
 
@@ -90,7 +90,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             ['DebugRequestLifecycle-Start', new Date().getTime().toString()]));
     }
 
-    async mismatch(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: WrongRoute): Promise<void> {
+    async mismatch(request: HttpRequest, routeKey: string, route: Route, reason: WrongRoute): Promise<void> {
         this.requestMismatches[getHeaderValue(request, DEBUG_ID_HEADER)!].push({
             key: routeKey,
             route,
@@ -98,14 +98,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
         });
     }
 
-    private consumeUnmatched(request: HttpRequest): RequestMismatch[] {
-        const requestId = getHeaderValue(request, DEBUG_ID_HEADER)!;
-        const mismatches = this.requestMismatches[requestId] || [];
-        delete this.requestMismatches[requestId];
-        return mismatches;
-    }
-
-    async match(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, response: HttpResponse): Promise<HttpResponse> {
+    async match(request: HttpRequest, routeKey: string, route: Route, response: HttpResponse): Promise<HttpResponse> {
         console.log([
             "",
             marker(GREEN, "request", "="),
@@ -119,7 +112,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
         return setHeader(response, "Matched-Route", routeKey);
     }
 
-    async clientError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, reason: lenses.RouteFailed): Promise<HttpResponse> {
+    async clientError(request: HttpRequest, routeKey: string, route: Route, reason: lenses.RouteFailed): Promise<HttpResponse> {
         const mismatches = this.consumeUnmatched(request);
         console.log([
             "",
@@ -134,7 +127,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
         return reason.response;
     }
 
-    async serverError(request: HttpRequest, routeKey: string, route: Route<unknown, unknown>, error: any): Promise<HttpResponse> {
+    async serverError(request: HttpRequest, routeKey: string, route: Route, error: any): Promise<HttpResponse> {
         const mismatches = this.consumeUnmatched(request);
         const errorString = error.stack || error.toString();
         const response = responseOf(500, errorString)
@@ -168,10 +161,13 @@ export class DebugRequestLifecycle implements RequestLifecycle {
         return response;
     }
 
+    private consumeUnmatched(request: HttpRequest): RequestMismatch[] {
+        const requestId = getHeaderValue(request, DEBUG_ID_HEADER)!;
+        const mismatches = this.requestMismatches[requestId] || [];
+        delete this.requestMismatches[requestId];
+        return mismatches;
+    }
+
 }
 
-const DEBUG: RequestLifecycle = new DebugRequestLifecycle();
-
-export function debug(): RequestLifecycle {
-    return DEBUG;
-}
+export const DEBUG: RequestLifecycle = new DebugRequestLifecycle();

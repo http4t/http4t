@@ -62,17 +62,7 @@ describe('store', function () {
         });
         expect(e.message).match(/Deliberate error/);
         expect(e.problems).deep.eq([
-            problem("Status was not 200", ["response", "status"], "storeDocThenFail"),
-            problem("Status was not in 401, 403", ["response", "status"], "storeDocThenFail")]);
-
-        // expected should be actual, with the json path of each problem replaced with the message(s)
-        expect(e.expected.response).deep.contains({
-                status: [
-                    "Status was not 200",
-                    "Status was not in 401, 403"
-                ]
-            }
-        );
+            problem("Server threw an exception", ["request"], "storeDocThenFail")]);
 
         expect(await alice.get({id: request.id})).deep.eq(success(undefined))
     });

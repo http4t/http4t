@@ -167,4 +167,75 @@ describe('buildClient()', () => {
             actual: {response: responseOf(200, notJson)}
         });
     });
+
+    it('throws error when client lens does not match server lens', async () => {
+        const routesInOldVersionOfClient = {
+            example: route(
+                request('GET', "/old/path"),
+                json<any>()
+            )
+        };
+        const routesInNewVersionOfServer = {
+            example: route(
+                request('GET', "/new/path"),
+                json<any>()
+            )
+        };
+
+        const server = buildRouter(routesInNewVersionOfServer, {
+            example: () => {
+                throw new Error("Route should never be matched")
+            }
+        });
+        const c = buildClient(routesInOldVersionOfClient, server);
+
+        const e: Error = await catchError(() => c.example());
+        expect(e.message).contains("404: /old/path Server could not find a valid route for request");
+    });
+
+    it('throws error when client lens creates an invalid request', async () => {
+        const routesInOldVersionOfClient = {
+            example: route(
+                // Old route expects any string
+                request('POST', "/path", text()),
+                json<any>()
+            )
+        };
+        const routesInNewVersionOfServer = {
+            example: route(
+                // Old route expects valid json
+                request('POST', "/path", json<any>()),
+                json<any>()
+            )
+        };
+
+        const server = buildRouter(routesInNewVersionOfServer, {
+            example: () => {
+                throw new Error("Route should never be matched")
+            }
+        });
+        const c = buildClient(routesInOldVersionOfClient, server);
+
+        const e: Error = await catchError(() => c.example("noJson}"));
+        expect(e.message).contains("400: /path Server could not understand request");
+    });
+
+    it('throws error when server throws unexpected exception', async () => {
+        const routes = {
+            example: route(
+                request('GET', "/path"),
+                json<any>()
+            )
+        };
+
+        const server = buildRouter(routes, {
+            example: () => {
+                throw new Error("Server throws an exception")
+            }
+        });
+        const c = buildClient(routes, server);
+
+        const e: Error = await catchError(() => c.example());
+        expect(e.message).contains("500: /path Server threw an exception");
+    });
 });
