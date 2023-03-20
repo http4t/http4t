@@ -13,27 +13,30 @@ export type AuthError = {
     message: string
 }
 
+/**
+ * Gets/sets {@link AuthError} as json response body, with {@link AuthError#reason} mapped to response codes of:
+ *
+ * * 'unauthorized' <-> 401
+ * * 'forbidden' <-> 403
+ */
 export function authError(): ResponseLens<AuthError> {
     return statuses({
-        401: json<AuthError>(),
-        403: json<AuthError>()
-    }, value => {
-        const reason = value.reason;
-        switch (reason) {
-            case "unauthorized":
-                return 401;
-            case "forbidden":
-                return 403;
-            default:
-                return assertExhaustive(reason);
-        }
-    })
+            401: json<AuthError>(),
+            403: json<AuthError>()
+        },
+        authError => {
+            const reason = authError.reason;
+            switch (reason) {
+                case "unauthorized":
+                    return 401;
+                case "forbidden":
+                    return 403;
+                default:
+                    return assertExhaustive(reason);
+            }
+        })
 }
 
-/**
- * {@param successLens} will be matched first, so it'll be able to handle more specific `401` and `403` responses
- * before returning {@link AuthError}, although this is a little confusing, and not recommended
- */
 export function authErrorOr<T>(successLens: ResponseLens<T>): ResponseLens<Result<AuthError, T>> {
     return result(
         authError(),
