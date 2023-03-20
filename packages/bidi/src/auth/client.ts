@@ -4,7 +4,7 @@ import {isFailure, Result, success} from "@http4t/result";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
 import {Mutable} from "../util/mutable";
-import {AuthReportingRoute, SecuredRoute, SecuredRoutes} from "./clientserver";
+import {AuthReportingRoute, SecuredRoute, SecuredRoutes} from "./";
 
 export class ProvideSecurityTokenLens<T, TToken> extends BaseRequestLens<T> {
     constructor(private readonly securedLens: RequestLens<WithSecurity<T, TToken>>,

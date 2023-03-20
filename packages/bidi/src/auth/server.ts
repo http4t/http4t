@@ -3,7 +3,7 @@ import {WithSecurity} from "./withSecurity";
 import {isFailure, Result, success} from "@http4t/result";
 import {BaseRequestLens, RequestLens, RoutingResult} from "../lenses";
 import {HttpRequest} from "@http4t/core/contract";
-import {SecuredRoutes} from "./clientserver";
+import {SecuredRoutes} from "./";
 import {AuthError} from "./authError";
 
 export class TokenToClaimsLens<T, TToken, TClaims> extends BaseRequestLens<WithSecurity<T, TClaims>> {

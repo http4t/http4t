@@ -1,7 +1,7 @@
 import {RoutingResult} from "@http4t/bidi/lenses";
 import {bearerAuthHeader} from "@http4t/bidi/lenses/BearerAuthHeader";
 import {AuthError} from "@http4t/bidi/auth/authError";
-import {AuthReportingRoutes, SecuredRoutes, securedRoutes} from "@http4t/bidi/auth/clientserver";
+import {AuthReportingRoutes, SecuredRoutes, securedRoutes} from "@http4t/bidi/auth";
 import {tokenToClaimsRoutes} from "@http4t/bidi/auth/server";
 import {isFailure} from "@http4t/result";
 
