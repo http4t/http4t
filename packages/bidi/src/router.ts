@@ -84,7 +84,9 @@ export class Router<TRoutes extends Routes> implements HttpHandler {
 
         To fix this, we alpha-order the routes to provide arbitrary but at least deterministic behaviour.
          */
-        this.alphaOrderedRoutes = Object.entries(this.routes).sort(([k1], [k2]) => k1.localeCompare(k2)) as [keyof TRoutes & string, Route][];
+        this.alphaOrderedRoutes = Object.entries(this.routes)
+            .sort(([k1], [k2]) =>
+                k1.localeCompare(k2)) as [keyof TRoutes & string, Route][];
     }
 
     async handle(originalRequest: HttpRequest): Promise<HttpResponse> {

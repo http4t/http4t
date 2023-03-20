@@ -54,11 +54,15 @@ export interface JwtStrategy {
 export function jwtRoutes<TRoutes extends Routes>(
     unsecuredRoutes: TRoutes
 ): SecuredRoutes<TRoutes, JwtString> {
+
     return securedRoutes(
         unsecuredRoutes,
         bearerAuthHeader());
 }
 
+/**
+ * For routes secured with a jwt string, maps each route to one
+ */
 export function serverSideJwtRoutes<TRoutes extends SecuredRoutes<TRoutes, JwtString>,
     TToken,
     TClaims = JwtPayload>(
@@ -70,8 +74,11 @@ export function serverSideJwtRoutes<TRoutes extends SecuredRoutes<TRoutes, JwtSt
     return tokenToClaimsRoutes(
         tokenSecuredRoutes,
         async (token: JwtString) => {
+
             const verificationResult = await jwtStrategy.verify(token);
+
             if (isFailure(verificationResult)) return verificationResult;
+
             return tokenToClaims(verificationResult.value);
         });
 }
