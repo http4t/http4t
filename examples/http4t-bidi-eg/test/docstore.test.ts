@@ -49,7 +49,7 @@ describe('store', function () {
         expect(await alice.get({id: doc.id})).deep.eq(success(doc))
     });
 
-    it('transactions roll back on error', async () => {
+    it('rolls back transactions on error', async () => {
         const request = {
             id: uuid(),
             document: {name: 'Should not be created'}
@@ -67,7 +67,7 @@ describe('store', function () {
         expect(await alice.get({id: request.id})).deep.eq(success(undefined))
     });
 
-    it('cannot view or edit docs I do not own', async function () {
+    it('does not allow users to view or edit docs they do not own', async function () {
         const aliceDocId = uuid();
         await alice.post({id: aliceDocId, document: {hello: "world"}})
 
