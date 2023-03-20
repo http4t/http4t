@@ -10,9 +10,9 @@
     "packages/*/test"
   ],
   "scripts": {
-    "build": "ts-node build/build",
+    "build": "ts-node build/delegate build examples packages",
     "clean": "ts-node build/clean",
-    "test": "ts-node build/clean && ts-node build/test test,test:browser examples packages",
+    "test": "ts-node build/clean && ts-node build/delegate test,test:browser examples packages",
     "test:nobuild": "ts-node build/test node,browser packages examples",
     "test:packages:node": "ts-node build/clean && ts-node build/test node packages",
     "test:packages:browser": "ts-node build/clean && ts-node build/test browser packages",

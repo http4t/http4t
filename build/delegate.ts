@@ -1,7 +1,7 @@
 import {packages, Packages} from "./util/packages";
 import {spawnPromise} from "./util/processes";
 
-(async function test() {
+(async function delegate() {
     const args = process.argv.slice(2);
     const commands = args.slice(0, 1)[0].split(",");
     const dirs = args.slice(1);
