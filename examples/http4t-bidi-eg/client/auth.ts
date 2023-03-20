@@ -10,8 +10,11 @@ import {response} from "@http4t/bidi/responses";
 export type DocStoreClaims = {
     principal: { type: "user", userName: string }
 }
+
 export type WithDocStoreClaims<T> = WithSecurity<T, DocStoreClaims>;
+
 export type Credentials = { userName: string, password: string };
+
 export type User = {
     userName: string
 }

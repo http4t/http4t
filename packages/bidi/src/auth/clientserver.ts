@@ -9,7 +9,8 @@ export type AuthReportingRoute<TAuthError = AuthError> = Route<any, Result<TAuth
 export type AuthReportingRoutes<TRoutes extends Routes, TAuthError = AuthError> =
     { [K in keyof TRoutes]: AuthReportingRoute<TAuthError> };
 
-export type SecuredRoute<TRoute extends AuthReportingRoute<TAuthError>, TClaimsOrToken, TAuthError = AuthError> = Route<WithSecurity<any, TClaimsOrToken>, Result<TAuthError, any>>;
+export type SecuredRoute<TRoute extends AuthReportingRoute<TAuthError>, TClaimsOrToken, TAuthError = AuthError> =
+    Route<WithSecurity<any, TClaimsOrToken>, Result<TAuthError, any>>;
 
 export type SecuredRoutes<TRoutes extends AuthReportingRoutes<TRoutes, TAuthError>, TClaimsOrToken, TAuthError = AuthError> =
     { [K in keyof TRoutes]: SecuredRoute<TRoutes[K], TClaimsOrToken, TAuthError> }
