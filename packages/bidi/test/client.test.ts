@@ -162,6 +162,7 @@ describe('buildClient()', () => {
         const c = buildClient(routes, brokenServer);
 
         const e: JsonPathError = await catchError(() => c.example());
+        delete e.actual['request']
         expect(e).deep.contains({
             problems: [problem("Expected valid json- " + jsonParseError(notJson), ["response", "body"], "example")],
             actual: {response: responseOf(200, notJson)}

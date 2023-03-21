@@ -20,6 +20,15 @@ export function setHeader<T extends HttpMessage>(message: T, headerOrName: Heade
         throw new Error(`Not a valid header value: ${maybeValue}`);
 }
 
+export function setHeaders<T extends HttpMessage>(message: T, ...headers: (Header | undefined)[]): T {
+    return headers.reduce(
+        (message, header) => {
+            if (!header) return message;
+            return setHeader(message, header);
+        },
+        message)
+}
+
 
 /**
  * Case insensitive on name
@@ -31,9 +40,17 @@ export function getHeaderValue(message: HttpMessage, name: HeaderName): HeaderVa
 /**
  * Case insensitive on name
  */
+export function getHeader(message: HttpMessage, name: HeaderName): Header | undefined {
+    return headers.getHeader(message.headers, name);
+}
+
+/**
+ * Case insensitive on name
+ */
 export function getHeaderValues(message: HttpMessage, name: HeaderName): HeaderValue[] {
     return headers.getHeaderValues(message.headers, name);
 }
+
 export function appendHeader<T extends HttpMessage>(message: T, name: HeaderName, value: HeaderValueLike): T ;
 export function appendHeader<T extends HttpMessage>(message: T, header: Header): T ;
 export function appendHeader<T extends HttpMessage>(message: T, headerOrName: Header | HeaderName, maybeValue?: HeaderValueLike): T {
@@ -43,7 +60,7 @@ export function appendHeader<T extends HttpMessage>(message: T, headerOrName: He
         return modify(message, {headers: h.appendHeader(message.headers, headerOrName, maybeValue as HeaderValueLike)} as Partial<T>);
 }
 
-export function appendHeaders<T extends HttpMessage>(message: T, ...headers: Header[]): T {
+export function appendHeaders<T extends HttpMessage>(message: T, ...headers: (Header|undefined)[]): T {
     return modify(message, {headers: h.appendHeaders(message.headers, ...headers)} as Partial<T>)
 }
 

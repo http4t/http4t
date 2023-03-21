@@ -23,7 +23,7 @@ describe("ServerHandler", function () {
         try {
             return server.close();
         } catch (ignore) {
-            console.log("could not close node server", ignore);
+            console.error("could not close node server", ignore);
         }
     });
 

@@ -23,7 +23,7 @@ export type Method =
 /**
  * Header is a name value pair
  */
-export type Header = [HeaderName, HeaderValue];
+export type Header = readonly [HeaderName, HeaderValue];
 
 /**
  * The standard HTTP header name as defined by [RFC 7230](https://tools.ietf.org/html/rfc7230) or an extension

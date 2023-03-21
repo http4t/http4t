@@ -1,6 +1,6 @@
 import {RequestLifecycle} from "../router";
 import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
-import {appendHeaders, bufferedText, bufferText, getHeaderValue, setHeader} from "@http4t/core/messages";
+import {appendHeaders, bufferedText, bufferText, getHeader, getHeaderValue} from "@http4t/core/messages";
 import * as lenses from "../lenses";
 import {WrongRoute} from "../lenses";
 import {Route} from "../routes";
@@ -9,6 +9,8 @@ import uuidPkg from "uuid";
 import {responseOf} from "@http4t/core/responses";
 import {jsonBody} from "@http4t/core/json";
 import {pathToString} from "@http4t/result/JsonPathResult";
+import {httpHeaderDate} from "@http4t/core/headers";
+import {Http4tHeaders, Http4tRouteResult} from "./headers";
 
 const {v4: uuid} = uuidPkg;
 
@@ -76,18 +78,31 @@ function printUnmatchedRoutes(markerColour: string, mismatches: RequestMismatch[
 
 const DEBUG_ID_HEADER = 'DebugRequestLifecycle-Id';
 
+export type DebugRequestLifecycleOpts = {
+    readonly now: () => Date
+}
+export const DEFAULTS: DebugRequestLifecycleOpts = {
+    now: () => new Date
+}
+
 /**
  * TODO: read and then re-stream bodies instead of buffering them, so that streaming logic is still exercised
  */
 export class DebugRequestLifecycle implements RequestLifecycle {
     private readonly requestMismatches: { [id: string]: RequestMismatch[] } = {};
+    private readonly opts: DebugRequestLifecycleOpts;
+
+    constructor(opts: Partial<DebugRequestLifecycleOpts> = {}) {
+        this.opts = {...DEFAULTS, ...opts}
+    }
+
 
     async begin(request: HttpRequest): Promise<HttpRequest> {
         const id = uuid();
         this.requestMismatches[id] = [];
         return await bufferText(appendHeaders(request,
             [DEBUG_ID_HEADER, id],
-            ['DebugRequestLifecycle-Start', new Date().getTime().toString()]));
+            [Http4tHeaders.DEBUG_START_TIME, httpHeaderDate(this.now())]));
     }
 
     async mismatch(request: HttpRequest, routeKey: string, route: Route, reason: WrongRoute): Promise<void> {
@@ -99,6 +114,12 @@ export class DebugRequestLifecycle implements RequestLifecycle {
     }
 
     async match(request: HttpRequest, routeKey: string, route: Route, response: HttpResponse): Promise<HttpResponse> {
+        response = appendHeaders(response,
+            [Http4tHeaders.ROUTE_RESULT, Http4tRouteResult.SUCCESS],
+            [Http4tHeaders.DEBUG_MATCHED_ROUTE, routeKey],
+            getHeader(request, Http4tHeaders.DEBUG_START_TIME),
+            [Http4tHeaders.DEBUG_END_TIME, httpHeaderDate(this.now())],);
+
         console.log([
             "",
             marker(GREEN, "request", "="),
@@ -109,11 +130,18 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             ...(await printResponse(response)),
             ...printUnmatchedRoutes(GREEN, this.consumeUnmatched(request))
         ].join("\r\n"));
-        return setHeader(response, "Matched-Route", routeKey);
+
+        return response;
     }
 
     async clientError(request: HttpRequest, routeKey: string, route: Route, reason: lenses.RouteFailed): Promise<HttpResponse> {
         const mismatches = this.consumeUnmatched(request);
+        const response = appendHeaders(reason.response,
+            [Http4tHeaders.ROUTE_RESULT, Http4tRouteResult.CLIENT_ERROR],
+            [Http4tHeaders.DEBUG_MATCHED_ROUTE, routeKey],
+            getHeader(request, Http4tHeaders.DEBUG_START_TIME),
+            [Http4tHeaders.DEBUG_END_TIME, httpHeaderDate(this.now())]);
+
         console.log([
             "",
             marker(YELLOW, "request", "="),
@@ -121,16 +149,22 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             marker(YELLOW, "result"),
             colour(CYAN, `Request could not be handled by matched route "${routeKey}"`),
             marker(YELLOW, "response"),
-            ...(await printResponse(reason.response)),
+            ...(await printResponse(response)),
             ...printUnmatchedRoutes(YELLOW, mismatches)
         ].join("\r\n"));
-        return reason.response;
+
+        return response;
     }
 
     async serverError(request: HttpRequest, routeKey: string, route: Route, error: any): Promise<HttpResponse> {
         const mismatches = this.consumeUnmatched(request);
         const errorString = error.stack || error.toString();
-        const response = responseOf(500, errorString)
+        const response = responseOf(500, errorString,
+            [Http4tHeaders.ROUTE_RESULT, Http4tRouteResult.SERVER_ERROR],
+            [Http4tHeaders.DEBUG_MATCHED_ROUTE, routeKey],
+            getHeader(request, Http4tHeaders.DEBUG_START_TIME),
+            [Http4tHeaders.DEBUG_END_TIME, httpHeaderDate(this.now())])
+
         console.error([
             "",
             marker(RED, "request", "="),
@@ -142,12 +176,17 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             ...(await printResponse(response)),
             ...printUnmatchedRoutes(RED, mismatches)
         ].join("\r\n"));
+
         return response;
     }
 
     async noMatchFound(request: HttpRequest): Promise<HttpResponse> {
         const mismatches = this.consumeUnmatched(request);
-        const response = responseOf(404, jsonBody({mismatches}))
+        const response = responseOf(404, jsonBody({mismatches}),
+            [Http4tHeaders.ROUTE_RESULT, Http4tRouteResult.NO_MATCH],
+            getHeader(request, Http4tHeaders.DEBUG_START_TIME),
+            [Http4tHeaders.DEBUG_END_TIME, httpHeaderDate(this.now())])
+
         console.log([
             "",
             marker(YELLOW, "request", "="),
@@ -158,6 +197,7 @@ export class DebugRequestLifecycle implements RequestLifecycle {
             ...(await printResponse(response)),
             ...printUnmatchedRoutes(YELLOW, mismatches)
         ].join("\r\n"));
+
         return response;
     }
 
@@ -168,6 +208,9 @@ export class DebugRequestLifecycle implements RequestLifecycle {
         return mismatches;
     }
 
+    private now(): Date {
+        return this.opts.now();
+    }
 }
 
 export const DEBUG: RequestLifecycle = new DebugRequestLifecycle();

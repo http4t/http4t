@@ -7,8 +7,8 @@ import {prefix, prefixProducedBy, problem} from "@http4t/result/JsonPathResult";
 import {RequestLens, ResponseLens} from "./lenses";
 import {ClientApiFor, Route, Routes, ServerApiFnFor} from "./routes";
 import {Mutable} from "./util/mutable";
-import {HTTP4T_ROUTE_RESULT, Http4tRouteResult} from "./router";
 import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
+import {Http4tHeaders, Http4tRouteResult} from "./lifecycles/headers";
 
 async function routingError(message: string, routeName: string, request: HttpRequest, response: HttpResponse): Promise<Error> {
     return new JsonPathError({
@@ -50,9 +50,11 @@ function validator<T>(
          We want to immediately throw an error for responses to requests that the server did not understand at all,
          rather than trying to parse them with a response lens.
          */
-        const routeResult = getHeaderValue(response, HTTP4T_ROUTE_RESULT) as Http4tRouteResult | undefined;
+        const routeResult = getHeaderValue(response, Http4tHeaders.ROUTE_RESULT) as Http4tRouteResult | undefined;
         if (routeResult) {
             switch (routeResult) {
+                case Http4tRouteResult.SUCCESS:
+                    break;
                 case Http4tRouteResult.CLIENT_ERROR:
                     throw await routingError("Server could not understand request", routeName, request, response);
                 case Http4tRouteResult.NO_MATCH:
@@ -60,15 +62,20 @@ function validator<T>(
                 case Http4tRouteResult.SERVER_ERROR:
                     throw await routingError("Server threw an exception", routeName, request, response);
                 default:
-                    return assertExhaustive(routeResult, `Received an unexpected ${HTTP4T_ROUTE_RESULT} header value`)
+                    return assertExhaustive(routeResult, `Received an unexpected ${Http4tHeaders.ROUTE_RESULT} header value`)
             }
         }
 
         const result = await lens.get(response);
         if (isFailure(result))
             throw new JsonPathError({
+                    request: {
+                        ...request,
+                        body: await bufferText(response.body)
+                    },
                     response: {
                         ...response,
+                        // TODO: what happens if response was a stream that we've already read?
                         body: await bufferText(response.body)
                     }
                 },

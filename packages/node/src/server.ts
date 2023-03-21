@@ -38,10 +38,6 @@ export class NodeServer implements Server {
     }
 }
 
-/**
- * TODO: allow injecting logging etc.
- * @param handler
- */
 export function adapter(handler: HttpHandler) {
     return (nodeRequest: node.IncomingMessage, nodeResponse: node.ServerResponse) => {
         try {
