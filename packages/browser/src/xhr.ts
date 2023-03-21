@@ -5,7 +5,10 @@ import {responseOf} from "@http4t/core/responses";
 import {Uri} from "@http4t/core/uri";
 
 function getHeaders(xhr: XMLHttpRequest): Header[] {
-    return xhr.getAllResponseHeaders().split("\n").map((header) => header.split(": ") as Header);
+    return xhr.getAllResponseHeaders()
+        .split("\n")
+        .map((header) =>
+            header.split(": ") as any as Header);
 }
 
 const unsafeHeaders: Readonly<HeaderName[]> = ['content-length', 'host'];

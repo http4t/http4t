@@ -1,7 +1,7 @@
 import chai from "chai";
 const { expect } = chai;
 import {bufferBinary, bufferText, streamBinary, streamText} from "@http4t/core/bodies";
-import {textEncoder} from "@http4t/core/util/textencoding";
+import {ENCODER} from "@http4t/core/util/textencoding";
 
 describe('bufferText()', () => {
     it('handles strings', async () => {
@@ -10,7 +10,7 @@ describe('bufferText()', () => {
     });
 
     it('handles Uint8Array', async () => {
-        const body: Uint8Array = textEncoder().encode('data');
+        const body: Uint8Array = ENCODER.encode('data');
         expect(await bufferText(body)).eq('data');
     });
 
@@ -20,7 +20,7 @@ describe('bufferText()', () => {
     });
 
     it('handles iterables of data', async () => {
-        const body = [textEncoder().encode('chunk1'), textEncoder().encode('chunk2')];
+        const body = [ENCODER.encode('chunk1'), ENCODER.encode('chunk2')];
         expect(await bufferText(body)).eq('chunk1chunk2');
     });
 
@@ -39,8 +39,8 @@ describe('bufferText()', () => {
         const body: AsyncIterable<Uint8Array> = {
 
             [Symbol.asyncIterator]: async function* () {
-                yield textEncoder().encode("chunk1");
-                yield textEncoder().encode("chunk2");
+                yield ENCODER.encode("chunk1");
+                yield ENCODER.encode("chunk2");
             }
         };
         expect(await bufferText(body)).eq('chunk1chunk2');
@@ -50,22 +50,22 @@ describe('bufferText()', () => {
 describe('bufferBinary()', () => {
     it('handles strings', async () => {
         const body = "a string";
-        expect(await bufferBinary(body)).deep.eq(textEncoder().encode('a string'));
+        expect(await bufferBinary(body)).deep.eq(ENCODER.encode('a string'));
     });
 
     it('handles Uint8Array', async () => {
-        const body: Uint8Array = textEncoder().encode('some data');
-        expect(await bufferBinary(body)).deep.eq(textEncoder().encode('some data'));
+        const body: Uint8Array = ENCODER.encode('some data');
+        expect(await bufferBinary(body)).deep.eq(ENCODER.encode('some data'));
     });
 
     it('handles iterables of strings', async () => {
         const body = ["chunk1", "chunk2"];
-        expect(await bufferBinary(body)).deep.eq(textEncoder().encode('chunk1chunk2'));
+        expect(await bufferBinary(body)).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 
     it('handles iterables of data', async () => {
-        const body = [textEncoder().encode('chunk1'), textEncoder().encode('chunk2')];
-        expect(await bufferBinary(body)).deep.eq(textEncoder().encode('chunk1chunk2'));
+        const body = [ENCODER.encode('chunk1'), ENCODER.encode('chunk2')];
+        expect(await bufferBinary(body)).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 
     it('handles async iterables of strings', async () => {
@@ -76,18 +76,18 @@ describe('bufferBinary()', () => {
                 yield "chunk2";
             }
         };
-        expect(await bufferBinary(body)).deep.eq(textEncoder().encode('chunk1chunk2'));
+        expect(await bufferBinary(body)).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 
     it('handles async iterables of data', async () => {
         const body: AsyncIterable<Uint8Array> = {
 
             [Symbol.asyncIterator]: async function* () {
-                yield textEncoder().encode('chunk1');
-                yield textEncoder().encode('chunk2');
+                yield ENCODER.encode('chunk1');
+                yield ENCODER.encode('chunk2');
             }
         };
-        expect(await bufferBinary(body)).deep.eq(textEncoder().encode('chunk1chunk2'));
+        expect(await bufferBinary(body)).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 });
 
@@ -98,7 +98,7 @@ describe('streamText()', () => {
     });
 
     it('handles Uint8Array', async () => {
-        const body: Uint8Array = textEncoder().encode('data');
+        const body: Uint8Array = ENCODER.encode('data');
         expect(await bufferText(await streamText(body))).eq('data');
     });
 
@@ -108,7 +108,7 @@ describe('streamText()', () => {
     });
 
     it('handles iterables of data', async () => {
-        const body = [textEncoder().encode('chunk1'), textEncoder().encode('chunk2')];
+        const body = [ENCODER.encode('chunk1'), ENCODER.encode('chunk2')];
         expect(await bufferText(await streamText(body))).eq('chunk1chunk2');
     });
 
@@ -127,8 +127,8 @@ describe('streamText()', () => {
         const body: AsyncIterable<Uint8Array> = {
 
             [Symbol.asyncIterator]: async function* () {
-                yield textEncoder().encode("chunk1");
-                yield textEncoder().encode("chunk2");
+                yield ENCODER.encode("chunk1");
+                yield ENCODER.encode("chunk2");
             }
         };
         expect(await bufferText(await streamText(body))).eq('chunk1chunk2');
@@ -138,22 +138,22 @@ describe('streamText()', () => {
 describe('streamBinary()', () => {
     it('handles strings', async () => {
         const body = "a string";
-        expect(await bufferBinary(await streamBinary(body))).deep.eq(textEncoder().encode('a string'));
+        expect(await bufferBinary(await streamBinary(body))).deep.eq(ENCODER.encode('a string'));
     });
 
     it('handles Uint8Array', async () => {
-        const body: Uint8Array = textEncoder().encode('some data');
-        expect(await bufferBinary(await streamBinary(body))).deep.eq(textEncoder().encode('some data'));
+        const body: Uint8Array = ENCODER.encode('some data');
+        expect(await bufferBinary(await streamBinary(body))).deep.eq(ENCODER.encode('some data'));
     });
 
     it('handles iterables of strings', async () => {
         const body = ["chunk1", "chunk2"];
-        expect(await bufferBinary(await streamBinary(body))).deep.eq(textEncoder().encode('chunk1chunk2'));
+        expect(await bufferBinary(await streamBinary(body))).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 
     it('handles iterables of data', async () => {
-        const body = [textEncoder().encode('chunk1'), textEncoder().encode('chunk2')];
-        expect(await bufferBinary(await streamBinary(body))).deep.eq(textEncoder().encode('chunk1chunk2'));
+        const body = [ENCODER.encode('chunk1'), ENCODER.encode('chunk2')];
+        expect(await bufferBinary(await streamBinary(body))).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 
     it('handles async iterables of strings', async () => {
@@ -164,17 +164,17 @@ describe('streamBinary()', () => {
                 yield "chunk2";
             }
         };
-        expect(await bufferBinary(await streamBinary(body))).deep.eq(textEncoder().encode('chunk1chunk2'));
+        expect(await bufferBinary(await streamBinary(body))).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 
     it('handles async iterables of data', async () => {
         const body: AsyncIterable<Uint8Array> = {
 
             [Symbol.asyncIterator]: async function* () {
-                yield textEncoder().encode('chunk1');
-                yield textEncoder().encode('chunk2');
+                yield ENCODER.encode('chunk1');
+                yield ENCODER.encode('chunk2');
             }
         };
-        expect(await bufferBinary(await streamBinary(body))).deep.eq(textEncoder().encode('chunk1chunk2'));
+        expect(await bufferBinary(await streamBinary(body))).deep.eq(ENCODER.encode('chunk1chunk2'));
     });
 });

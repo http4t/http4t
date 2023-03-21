@@ -1,6 +1,9 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../../../tsconfig-test-base.json",
   "compilerOptions": {
+    "types": [
+      "chrome"
+    ],
     "outDir": "dist"
   },
   "references": [

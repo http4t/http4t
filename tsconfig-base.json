@@ -22,7 +22,8 @@
         "downlevelIteration": true,
         "declarationMap": true,
         "sourceMap": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "types": []
     },
     "exclude": [
         "node_modules"

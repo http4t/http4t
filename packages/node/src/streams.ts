@@ -1,7 +1,7 @@
 import {streamBinary} from "@http4t/core/bodies";
 import {HttpBody} from "@http4t/core/contract";
 import {AsyncIteratorHandler} from "@http4t/core/util/AsyncIteratorHandler";
-import {textEncoder} from "@http4t/core/util/textencoding";
+import {ENCODER} from "@http4t/core/util/textencoding";
 import {Readable, Writable} from 'stream';
 
 
@@ -26,7 +26,7 @@ export function streamToBody(stream: Readable): HttpBody {
         [Symbol.asyncIterator]: function (): AsyncIterator<Uint8Array> {
             const iterator = new AsyncIteratorHandler<Uint8Array>();
             stream.on("data", chunk => {
-                iterator.push(typeof chunk === 'string' ? textEncoder().encode(chunk) : chunk);
+                iterator.push(typeof chunk === 'string' ? ENCODER.encode(chunk) : chunk);
             });
             stream.on("end", () => {
                 iterator.end();

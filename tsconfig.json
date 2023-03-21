@@ -29,6 +29,12 @@
       "path": "./packages/browser/test"
     },
     {
+      "path": "./packages/chrome-extension/src"
+    },
+    {
+      "path": "./packages/chrome-extension/test"
+    },
+    {
       "path": "./packages/core/src"
     },
     {

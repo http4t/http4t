@@ -1,5 +1,5 @@
 import {Data, HttpBody} from "./contract";
-import {textDecoder, textEncoder} from "./util/textencoding";
+import {DECODER, ENCODER} from "./util/textencoding";
 
 function wrongBodyType(body: never) {
     return new Error(`Not a valid HttpBody: '${body}' (${typeDescription(body)})`);
@@ -104,14 +104,14 @@ export async function* streamBinary(body: HttpBody): AsyncIterable<Uint8Array> {
 export function asString(data: Data): string {
     if (typeof data === 'string') return data;
     // noinspection SuspiciousTypeOfGuard
-    if (data instanceof Uint8Array) return textDecoder().decode(data);
+    if (data instanceof Uint8Array) return DECODER.decode(data);
     throw new Error(`Not supported ${typeDescription(data)}`)
 }
 
 export function asBinary(data: Data): Uint8Array {
     if (data instanceof Uint8Array) return data;
     // noinspection SuspiciousTypeOfGuard
-    if (typeof data === 'string') return textEncoder().encode(data);
+    if (typeof data === 'string') return ENCODER.encode(data);
     throw new Error(`Not supported ${typeDescription(data)}`)
 }
 

@@ -1,5 +1,5 @@
 import {bufferText} from "@http4t/core/bodies";
-import {get, toJSON} from "@http4t/core/requests";
+import {get, getHeaderValue, toJSON} from "@http4t/core/requests";
 import {responseOf as responseOf} from "@http4t/core/responses";
 import chai from "chai";
 import {routeFailedError, wrongRouteError} from "@http4t/bidi/lenses";
@@ -9,6 +9,7 @@ import {request, text} from "@http4t/bidi/requests";
 import {buildRouter} from "@http4t/bidi/router";
 import {route} from "@http4t/bidi/routes";
 import {DebugRequestLifecycle} from "@http4t/bidi/lifecycles/DebugRequestLifecycle";
+import {Http4tHeaders, Http4tRouteResult} from "@http4t/bidi/lifecycles/headers";
 
 const {expect} = chai;
 
@@ -48,10 +49,10 @@ describe('Router', () => {
             },
             async zzzLastRouteAlsoMatchesWrongRoute(): Promise<string> {
                 lastRouteWasHit = true;
-                return "last route";
+                return "last route matched /wrongRoute";
             }
         },
-        new DebugRequestLifecycle());
+        new DebugRequestLifecycle({now: () => new Date(Date.parse("2023-03-21T01:03:01"))}));
 
     it('matches route and calls handler', async () => {
         const response = await router.handle(get("/some/path"));
@@ -59,9 +60,26 @@ describe('Router', () => {
         expect(await toJSON(response)).deep.eq(
             {
                 status: 200,
-                "headers": [
-                    ["Content-Type", "text/plain"],
-                    ["Matched-Route", "helloWorld"]
+                headers: [
+                    [
+                        "Content-Type",
+                        "text/plain"],
+                    [
+                        Http4tHeaders.ROUTE_RESULT,
+                        Http4tRouteResult.SUCCESS
+                    ],
+                    [
+                        Http4tHeaders.DEBUG_MATCHED_ROUTE,
+                        "helloWorld"],
+                    [
+                        Http4tHeaders.DEBUG_START_TIME,
+                        "Tue, 21 Mar 2023 01:03:01 GMT"
+                    ],
+                    [
+                        Http4tHeaders.DEBUG_END_TIME,
+                        "Tue, 21 Mar 2023 01:03:01 GMT"
+
+                    ]
                 ],
                 body: "hello world"
             });
@@ -71,6 +89,7 @@ describe('Router', () => {
         const response = await router.handle(get('/doesnotexist'));
 
         expect(response.status).eq(404);
+        expect(getHeaderValue(response, Http4tHeaders.ROUTE_RESULT)).eq(Http4tRouteResult.NO_MATCH);
     });
 
     it('ignores trailing slashes in url', async () => {
@@ -90,7 +109,7 @@ describe('Router', () => {
         const response = await router.handle(get('/wrongRoute'));
 
         expect(response.status).eq(200);
-        expect(await bufferText(response.body)).eq("last route");
+        expect(await bufferText(response.body)).eq("last route matched /wrongRoute");
     });
 });
 

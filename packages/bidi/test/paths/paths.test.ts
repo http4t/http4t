@@ -44,6 +44,6 @@ describe('path()', () => {
     });
     it('can inject', async () => {
         expect(componentPath.expand({widgetId: "123", componentId: "456"}))
-            .deep.eq("/widgets/123/components/456")
+            .deep.eq("widgets/123/components/456")
     });
 });
