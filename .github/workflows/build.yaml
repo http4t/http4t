@@ -21,6 +21,19 @@ jobs:
         run: yarn install
       - name: test
         run: yarn run test:packages:node
+  type-check:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18.x
+          registry-url: https://registry.npmjs.org/
+      - name: install
+        run: yarn install
+      - name: type check
+        run: yarn run build
   test-browser:
     runs-on: ubuntu-latest
     name: Browser test
@@ -67,7 +80,7 @@ jobs:
         run: yarn run test:examples
   publish:
     name: Publish
-    needs: [ test, test-browser ]
+    needs: [ test, test-browser, test-examples, type-check ]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
