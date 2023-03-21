@@ -37,6 +37,15 @@ export function prefixFailure<T>(result: JsonPathResult<T>,
 export class Problem {
     constructor(readonly message: string,
                 readonly path: JsonPath,
+                /**
+                 * A hint to indicate where this problem was produced.
+                 *
+                 * Useful for example when we have a process where we want to check an object matches one of two schemas,
+                 * but we are given a value that matches neither.
+                 *
+                 * In this case we want to see all the problems from both schemas in our error, but we want to be able
+                 * to distinguish which problems came from the first schema and which came from the second.
+                 */
                 readonly producedBy: string | undefined
     ) {
     }
