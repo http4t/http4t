@@ -1,11 +1,5 @@
 import {RequestLens, ResponseLens} from "./lenses";
 
-/**
- * `TRequestSet` is used to serialize the request on the client-side
- * `TResponseGet` is used to deserialize the response on the client-side
- * `TRequestGet` is used to deserialize the request on the server-side
- * `TResponseSet` is used to serialize the response on the server-side
- */
 export type Route<TRequest = unknown, TResponse = unknown> = {
     readonly request: RequestLens<TRequest>;
     readonly response: ResponseLens<TResponse>;
@@ -28,7 +22,7 @@ export type HandlerFn = HandlerFn0 | HandlerFn1
 /**
  * An interface of only arity 1 or zero functions returning Promise
  */
-export type RoutableApi<TApi extends { [K in keyof TApi]: HandlerFn }> = { [K in keyof TApi]: HandlerFn };
+export type RoutableApi<TApi> = { [K in keyof TApi]: HandlerFn };
 
 export type Routes = { readonly [k: string]: Route };
 
@@ -42,9 +36,7 @@ export type RouteFor<TApiMethod> =
 /**
  * Use as a compile-time check that symmetrical routes are compatible with `TApi`
  */
-export type RoutesFor<TApi extends RoutableApi<TApi>,
-    TClientApi extends RoutableApi<TApi> = TApi> =
-
+export type RoutesFor<TApi extends RoutableApi<TApi>> =
     { readonly [K in keyof TApi]: RouteFor<TApi[K]> };
 
 /**
