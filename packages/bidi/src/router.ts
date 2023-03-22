@@ -3,7 +3,7 @@ import {responseOf} from "@http4t/core/responses";
 import {isFailure} from "@http4t/result";
 import {ROUTE_FAILED, RouteFailed, RoutingResult, WRONG_ROUTE, WrongRoute} from "./lenses";
 import {PROD_LIFECYCLE} from "./lifecycles/ProductionRequestLifecycle";
-import {Route, Routes, ServerApiFor} from "./routes";
+import {Route, Routes, ApiFor} from "./routes";
 import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 
@@ -63,10 +63,10 @@ export interface RequestLifecycle {
 
 
 export type RoutingContext<TRoutes extends Routes> = {
-    route: keyof ServerApiFor<TRoutes>
+    route: keyof ApiFor<TRoutes>
 }
 
-export type ApiBuilder<TRoutes extends Routes> = (request: HttpRequest, context: RoutingContext<TRoutes>) => Promise<ServerApiFor<TRoutes>>;
+export type ApiBuilder<TRoutes extends Routes> = (request: HttpRequest, context: RoutingContext<TRoutes>) => Promise<ApiFor<TRoutes>>;
 
 export class Router<TRoutes extends Routes = Routes> implements HttpHandler {
     private readonly alphaOrderedRoutes: [keyof TRoutes & string, Route][]
@@ -135,7 +135,7 @@ export class Router<TRoutes extends Routes = Routes> implements HttpHandler {
 
 export function buildRouter<TRoutes extends Routes>(
     routes: TRoutes,
-    api: ServerApiFor<TRoutes> | ApiBuilder<TRoutes>,
+    api: ApiFor<TRoutes> | ApiBuilder<TRoutes>,
     lifecycle: RequestLifecycle = PROD_LIFECYCLE): HttpHandler {
     return new Router(routes, typeof api === "function" ? api : async () => api, lifecycle);
 }

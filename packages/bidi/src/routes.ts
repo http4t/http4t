@@ -50,7 +50,7 @@ export type RoutesFor<TApi extends RoutableApi<TApi>,
 /**
  * Uses `TRequestGet` for method parameter and `TResponseSet` for return value
  */
-export type ServerApiFnFor<TRoute> = TRoute extends Route<infer TRequest, infer TResponse>
+export type ApiFnFor<TRoute> = TRoute extends Route<infer TRequest, infer TResponse>
     ? TRequest extends undefined
         ? HandlerFn0<TResponse>
         : HandlerFn1<TRequest, TResponse>
@@ -59,18 +59,7 @@ export type ServerApiFnFor<TRoute> = TRoute extends Route<infer TRequest, infer 
 /**
  * Uses `TRequestGet` for method parameter and `TResponseSet` for return value
  */
-export type ServerApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ServerApiFnFor<TRoutes[K]> };
-
-export type ClientApiFnFor<TRoute> = TRoute extends Route<infer TRequest, infer TResponse>
-    ? TRequest extends undefined
-        ? HandlerFn0<TResponse>
-        : HandlerFn1<TRequest, TResponse>
-    : never;
-/**
- * Uses `TRequestSet` for method parameter and `TResponseGet` for return value
- */
-export type ClientApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ClientApiFnFor<TRoutes[K]> };
-
+export type ApiFor<TRoutes> = { readonly [K in keyof TRoutes]: ApiFnFor<TRoutes[K]> };
 
 export function routes<A extends Routes, B extends Routes>(a: A, b: B): A & B;
 export function routes<A extends Routes, B extends Routes, C extends Routes>(a: A, b: B, c: C): A & B & C;
