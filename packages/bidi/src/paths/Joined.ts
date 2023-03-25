@@ -1,7 +1,7 @@
 import {isFailure, success} from "@http4t/result";
 import {NoopPath} from "./NoopPath";
 import {PathMatcher, PathResult} from "./PathMatcher";
-import {stripSlashes} from "@http4t/core/uri";
+import {joinPaths} from "@http4t/core/uri";
 
 export class Joined<A, B> implements PathMatcher<A & B> {
     constructor(private readonly a: PathMatcher<A>,
@@ -27,10 +27,9 @@ export class Joined<A, B> implements PathMatcher<A & B> {
     }
 
     expand(value: A & B): string {
-        return [
-            stripSlashes(this.a.expand(value)),
-            stripSlashes(this.b.expand(value))]
-            .join("/");
+        return joinPaths(
+            this.a.expand(value),
+            this.b.expand(value));
     }
 }
 
