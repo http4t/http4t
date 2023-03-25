@@ -1,34 +1,21 @@
 import {JwtPayload, JwtStrategy} from "@http4t/bidi-jwt";
 import {TotallyInsecureServerJwtStrategy} from "@http4t/bidi-jwt/testing";
-import {ConfigureSigner, serverJwt} from "@http4t/bidi-jwt/jose";
-import {importPKCS8, importSPKI} from "jose";
 import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 import {routeFailed, RoutingResult} from "@http4t/bidi/lenses";
 import {DocStoreClaims} from "@http4t/bidi-eg-client/auth";
 import {success} from "@http4t/result";
-import {AuthConfig, SecureAuthConfig} from "../../config";
-
-async function secureJwtStrategy(auth: SecureAuthConfig) {
-    const configureJose: ConfigureSigner = enc => {
-        return enc
-            .setProtectedHeader({typ: "JWT", alg: "Ed25519"})
-            .setIssuedAt()
-            .setExpirationTime('8h');
-    };
-
-    const publicKey = await importSPKI(auth.publicKey, "Ed25519");
-    const privateKey = await importPKCS8(auth.privateKey, "Ed25519");
-    return serverJwt(
-        {publicKey, privateKey},
-        configureJose);
-}
+import {AuthConfig} from "../../config";
+import {ed25519} from "@http4t/bidi-jwt/jose";
 
 export async function jwtStrategy(auth: AuthConfig): Promise<JwtStrategy> {
     const authType = auth.type;
 
     switch (authType) {
         case "secure":
-            return await secureJwtStrategy(auth);
+            return await ed25519({
+                ...auth,
+                expirationTime: '8h'
+            });
         case "insecure":
             return new TotallyInsecureServerJwtStrategy(auth.expectedSignature)
         default:
