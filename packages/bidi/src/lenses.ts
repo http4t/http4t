@@ -53,15 +53,23 @@ export function routeFailed(message: string, path: JsonPath, response: HttpRespo
 }
 
 /**
- * A lens is something that, for example, knows how to both extract a named
- * header from an http request, and how to add it to a request.
+ * A lens is something that, for example, knows:
  *
- * Or how to deserialize a request body into an object, and how to serialize
- * the same type of object, and put it into a request body.
+ * - How to both extract a named header from an http request, and how to add it
+ *
+ * - Or how to deserialize a request body into an object, and how to serialize
+ *   the same type of object, and put it into a request body
  *
  * It's useful because the same lens can be used on the client side to
  * inject the header or body into the request, and on the server side to
  * read out the header, or deserialise the body.
+ *
+ * By using the same lenses to:
+ *
+ * - Create requests in the client and to parse them on the server
+ * - Create responses on the server and parse them on the client
+ *
+ * ...we ensure that the server and client always understand one another
  */
 export interface MessageLens<TMessage extends HttpMessage = HttpMessage, T = unknown> {
     get(from: TMessage): Promise<RoutingResult<T>>;

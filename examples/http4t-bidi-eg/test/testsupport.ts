@@ -7,7 +7,8 @@ import {isFailure} from "@http4t/result";
 import {PoolConfig} from 'pg';
 import {authClient} from "@http4t/bidi-eg-client/auth";
 import {DocStore, docStoreClient} from "@http4t/bidi-eg-client/docstore";
-import {RouterConfig, startRouter} from "@http4t/bidi-eg-server/docStoreRouter";
+import {startRouter} from "@http4t/bidi-eg-server/docStoreRouter";
+import {DocStoreConfig} from "@http4t/bidi-eg-server/config";
 
 export type CloseableHttpHandler = HttpHandler & Closeable;
 
@@ -16,7 +17,7 @@ export const testDatabase: PoolConfig = {
     user: "bidi-example",
     password: "password",
 };
-export const TEST_CONFIG: RouterConfig = {
+export const TEST_CONFIG: DocStoreConfig = {
     auth: {
         type: "insecure",
         expectedSignature: "somesignature"
@@ -25,7 +26,7 @@ export const TEST_CONFIG: RouterConfig = {
     dataStore: {type: "docker-postgres", config: testDatabase}
 };
 
-export async function startTestServer(opts: RouterConfig = TEST_CONFIG): Promise<CloseableHttpHandler> {
+export async function startTestServer(opts: DocStoreConfig = TEST_CONFIG): Promise<CloseableHttpHandler> {
     const router = await startRouter(opts);
 
     const server = await NodeServer.start(router);

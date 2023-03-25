@@ -7,7 +7,7 @@ export interface Logger {
 /**
  * Create one of these per request in order to keep logs for each request together in console.out
  */
-export class CumulativeLogger implements Logger {
+export class PerRequestLogger implements Logger {
     constructor(private infos: string[] = []) {
     }
 

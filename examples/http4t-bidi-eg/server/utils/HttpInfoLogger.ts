@@ -7,7 +7,7 @@ export function httpInfoLogger(logger: Logger): Filter {
 }
 
 export class HttpInfoLogger implements HttpHandler {
-    constructor(private handler: HttpHandler, private logger: Logger) {
+    constructor(private handler: HttpHandler, private logger:  Logger) {
     }
 
     async handle(request: HttpRequest): Promise<HttpResponse> {

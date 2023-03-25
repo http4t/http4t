@@ -1,7 +1,7 @@
-import {CumulativeLogger} from "../utils/Logger";
+import {Logger} from "../utils/Logger";
 import {Health} from "@http4t/bidi-eg-client/health";
 
-export type HealthOpts = { logger: CumulativeLogger };
+export type HealthOpts = { logger: Logger };
 
 export function healthLogic(opts: HealthOpts): Health {
     const {logger} = opts;
