@@ -7,7 +7,6 @@ import chai from "chai";
 
 const {assert} = chai;
 
-
 export function handlerContract(httpHandler: (HttpHandler | Promise<HttpHandler>)) {
     const handle: HttpHandlerFn = async request => {
         return (await httpHandler).handle(request);
@@ -50,7 +49,8 @@ export function handlerContract(httpHandler: (HttpHandler | Promise<HttpHandler>
         assert.equal(response.status, 200);
 
         const json = JSON.parse(await bufferText(response.body));
-        assert.equal(json.headers['Accept'], "application/json");
+        // In fetchAdapter(), fetch forces lower-casing of header names
+        assert.equal(json.headers['Accept'] || json.headers['accept'], "application/json");
     });
 
     it("supports chunked binary", async function () {

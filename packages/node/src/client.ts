@@ -3,7 +3,7 @@ import * as http from "http";
 import * as https from "https";
 import {RequestOptions} from "https";
 import {requestHttp4tToNode, responseNodeToHttp4t} from "./conversions";
-import {bodyToStream} from "./streams";
+import {bodyToWriteStream} from "./streams";
 import {assertExhaustive} from "@http4t/core/util/assertExhaustive";
 
 export type Handler = (options: RequestOptions, callback?: (res: http.IncomingMessage) => void) => http.ClientRequest;
@@ -43,7 +43,7 @@ export class ClientHandler implements HttpHandler {
                     if (request.body === '') {
                         nodeRequest.end();
                     } else {
-                        await bodyToStream(request.body, nodeRequest);
+                        await bodyToWriteStream(request.body, nodeRequest);
                     }
                 } catch (e: any) {
                     reject(e);

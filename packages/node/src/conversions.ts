@@ -2,7 +2,7 @@ import {Header, HttpRequest, HttpResponse} from "@http4t/core/contract";
 import {authority, requestOf} from "@http4t/core/requests";
 import {responseOf} from "@http4t/core/responses";
 import * as node from 'http';
-import {bodyToStream, streamToBody} from "./streams";
+import {bodyToWriteStream, readableStreamToBody} from "./streams";
 
 
 /*
@@ -32,7 +32,7 @@ export function requestNodeToHttp4t(nodeRequest: node.IncomingMessage): HttpRequ
     return requestOf(
         nodeRequest.method || "",
         nodeRequest.url || "",
-        streamToBody(nodeRequest),
+        readableStreamToBody(nodeRequest),
         ...fromRawHeaders(nodeRequest.rawHeaders));
 }
 
@@ -43,13 +43,13 @@ export async function responseHttp4tToNode(response: HttpResponse, nodeResponse:
         if (value) nodeResponse.setHeader(name, value);
     }
 
-    await bodyToStream(response.body, nodeResponse);
+    await bodyToWriteStream(response.body, nodeResponse);
 }
 
 export function responseNodeToHttp4t(nodeResponse: node.IncomingMessage): HttpResponse {
     return responseOf(
         nodeResponse.statusCode || -1,
-        streamToBody(nodeResponse),
+        readableStreamToBody(nodeResponse),
         ...fromRawHeaders(nodeResponse.rawHeaders));
 }
 

@@ -5,7 +5,7 @@ import {ENCODER} from "@http4t/core/util/textencoding";
 import {Readable, Writable} from 'stream';
 
 
-export async function bodyToStream(body: HttpBody, stream: Writable): Promise<void> {
+export async function bodyToWriteStream(body: HttpBody, stream: Writable): Promise<void> {
     try {
         for await (const chunk of streamBinary(body)) {
             const buffer = Buffer.alloc(chunk.buffer.byteLength);
@@ -21,7 +21,7 @@ export async function bodyToStream(body: HttpBody, stream: Writable): Promise<vo
     }
 }
 
-export function streamToBody(stream: Readable): HttpBody {
+export function readableStreamToBody(stream: Readable): HttpBody {
     return {
         [Symbol.asyncIterator]: function (): AsyncIterator<Uint8Array> {
             const iterator = new AsyncIteratorHandler<Uint8Array>();
