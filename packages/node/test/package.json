@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "test": "NODE_ENV=development mocha --experimental-specifier-resolution=node --loader=ts-node/esm --extensions ts,tsx --colors --exit  '**/*.test.ts'",
+    "test": "source ../../../dockerHttpBin.sh && NODE_ENV=development mocha --experimental-specifier-resolution=node --loader=ts-node/esm --extensions ts,tsx --colors --exit  '**/*.test.ts'",
     "test:browser": "echo only runs in node"
   },
   "dependencies": {

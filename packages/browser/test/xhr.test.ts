@@ -1,11 +1,11 @@
 import {XmlHttpHandler} from "@http4t/browser/xhr";
 import {handlerContract} from '@http4t/core-test/handler.contract';
-import {toHttpBin} from "./helpers";
+import {toHttpBin, toHttpBinDocker} from "./helpers";
 
 describe("XmlHttpHandler", function () {
     describe('http', function () {
         this.timeout(10000);
-        handlerContract(toHttpBin("http")(new XmlHttpHandler()));
+        handlerContract(toHttpBinDocker("http")(new XmlHttpHandler()));
     });
     describe('https', function ()  {
         this.timeout(10000);

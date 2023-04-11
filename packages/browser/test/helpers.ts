@@ -16,3 +16,19 @@ export function toHttpBin(scheme: string): Filter {
         }
     })
 }
+export function toHttpBinDocker(scheme: string): Filter {
+    return filterRequest((request: HttpRequest): HttpRequest => {
+        return {
+            ...request,
+            uri: {
+                ...request.uri,
+                scheme: scheme,
+                authority: {
+                    ...request.uri.authority,
+                    host: "localhost",
+                    port: 4321
+                }
+            }
+        }
+    })
+}

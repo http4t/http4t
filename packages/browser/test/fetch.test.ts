@@ -1,13 +1,13 @@
 import {fetchAdapter, FetchHandler} from "@http4t/browser/fetch";
 import {handlerContract} from "@http4t/core-test/handler.contract";
-import {toHttpBin} from "./helpers";
+import {toHttpBin, toHttpBinDocker} from "./helpers";
 import {BinHandler} from "@http4t/core/bin";
 
 describe("fetch", function () {
     describe('FetchHandler', function () {
         describe('http', function () {
             this.timeout(10000);
-            handlerContract(toHttpBin("http")(new FetchHandler()));
+            handlerContract(toHttpBinDocker("http")(new FetchHandler()));
         });
         describe('https', function () {
             this.timeout(10000);

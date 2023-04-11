@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --build",
     "test": "echo tests do not run outside browser",
-    "test:browser": "muppeteer"
+    "test:browser": "source ../../../dockerHttpBin.sh && muppeteer"
   },
   "dependencies": {
     "@http4t/browser": "1.0.0",
