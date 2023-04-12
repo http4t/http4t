@@ -10,6 +10,11 @@ jobs:
       matrix:
         node-version: [16.x, 17.x, 18.x]
     name: Test node ${{ matrix.node-version }}
+    services:
+      httpbin:
+        image: kennethreitz/httpbin
+        ports:
+          - 4321:80
     steps:
       - uses: actions/checkout@v1
       - name: Setup node
