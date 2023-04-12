@@ -5,8 +5,8 @@ import {success} from "@http4t/result";
 import {MessageLens, routeFailed, RoutingResult} from "../lenses";
 import {Lenses, named} from "./NamedLenses";
 
-export class HeaderLens<TMessage extends HttpMessage> implements MessageLens<TMessage, string> {
-    constructor(private name: string) {
+export class HeaderLens<TMessage extends HttpMessage = HttpMessage> implements MessageLens<TMessage, string> {
+    constructor(readonly name: string) {
     }
 
     async get(output: TMessage): Promise<RoutingResult<string>> {

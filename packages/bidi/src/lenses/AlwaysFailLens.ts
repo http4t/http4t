@@ -2,7 +2,7 @@ import {HttpMessage} from "@http4t/core/contract";
 import {failure} from "@http4t/result";
 import {MessageLens, RoutingError, RoutingResult} from "../lenses";
 
-class AlwaysFailLens<TMessage extends HttpMessage, T = unknown> implements MessageLens<TMessage, T> {
+export class AlwaysFailLens<TMessage extends HttpMessage = HttpMessage, T = unknown> implements MessageLens<TMessage, T> {
     constructor(private readonly error: (message: TMessage) => RoutingError) {
 
     }

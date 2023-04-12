@@ -29,6 +29,6 @@ export class OrNotFoundLens<T> extends BaseResponseLens<T | undefined> {
     }
 }
 
-export function orNotFound<T>(lens: ResponseLens<T>, {expectedStatus = 200}: { expectedStatus?: number } = {}): ResponseLens<T | undefined> {
+export function orNotFound<T>(lens: ResponseLens<Exclude<T, undefined>>, {expectedStatus = 200}: { expectedStatus?: number } = {}): ResponseLens<T | undefined> {
     return new OrNotFoundLens(lens, expectedStatus);
 }
