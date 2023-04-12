@@ -37,6 +37,11 @@ jobs:
   test-browser:
     runs-on: ubuntu-latest
     name: Browser test
+    services:
+      httpbin:
+        image: kennethreitz/httpbin
+        ports:
+          - 4321:80
     steps:
       - uses: actions/checkout@v1
       - name: Setup node
