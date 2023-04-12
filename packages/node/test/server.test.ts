@@ -26,5 +26,4 @@ describe("ServerHandler", function () {
             console.error("could not close node server", ignore);
         }
     });
-
 });

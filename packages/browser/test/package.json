@@ -6,12 +6,12 @@
   "scripts": {
     "build": "tsc --build",
     "test": "echo tests do not run outside browser",
-    "test:browser": "source ../../../dockerHttpBin.sh && muppeteer"
+    "test:browser": "sh ../../../dockerHttpBin.sh && muppeteer"
   },
   "dependencies": {
     "@http4t/browser": "1.0.0",
     "@http4t/core": "1.0.0",
-    "@http4t/muppeteer": "0.0.29",
+    "@http4t/muppeteer": "0.0.30",
     "@http4t/node": "1.0.0",
     "uuid": "^8.3.1"
   },

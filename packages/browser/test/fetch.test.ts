@@ -1,5 +1,5 @@
 import {fetchAdapter, FetchHandler} from "@http4t/browser/fetch";
-import {handlerContract} from "@http4t/core-test/handler.contract";
+import {handlerContract, handlerHttpsSmokeTest} from "@http4t/core-test/handler.contract";
 import {toHttpBin, toHttpBinDocker} from "./helpers";
 import {BinHandler} from "@http4t/core/bin";
 
@@ -10,11 +10,10 @@ describe("fetch", function () {
             handlerContract(toHttpBinDocker("http")(new FetchHandler()));
         });
         describe('https', function () {
-            this.timeout(10000);
-            handlerContract(toHttpBin("https")(new FetchHandler()));
+            handlerHttpsSmokeTest(toHttpBin("https")(new FetchHandler()));
         });
     });
     describe('fetchAdapter()', function () {
-        handlerContract(toHttpBin("http")(new FetchHandler({fetch: fetchAdapter(new BinHandler())})));
+        handlerContract(new FetchHandler({fetch: fetchAdapter(new BinHandler())}));
     });
 });

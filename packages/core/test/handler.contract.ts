@@ -7,6 +7,16 @@ import chai from "chai";
 
 const {assert} = chai;
 
+export function handlerHttpsSmokeTest(httpHandler: (HttpHandler | Promise<HttpHandler>)) {
+    const handle: HttpHandlerFn = async request => {
+        return (await httpHandler).handle(request);
+    }
+
+    it("supports GET", async function () {
+        const response = await handle(get('/get'));
+        assert.equal(response.status, 200);
+    });
+}
 export function handlerContract(httpHandler: (HttpHandler | Promise<HttpHandler>)) {
     const handle: HttpHandlerFn = async request => {
         return (await httpHandler).handle(request);
