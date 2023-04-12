@@ -57,7 +57,6 @@ jobs:
       - name: install
         run: yarn install
       - name: test
-        uses: mujo-code/puppeteer-headful@v2
         env:
           CI: 'true'
         with:
