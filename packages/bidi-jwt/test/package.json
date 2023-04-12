@@ -11,7 +11,7 @@
   "dependencies": {
     "@http4t/bidi": "1.0.0",
     "@http4t/core": "1.0.0",
-    "@http4t/muppeteer": "0.0.24",
+    "@http4t/muppeteer": "0.0.29",
     "@http4t/result": "1.0.0"
   },
   "devDependencies": {
